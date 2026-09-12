@@ -1,0 +1,259 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Arcade"
+  description="arcadelab — hand-crafted indie mini-games, built entirely in the browser with vanilla JavaScript and HTML5 Canvas."
+>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-16">
+
+    <!-- ══════════════════════════════════════════════════════
+         HERO — 16:9 video teaser placeholder
+    ══════════════════════════════════════════════════════ -->
+    <section aria-label="Featured teaser" class="space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)]">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent)] opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-accent)]"></span>
+        </span>
+        <span class="text-xs font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
+          arcade is live
+        </span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl text-[var(--color-text)]" style="font-family:var(--font-heading); font-weight:700;">
+        hand-crafted games,<br />
+        <span class="text-[var(--color-brand)]">no engines. no frameworks.</span>
+      </h1>
+
+      <p class="text-[var(--color-muted)] max-w-xl leading-relaxed">
+        every pixel pushed manually. pure canvas, pure JS.
+        new games drop regularly — follow along on YouTube.
+      </p>
+
+      <!-- 16:9 arcade-cabinet screen placeholder -->
+      <div
+        id="hero-teaser"
+        class="relative w-full rounded-xl overflow-hidden border border-[var(--color-surface-2)]"
+        style="aspect-ratio: 16/9;"
+        role="img"
+        aria-label="Game teaser video — coming soon"
+      >
+        <!-- Simulated scanlines + CRT glow -->
+        <div class="absolute inset-0 bg-[var(--color-surface)]"></div>
+
+        <!-- Grid pattern overlay -->
+        <div
+          class="absolute inset-0 opacity-[0.04]"
+          style="background-image: linear-gradient(var(--color-muted) 1px, transparent 1px),
+                                   linear-gradient(90deg, var(--color-muted) 1px, transparent 1px);
+                 background-size: 32px 32px;"
+        ></div>
+
+        <!-- CRT inner shadow -->
+        <div
+          class="absolute inset-0 rounded-xl pointer-events-none"
+          style="box-shadow: inset 0 0 80px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.5);"
+        ></div>
+
+        <!-- Scanlines animation -->
+        <div
+          aria-hidden="true"
+          class="absolute inset-0 pointer-events-none rounded-xl"
+          style="background: repeating-linear-gradient(
+            to bottom,
+            transparent,
+            transparent 3px,
+            rgba(0,0,0,0.07) 3px,
+            rgba(0,0,0,0.07) 4px
+          );"
+        ></div>
+
+        <!-- Centre content -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center px-4">
+          <div
+            class="w-16 h-16 rounded-2xl border-2 border-[var(--color-brand)] flex items-center justify-center"
+            style="box-shadow: 0 0 24px rgba(242,184,75,0.25);"
+          >
+            <!-- Play icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M8 5.14v14l11-7-11-7z" fill="var(--color-brand)"/>
+            </svg>
+          </div>
+          <p class="text-[var(--color-muted)] text-sm font-mono" style="font-family:var(--font-mono);">
+            gameplay teaser — uploading soon
+          </p>
+        </div>
+
+        <!-- Corner accents -->
+        <span aria-hidden="true" class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-[var(--color-brand)] opacity-60 rounded-tl"></span>
+        <span aria-hidden="true" class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-[var(--color-brand)] opacity-60 rounded-tr"></span>
+        <span aria-hidden="true" class="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-[var(--color-brand)] opacity-60 rounded-bl"></span>
+        <span aria-hidden="true" class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-[var(--color-brand)] opacity-60 rounded-br"></span>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         GAME GRID
+    ══════════════════════════════════════════════════════ -->
+    <section aria-label="Game catalogue" class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl text-[var(--color-text)]" style="font-family:var(--font-heading); font-weight:700;">
+          the arcade
+        </h2>
+        <span class="text-xs font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
+          1 game available
+        </span>
+      </div>
+
+      <ul
+        id="game-grid"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 list-none m-0 p-0"
+        role="list"
+      >
+        <!-- ── CARD 1: Dig Deep (active) ───────────────────────── -->
+        <li role="listitem">
+          <a
+            href="/games/dig-deep"
+            id="card-dig-deep"
+            class="group block h-full rounded-xl border border-[var(--color-border)]
+                   bg-[var(--color-surface)] p-5 space-y-4
+                   transition-all duration-200 ease-out
+                   hover:scale-[1.03] hover:border-[var(--color-accent)]
+                   hover:shadow-[0_0_32px_rgba(255,140,66,0.12)]
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+            aria-label="Play Dig Deep"
+          >
+            <!-- Game thumbnail placeholder -->
+            <div
+              class="w-full rounded-lg overflow-hidden"
+              style="aspect-ratio:16/9; background: linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%);"
+            >
+              <div class="w-full h-full flex items-center justify-center relative">
+                <!-- Particle dots -->
+                <div class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+                  <svg width="100%" height="100%" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
+                    <!-- Ground strata layers -->
+                    <rect x="0" y="60" width="160" height="8" fill="#3d2b0a" opacity="0.6"/>
+                    <rect x="0" y="68" width="160" height="8" fill="#2d1f07" opacity="0.8"/>
+                    <rect x="0" y="76" width="160" height="14" fill="#1a1005" />
+                    <!-- Gem accents -->
+                    <rect x="20" y="63" width="6" height="6" rx="1" fill="#ff8c42" opacity="0.9"/>
+                    <rect x="80" y="70" width="5" height="5" rx="1" fill="#f2b84b" opacity="0.8"/>
+                    <rect x="130" y="65" width="4" height="4" rx="1" fill="#ff8c42" opacity="0.7"/>
+                    <!-- Driller character (simple pixel art) -->
+                    <rect x="72" y="46" width="16" height="14" rx="2" fill="#ff8c42"/>
+                    <rect x="74" y="48" width="5" height="5" rx="1" fill="#0d0f14"/>
+                    <rect x="81" y="48" width="5" height="5" rx="1" fill="#0d0f14"/>
+                    <rect x="68" y="52" width="4" height="6" rx="1" fill="#e07030"/>
+                    <rect x="88" y="52" width="4" height="6" rx="1" fill="#e07030"/>
+                    <!-- drill bit -->
+                    <polygon points="76,60 84,60 80,66" fill="#f2b84b"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card body -->
+            <div class="space-y-2">
+              <div class="flex items-center gap-2">
+                <span
+                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-accent)] text-[var(--color-accent)]"
+                  style="font-family:var(--font-mono);"
+                >
+                  playable
+                </span>
+              </div>
+
+              <h3
+                class="text-base text-[var(--color-text)] transition-colors duration-200
+                       group-hover:text-[var(--color-accent)]"
+                style="font-family:var(--font-heading); font-weight:700;"
+              >
+                Dig Deep
+              </h3>
+
+              <p class="text-xs text-[var(--color-muted)] leading-relaxed">
+                drill through procedural terrain, dodge cave-ins, and compete for the deepest score. pure canvas, zero deps.
+              </p>
+            </div>
+
+            <!-- Footer row -->
+            <div class="flex items-center justify-between pt-1 border-t border-[var(--color-border)]">
+              <span class="text-[10px] font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
+                canvas · vanilla js
+              </span>
+              <svg
+                width="14" height="14" viewBox="0 0 24 24" fill="none"
+                class="text-[var(--color-accent)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 -translate-x-1 group-hover:translate-x-0 transition-transform"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </a>
+        </li>
+
+        <!-- ── CARD 2: Coming Soon ─────────────────────────────── -->
+        <li role="listitem" aria-hidden="true">
+          <article
+            id="card-coming-soon-1"
+            class="h-full rounded-xl border border-dashed border-[var(--color-border)]
+                   bg-[var(--color-surface)] p-5 space-y-4 opacity-50 pointer-events-none
+                   select-none"
+            aria-label="Coming soon game slot"
+          >
+            <div
+              class="w-full rounded-lg"
+              style="aspect-ratio:16/9; background:var(--color-surface-2);"
+            ></div>
+            <div class="space-y-2">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-muted)]"
+                style="font-family:var(--font-mono);">
+                soon
+              </span>
+              <h3 class="text-base text-[var(--color-muted)]" style="font-family:var(--font-heading); font-weight:700;">
+                ??? — redacted
+              </h3>
+              <p class="text-xs text-[var(--color-muted)] leading-relaxed">
+                something's brewing underground. check back soon.
+              </p>
+            </div>
+          </article>
+        </li>
+
+        <!-- ── CARD 3: Coming Soon ─────────────────────────────── -->
+        <li role="listitem" aria-hidden="true">
+          <article
+            id="card-coming-soon-2"
+            class="h-full rounded-xl border border-dashed border-[var(--color-border)]
+                   bg-[var(--color-surface)] p-5 space-y-4 opacity-50 pointer-events-none
+                   select-none"
+            aria-label="Coming soon game slot"
+          >
+            <div
+              class="w-full rounded-lg"
+              style="aspect-ratio:16/9; background:var(--color-surface-2);"
+            ></div>
+            <div class="space-y-2">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-muted)]"
+                style="font-family:var(--font-mono);">
+                soon
+              </span>
+              <h3 class="text-base text-[var(--color-muted)]" style="font-family:var(--font-heading); font-weight:700;">
+                ??? — classified
+              </h3>
+              <p class="text-xs text-[var(--color-muted)] leading-relaxed">
+                new game in development. stay tuned.
+              </p>
+            </div>
+          </article>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+</Layout>
