@@ -113,44 +113,63 @@ import Layout from '../layouts/Layout.astro';
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 list-none m-0 p-0"
         role="list"
       >
-        <!-- ── CARD 1: Dig Deep (active) ───────────────────────── -->
+        <!-- ── CARD 1: Space Dodge (active) ───────────────────── -->
         <li role="listitem">
           <a
-            href="/games/dig-deep"
-            id="card-dig-deep"
+            href="/games/space-dodge"
+            id="card-space-dodge"
             class="group block h-full rounded-xl border border-[var(--color-border)]
                    bg-[var(--color-surface)] p-5 space-y-4
                    transition-all duration-200 ease-out
                    hover:scale-[1.03] hover:border-[var(--color-accent)]
-                   hover:shadow-[0_0_32px_rgba(255,140,66,0.12)]
+                   hover:shadow-[0_0_32px_rgba(77,217,240,0.12)]
                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-            aria-label="Play Dig Deep"
+            aria-label="Play Space Dodge"
           >
             <!-- Game thumbnail placeholder -->
             <div
               class="w-full rounded-lg overflow-hidden"
-              style="aspect-ratio:16/9; background: linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%);"
+              style="aspect-ratio:16/9; background: linear-gradient(135deg, #05070f 0%, #0d1326 50%, #05070f 100%);"
             >
               <div class="w-full h-full flex items-center justify-center relative">
                 <!-- Particle dots -->
                 <div class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
                   <svg width="100%" height="100%" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
-                    <!-- Ground strata layers -->
-                    <rect x="0" y="60" width="160" height="8" fill="#3d2b0a" opacity="0.6"/>
-                    <rect x="0" y="68" width="160" height="8" fill="#2d1f07" opacity="0.8"/>
-                    <rect x="0" y="76" width="160" height="14" fill="#1a1005" />
-                    <!-- Gem accents -->
-                    <rect x="20" y="63" width="6" height="6" rx="1" fill="#ff8c42" opacity="0.9"/>
-                    <rect x="80" y="70" width="5" height="5" rx="1" fill="#f2b84b" opacity="0.8"/>
-                    <rect x="130" y="65" width="4" height="4" rx="1" fill="#ff8c42" opacity="0.7"/>
-                    <!-- Driller character (simple pixel art) -->
-                    <rect x="72" y="46" width="16" height="14" rx="2" fill="#ff8c42"/>
-                    <rect x="74" y="48" width="5" height="5" rx="1" fill="#0d0f14"/>
-                    <rect x="81" y="48" width="5" height="5" rx="1" fill="#0d0f14"/>
-                    <rect x="68" y="52" width="4" height="6" rx="1" fill="#e07030"/>
-                    <rect x="88" y="52" width="4" height="6" rx="1" fill="#e07030"/>
-                    <!-- drill bit -->
-                    <polygon points="76,60 84,60 80,66" fill="#f2b84b"/>
+                    <defs>
+                      <linearGradient id="space-bg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#05070f"/>
+                        <stop offset="1" stop-color="#0d1326"/>
+                      </linearGradient>
+                    </defs>
+                    <rect width="160" height="90" fill="url(#space-bg)"/>
+                    <!-- Stars -->
+                    <g fill="#fff">
+                      <circle cx="25" cy="18" r="1"/>
+                      <circle cx="57" cy="9" r="1.6"/>
+                      <circle cx="104" cy="22" r="1"/>
+                      <circle cx="140" cy="12" r="1.6"/>
+                      <circle cx="18" cy="55" r="1.6"/>
+                      <circle cx="70" cy="60" r="1"/>
+                      <circle cx="128" cy="50" r="1"/>
+                      <circle cx="45" cy="76" r="1"/>
+                    </g>
+                    <!-- Distant planet -->
+                    <circle cx="137" cy="88" r="30" fill="#1a2238"/>
+                    <circle cx="130" cy="82" r="22" fill="#151c2e"/>
+                    <!-- Asteroids -->
+                    <ellipse cx="38" cy="22" rx="14" ry="10" fill="#56586a"/>
+                    <ellipse cx="33" cy="19" rx="3" ry="2" fill="#13141c" opacity="0.8"/>
+                    <ellipse cx="44" cy="26" rx="2.5" ry="1.8" fill="#13141c" opacity="0.7"/>
+                    <ellipse cx="120" cy="64" rx="11" ry="8" fill="#47495b"/>
+                    <ellipse cx="116" cy="62" rx="2.5" ry="1.8" fill="#13141c" opacity="0.7"/>
+                    <!-- Player ship -->
+                    <g transform="translate(80,52)">
+                      <polygon points="0,-26 10,4 10,20 -10,20 -10,4" fill="#dde2f5"/>
+                      <ellipse cx="0" cy="-8" rx="4.5" ry="6" fill="#2aa6c9"/>
+                      <polygon points="-9,4 -17,19 -9,18" fill="#4dd9f0"/>
+                      <polygon points="9,4 17,19 9,18" fill="#4dd9f0"/>
+                      <polygon points="-5,19 0,30 5,19" fill="#ff8c42"/>
+                    </g>
                   </svg>
                 </div>
               </div>
@@ -172,11 +191,11 @@ import Layout from '../layouts/Layout.astro';
                        group-hover:text-[var(--color-accent)]"
                 style="font-family:var(--font-heading); font-weight:700;"
               >
-                Dig Deep
+                Space Dodge
               </h3>
 
               <p class="text-xs text-[var(--color-muted)] leading-relaxed">
-                drill through procedural terrain, dodge cave-ins, and compete for the deepest score. pure canvas, zero deps.
+                pilot your ship through a procedural asteroid belt, dodge debris, and chase the deepest run. pure canvas, zero deps.
               </p>
             </div>
 
