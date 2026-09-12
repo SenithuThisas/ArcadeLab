@@ -1,0 +1,238 @@
+---
+const title = 'Space Dodge';
+const description = 'Pilot your ship through a procedurally generated asteroid belt. Pure canvas, zero dependencies.';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{title} | arcadelab.</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --color-base:    #04060d;
+        --color-surface: #0b0e1a;
+        --color-text:    #eef1f5;
+        --color-muted:   #8b93a1;
+        --color-brand:   #f2b84b;
+        --color-accent:  #4dd9f0;
+        --color-border:  #2a2f3d;
+        --nav-h: 44px;
+      }
+
+      html, body {
+        height: 100%;
+        background: var(--color-base);
+        color: var(--color-text);
+        font-family: 'Inter', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        /* prevent scroll on mobile so game fills screen */
+        overflow: hidden;
+      }
+
+      /* ── slim top nav ── */
+      .game-nav {
+        height: var(--nav-h);
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--color-border);
+        background: rgba(2,3,10,0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        z-index: 20;
+      }
+      .game-nav a {
+        color: var(--color-brand);
+        font-size: 13px;
+        font-family: 'Inter', sans-serif;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .game-nav a:hover { text-decoration: underline; }
+
+      /* ── shell: column flex, fills screen below nav ── */
+      .game-shell {
+        display: flex;
+        flex-direction: column;
+        /* 100dvh accounts for mobile browser chrome */
+        height: calc(100dvh - var(--nav-h));
+      }
+
+      /* ── game wrapper: expands to fill ALL remaining vertical space ── */
+      #game-wrapper {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;   /* critical — lets flex child shrink below its content size */
+        overflow: hidden;
+        background: #04060d;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        outline: none;
+      }
+
+      /* ── HUD overlay ── */
+      #hud {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px 12px;
+        background: rgba(2, 3, 10, 0.76);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        z-index: 10;
+        gap: 6px;
+      }
+
+      #ui-lives {
+        display: flex;
+        gap: 1px;
+        flex-shrink: 0;
+        align-items: center;
+      }
+      #ui-lives span { font-size: 12px; }
+
+      #hud-center {
+        flex: 1;
+        text-align: center;
+        color: var(--color-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #ui-score { color: var(--color-accent); font-weight: 700; }
+      #ui-high  { color: var(--color-muted); }
+      #ui-destroyed { color: var(--color-accent); font-weight: 700; }
+
+      select#ui-difficulty {
+        -webkit-appearance: none;
+        appearance: none;
+        background: #141a2e;
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        outline: none;
+        flex-shrink: 0;
+      }
+      select#ui-difficulty:focus { border-color: var(--color-accent); }
+
+      /* ── hint strip pinned at bottom ── */
+      .hints {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 7px 12px;
+        font-size: 11px;
+        color: var(--color-muted);
+        border-top: 1px solid var(--color-border);
+        background: var(--color-surface);
+        line-height: 1.2;
+      }
+      .hints span {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+      }
+
+      /* ══════════════════════════════════════════════════════
+         DESKTOP (≥640px) — restore 16:9 card with padding
+         ══════════════════════════════════════════════════════ */
+      @media (min-width: 640px) {
+        html, body { overflow: auto; }
+
+        .game-shell {
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 24px 20px 0;
+          height: auto; /* let content define height */
+        }
+
+        #game-wrapper {
+          flex: none;
+          aspect-ratio: 16 / 9;
+          border-radius: 14px;
+          box-shadow:
+            0 0 0 1px #2a2f3d,
+            0 24px 60px rgba(0, 0, 0, 0.7),
+            0 0 80px rgba(77, 217, 240, 0.08);
+        }
+
+        .hints {
+          background: transparent;
+          border-top: none;
+          padding: 10px 0 24px;
+          font-size: 12px;
+        }
+      }
+
+      /* ── very narrow phones (≤390px): tighten HUD ── */
+      @media (max-width: 390px) {
+        #hud { font-size: 10px; padding: 4px 8px; }
+        #ui-lives span { font-size: 10px; }
+        .hud-high, .hud-destroyed { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav class="game-nav">
+      <a href="/">← Arcade</a>
+    </nav>
+
+    <div class="game-shell">
+
+      <section id="game-wrapper">
+        <div id="hud">
+          <div id="ui-lives"></div>
+          <div id="hud-center">
+            Distance:&nbsp;<span id="ui-score">0</span>m
+            <span class="hud-destroyed">&nbsp;|&nbsp;☄️&nbsp;<span id="ui-destroyed">0</span></span>
+            <span class="hud-high">&nbsp;|&nbsp;Top:&nbsp;<span id="ui-high">0</span>m</span>
+          </div>
+          <select id="ui-difficulty">
+            <option value="easy">🟢 Easy</option>
+            <option value="medium" selected>🟡 Med</option>
+            <option value="hard">🔴 Hard</option>
+          </select>
+        </div>
+        <canvas id="gameCanvas" tabindex="0"></canvas>
+      </section>
+
+      <div class="hints">
+        <span>👆 Drag to steer</span>
+        <span>🖱️ Hold to thrust</span>
+        <span>☄️ Dodge asteroids</span>
+        <span>⌨️ Space to laser</span>
+        <span>❤️ 5 lives</span>
+      </div>
+
+    </div>
+
+    <script src="/space-dodge-engine.js" defer></script>
+  </body>
+</html>
