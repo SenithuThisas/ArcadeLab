@@ -141,7 +141,7 @@ function emitExplosion(px, py) {
 // ── Lasers ────────────────────────────────────────────────────
 const lasers = [];
 const LASER_W = 4, LASER_H = 16;
-const FIRE_COOLDOWN = 0.22;
+const FIRE_COOLDOWN = 0.09; // rapid continuous spray
 
 function emitSpark(px, py) {
   for (let i = 0; i < 6; i++) {
@@ -164,7 +164,7 @@ function emitSpark(px, py) {
 let shake = 0;
 
 // ── Input ─────────────────────────────────────────────────────
-const input = { x: 0, held: false };
+const input = { x: 0, held: false, shooting: false };
 function pointerX(e) {
   const rect = canvas.getBoundingClientRect();
   return e.clientX - rect.left;
@@ -190,12 +190,12 @@ canvas.addEventListener('touchend',  () => { input.held = false; });
 // Ignore when a form control (e.g. the difficulty <select>) has focus,
 // otherwise the browser hijacks the key to operate that control.
 document.addEventListener('keydown', e => {
-  if (e.repeat) return;
+  
   const tag = document.activeElement && document.activeElement.tagName;
   if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'A') return;
   if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
     e.preventDefault();
-    fireLaser();
+    input.shooting = true;
   }
 });
 
@@ -325,8 +325,8 @@ function update(dt) {
     for (let j = 0; j < asteroids.length; j++) {
       const ast = asteroids[j];
       const ay = ast.y - player.y + ch / 2;
-      if (l.x < ast.x + ast.w && l.x + l.w > ast.x &&
-          l.y < ay + ast.h && l.y + l.h > ay) {
+      if (l.x < ast.x + ast.w && l.x + LASER_W > ast.x &&
+          l.y < ay + ast.h && l.y + LASER_H > ay) {
         hit = true;
         ast.hp--;
         emitSpark(l.x + LASER_W / 2, l.y);
@@ -578,13 +578,13 @@ function render(ts) {
     if (!isFinite(l.x) || !isFinite(l.y)) continue; // skip corrupted bolts
     ctx.globalAlpha = 0.35;
     ctx.fillStyle = C.accent;
-    ctx.fillRect(l.x - 2, l.y - 1, LASER_W + 4, l.h + 2);
+    ctx.fillRect(l.x - 2, l.y - 1, LASER_W + 4, LASER_H + 2);
     ctx.globalAlpha = 1;
-    const lg = ctx.createLinearGradient(l.x, l.y, l.x, l.y + l.h);
+    const lg = ctx.createLinearGradient(l.x, l.y, l.x, l.y + LASER_H);
     lg.addColorStop(0, 'rgba(232,251,255,0.95)');
     lg.addColorStop(1, 'rgba(77,217,240,0.3)');
     ctx.fillStyle = lg;
-    ctx.fillRect(l.x, l.y, LASER_W, l.h);
+    ctx.fillRect(l.x, l.y, LASER_W, LASER_H);
   }
 
   // particles
