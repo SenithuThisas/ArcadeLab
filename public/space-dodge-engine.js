@@ -6,6 +6,169 @@ const canvas  = document.getElementById('gameCanvas');
 const ctx     = canvas.getContext('2d');
 let   cw, ch; // logical width/height (post-DPI)
 
+
+// ── Audio System (Web Audio API) ──────────────────────────────
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const sfxVolume = audioCtx.createGain();
+const bgmVolume = audioCtx.createGain();
+sfxVolume.gain.value = 0.5;
+bgmVolume.gain.value = 0.3;
+sfxVolume.connect(audioCtx.destination);
+bgmVolume.connect(audioCtx.destination);
+
+const sounds = {
+  playLaser: () => {
+    if (audioCtx.state === "suspended") return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(sfxVolume);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  },
+  playExplosion: () => {
+    if (audioCtx.state === "suspended") return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    osc.connect(gain);
+    gain.connect(sfxVolume);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.5);
+  },
+  playSpark: () => {
+    if (audioCtx.state === "suspended") return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+    osc.connect(gain);
+    gain.connect(sfxVolume);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+  },
+  playThrust: () => {
+    if (audioCtx.state === "suspended") return;
+    // Only play if not already playing or throttling
+    const now = audioCtx.currentTime;
+    if (sounds.lastThrust && now - sounds.lastThrust < 0.1) return;
+    sounds.lastThrust = now;
+    
+    const bufferSize = audioCtx.sampleRate * 0.1;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+    
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 400;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(sfxVolume);
+    noise.start();
+  },
+  playHit: () => {
+    if (audioCtx.state === "suspended") return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(sfxVolume);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  },
+  playGameOver: () => {
+    if (audioCtx.state === "suspended") return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 1.5);
+    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+    osc.connect(gain);
+    gain.connect(sfxVolume);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.5);
+  },
+bgmOsc1: null,
+  bgmOsc2: null,
+  bgmTimer: null,
+  isPlayingBGM: false,
+  startBGM: () => {
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    sounds.isPlayingBGM = true;
+    sounds.stopBGM();
+    
+    // Play a chiptune arpeggio loop instead of a drone
+    let step = 0;
+    // C minor pentatonic scale frequencies (C3, Eb3, F3, G3, Bb3, C4)
+    const scale = [130.81, 155.56, 174.61, 196.00, 233.08, 261.63];
+    const pattern = [0, 2, 4, 3, 5, 3, 4, 1]; // Sequence indices
+    
+    function playNote() {
+      if (!sounds.isPlayingBGM) return;
+      
+      const now = audioCtx.currentTime;
+      const freq = scale[pattern[step]];
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.type = "square";
+      osc.frequency.value = freq;
+      
+      // Pluck envelope
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      
+      osc.connect(gain);
+      gain.connect(bgmVolume);
+      
+      osc.start(now);
+      osc.stop(now + 0.15);
+      
+      step = (step + 1) % pattern.length;
+      sounds.bgmTimer = setTimeout(playNote, 150); // ~400 BPM (16th notes)
+    }
+    
+    playNote();
+  },
+  stopBGM: () => {
+    sounds.isPlayingBGM = false;
+    if (sounds.bgmTimer) {
+      clearTimeout(sounds.bgmTimer);
+      sounds.bgmTimer = null;
+    }
+    if (sounds.bgmOsc1) { sounds.bgmOsc1.stop(); sounds.bgmOsc1 = null; }
+    if (sounds.bgmOsc2) { sounds.bgmOsc2.stop(); sounds.bgmOsc2 = null; }
+  }
+};
+
+
 // ── DPI-aware resize ─────────────────────────────────────────
 function resizeCanvas() {
   const dpr  = window.devicePixelRatio || 1;
@@ -108,6 +271,7 @@ function ensureAsteroids() {
 // ── Particles ─────────────────────────────────────────────────
 const particles = [];
 function emitThrust(px, py) {
+  sounds.playThrust();
   for (let i = 0; i < 3; i++) {
     particles.push({
       x: px, y: py + SHIP_H,
@@ -122,6 +286,7 @@ function emitThrust(px, py) {
   }
 }
 function emitExplosion(px, py) {
+  sounds.playExplosion();
   for (let i = 0; i < 28; i++) {
     const angle = Math.random() * Math.PI * 2;
     const spd   = 40 + Math.random() * 120;
@@ -144,6 +309,7 @@ const LASER_W = 4, LASER_H = 16;
 const FIRE_COOLDOWN = 0.09; // rapid continuous spray
 
 function emitSpark(px, py) {
+  sounds.playSpark();
   for (let i = 0; i < 6; i++) {
     const angle = Math.random() * Math.PI * 2;
     const spd   = 30 + Math.random() * 90;
@@ -206,6 +372,7 @@ document.addEventListener("keyup", e => {
 });
 
 function fireLaser() {
+  sounds.playLaser();
   if (state !== S.PLAYING || player.fireCd > 0) return;
   if (!isFinite(ch) || !isFinite(player.x)) return; // canvas not measured yet
   player.fireCd = FIRE_COOLDOWN;
@@ -292,6 +459,7 @@ function update(dt) {
     player.flash       = 1 - (player.invincible / INVINC_TIME);
     if (player.invincible <= 0) {
       state = lives > 0 ? S.PLAYING : S.GAMEOVER;
+      if (state === S.GAMEOVER) { sounds.stopBGM(); sounds.playGameOver(); }
       player.invincible = 0;
     }
     return;
@@ -377,6 +545,7 @@ function update(dt) {
         renderLives();
         player.invincible = INVINC_TIME;
         player.flash = 0;
+        sounds.playHit();
         state = S.HIT;
         break;
       }
@@ -400,6 +569,7 @@ function startGame() {
   particles.length = 0;
   resetAsteroids();
   state = S.PLAYING;
+  sounds.startBGM();
 }
 
 // ── Draw helpers ──────────────────────────────────────────────
@@ -666,3 +836,54 @@ resetAsteroids();
 for (let i = 0; i < 120; i++) spawnStar(true);
 input.x = cw / 2;
 requestAnimationFrame(loop);
+
+
+let currentVolume = 1.0;
+let isMuted = false;
+
+function updateVolume() {
+  const v = isMuted ? 0 : currentVolume;
+  // Apply a curve for better perceived volume
+  sfxVolume.gain.value = 0.5 * v * v;
+  bgmVolume.gain.value = 0.3 * v * v;
+}
+
+const btnVolDown = document.getElementById("btn-vol-down");
+const btnVolUp = document.getElementById("btn-vol-up");
+const btnVolMute = document.getElementById("btn-vol-mute");
+
+if (btnVolDown) {
+  btnVolDown.addEventListener("click", () => {
+    currentVolume = Math.max(0, currentVolume - 0.2);
+    if (currentVolume <= 0) isMuted = true;
+    else isMuted = false;
+    updateVolume();
+    updateVolUI();
+  });
+}
+if (btnVolUp) {
+  btnVolUp.addEventListener("click", () => {
+    isMuted = false;
+    currentVolume = Math.min(1.0, currentVolume + 0.2);
+    updateVolume();
+    updateVolUI();
+  });
+}
+if (btnVolMute) {
+  btnVolMute.addEventListener("click", () => {
+    isMuted = !isMuted;
+    updateVolume();
+    updateVolUI();
+  });
+}
+
+function updateVolUI() {
+  if (btnVolMute) {
+    if (isMuted || currentVolume <= 0) {
+      btnVolMute.textContent = "🔇";
+    } else {
+      btnVolMute.textContent = "🔊";
+    }
+  }
+}
+updateVolUI();
