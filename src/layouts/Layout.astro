@@ -1,0 +1,156 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'arcadelab — hand-crafted indie mini-games, built in the browser.',
+  ogImage = '/og-cover.png',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadelab.vercel.app');
+---
+
+<!doctype html>
+<html lang="en" class="antialiased">
+  <head>
+    <!-- ── Core meta ── -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- ── SEO ── -->
+    <title>{title} | arcadelab.</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- ── Open Graph / Social ── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:url"         content={canonicalURL} />
+    <meta property="og:title"       content={`${title} | arcadelab.`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image"       content={ogImage} />
+    <meta name="twitter:card"       content="summary_large_image" />
+    <meta name="twitter:title"      content={`${title} | arcadelab.`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image"      content={ogImage} />
+
+    <!-- ── Favicon ── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- ── Google Fonts: Space Grotesk + Inter + JetBrains Mono ── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="min-h-screen bg-[var(--color-base)] text-[var(--color-text)]">
+
+    <!-- ═══════════════════════════════════════════════════════
+         HEADER / NAVIGATION
+    ═══════════════════════════════════════════════════════ -->
+    <header class="border-b border-[var(--color-border)] bg-[var(--color-surface)] sticky top-0 z-50 backdrop-blur-sm">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+
+        <!-- Site wordmark -->
+        <a
+          href="/"
+          id="site-logo"
+          class="flex items-center gap-2 group focus-visible:outline-none"
+          aria-label="arcadelab home"
+        >
+          <!-- Pixel-style dot indicator -->
+          <span
+            aria-hidden="true"
+            class="block w-2 h-2 rounded-sm bg-[var(--color-brand)]
+                   group-hover:scale-125 transition-transform duration-200"
+          ></span>
+          <span
+            class="text-[var(--color-brand)] font-heading text-lg leading-none tracking-tight"
+            style="font-family: var(--font-heading); font-weight: 700;"
+          >
+            arcadelab.
+          </span>
+        </a>
+
+        <!-- Tagline (hidden on very small screens) -->
+        <p
+          class="hidden sm:block text-xs text-[var(--color-muted)] tracking-wide font-mono"
+          style="font-family: var(--font-mono);"
+        >
+          built by hand.&nbsp;
+          <span class="text-[var(--color-brand)] opacity-70">new games dropping soon.</span>
+        </p>
+
+        <!-- Nav links -->
+        <nav aria-label="Main navigation">
+          <ul class="flex items-center gap-1 list-none m-0 p-0">
+            <li>
+              <a
+                href="/"
+                id="nav-home"
+                class="px-3 py-1.5 rounded text-sm text-[var(--color-muted)]
+                       hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                       transition-colors duration-150"
+              >
+                arcade
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAGE SLOT
+    ═══════════════════════════════════════════════════════ -->
+    <slot />
+
+    <!-- ═══════════════════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════════════════ -->
+    <footer class="mt-24 border-t border-[var(--color-border)] py-8 px-4">
+      <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <p class="text-xs text-[var(--color-muted)]" style="font-family: var(--font-mono);">
+          © {new Date().getFullYear()} arcadelab. — all games hand-coded.
+        </p>
+        <p class="text-xs text-[var(--color-muted)]">
+          built with <a href="https://astro.build" target="_blank" rel="noopener" class="hover:text-[var(--color-brand)] transition-colors">Astro</a>
+          + vanilla JS canvas.
+        </p>
+      </div>
+    </footer>
+
+  </body>
+</html>
+
+<style is:global>
+  /*
+   * Extra global token block — these variables are deliberately placed here so
+   * vanilla Canvas JS can read them via:
+   *   const style = getComputedStyle(document.documentElement);
+   *   const accent = style.getPropertyValue('--color-accent').trim();
+   */
+  :root {
+    --color-base:        #0d0f14;
+    --color-surface:     #171a21;
+    --color-surface-2:   #1e222c;
+    --color-text:        #eef1f5;
+    --color-muted:       #8b93a1;
+    --color-brand:       #f2b84b;
+    --color-accent:      #ff8c42;
+    --color-border:      #2a2f3d;
+
+    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-body:    'Inter', system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+  }
+</style>
