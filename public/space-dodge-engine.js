@@ -34,9 +34,9 @@ const C = {
 
 // ── Difficulty ────────────────────────────────────────────────
 const DIFF = {
-  easy   : { thrust: 420, gravity: 180, gap: 90,  rockW: [50, 90],  label:'🟢 Easy'   },
-  medium : { thrust: 520, gravity: 220, gap: 65,  rockW: [60, 110], label:'🟡 Medium' },
-  hard   : { thrust: 640, gravity: 260, gap: 45,  rockW: [70, 130], label:'🔴 Hard'   },
+  easy   : { thrust: 420, gravity: 180, gap: 90,  rockW: [50, 90],  moveAt: 15000, label:'🟢 Easy'   },
+  medium : { thrust: 520, gravity: 220, gap: 65,  rockW: [60, 110], moveAt: 10000, label:'🟡 Medium' },
+  hard   : { thrust: 640, gravity: 260, gap: 45,  rockW: [70, 130], moveAt: 5000,  label:'🔴 Hard'   },
 };
 let difficulty = 'medium';
 
@@ -83,7 +83,7 @@ function spawnAsteroidRow() {
     small,
     hp: small ? 1 : BIG_HP,
     maxHp: small ? 1 : BIG_HP,
-    seed: Math.random() * 1000,
+    seed: Math.random() * 1000, vx: 0,
   });
 }
 
@@ -199,6 +199,12 @@ document.addEventListener('keydown', e => {
   }
 });
 
+document.addEventListener("keyup", e => {
+  if (e.code === "Space" || e.code === "KeyW" || e.code === "ArrowUp") {
+    input.shooting = false;
+  }
+});
+
 function fireLaser() {
   if (state !== S.PLAYING || player.fireCd > 0) return;
   if (!isFinite(ch) || !isFinite(player.x)) return; // canvas not measured yet
@@ -299,6 +305,21 @@ function update(dt) {
   // keep the belt populated endlessly ahead of the ship
   ensureAsteroids();
 
+  // ── Horizontal asteroid drift after distance threshold ──
+  const moveThreshold = DIFF[difficulty].moveAt;
+  if (dist >= moveThreshold) {
+    const driftSpeed = 40 + Math.min((dist - moveThreshold) * 0.012, 120); // ramps up gradually
+    for (const ast of asteroids) {
+      // assign drift direction once (lazy init)
+      if (ast.vx === 0) ast.vx = (ast.seed > 500 ? 1 : -1) * (driftSpeed * (0.5 + Math.random() * 0.5));
+      // update X position
+      ast.x += ast.vx * dt;
+      // bounce off screen edges
+      if (ast.x <= 2) { ast.x = 2; ast.vx = Math.abs(ast.vx); }
+      if (ast.x + ast.w >= (cw || 700) - 2) { ast.x = (cw || 700) - ast.w - 2; ast.vx = -Math.abs(ast.vx); }
+    }
+  }
+
   const cfg = DIFF[difficulty];
   // gravity always pulls down (increases vy)
   player.vy += cfg.gravity * dt;
@@ -317,6 +338,7 @@ function update(dt) {
 
   // lasers — move, then test against rocks
   player.fireCd -= dt;
+  if (input.shooting) fireLaser(); // continuous spray while key held
   for (let i = lasers.length - 1; i >= 0; i--) {
     const l = lasers[i];
     l.y += l.vy * dt;
