@@ -1,0 +1,281 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const {
+  title = 'Dig Deep',
+  description = 'Drill down into procedurally generated terrain. Pure canvas, zero dependencies.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{title} | arcadelab.</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-[var(--color-base)] text-[var(--color-text)] min-h-screen">
+    <Layout title={title} description={description}>
+      <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+        <!-- Top bar navigation -->
+        <nav class="flex items-center gap-2 text-sm">
+          <a href="/" class="text-[var(--color-brand)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]">
+            ← Return to Arcade
+          </a>
+        </nav>
+
+        <!-- Game container -->
+        <section id="game-wrapper" class="relative rounded-xl overflow-hidden bg-[var(--color-surface)]" style="aspect-ratio: 16/9;">
+          <!-- Single unified HUD bar -->
+          <div class="absolute top-0 left-0 right-0 flex items-center justify-between px-3 py-1.5 bg-[rgba(13,15,20,0.7)] backdrop-blur-sm z-10 text-xs" style="font-family: var(--font-mono);">
+            <!-- Left: lives -->
+            <div class="flex items-center gap-1 text-[var(--color-text)]">
+              <span id="ui-lives"></span>
+            </div>
+            <!-- Center: depth score -->
+            <div class="text-[var(--color-text)]">
+              Depth: <span id="ui-score" class="text-[var(--color-accent)] font-bold">0</span>m
+              &nbsp;|&nbsp;
+              Best: <span id="ui-high" class="text-[var(--color-muted)]">0</span>m
+            </div>
+            <!-- Right: difficulty selector -->
+            <div>
+              <select id="ui-difficulty" class="bg-[#1e222c] text-[var(--color-text)] border border-[var(--color-border)] rounded px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]">
+                <option value="easy">🟢 Easy</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="hard">🔴 Hard</option>
+              </select>
+            </div>
+          </div>
+          <canvas id="gameCanvas" class="block w-full h-full"></canvas>
+        </section>
+      </main>
+    </Layout>
+
+    <script type="module">
+      // ------------------------------------------------------------
+  //  Dig Deep – Rocket Ship Demo with Lives & Difficulty
+      //  Dig Deep – Simple Drill Demo
+      // ------------------------------------------------------------
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // -------- DPI Scaling -------------------------------------------------
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        ctx.scale(dpr, dpr);
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // -------- Design Tokens ------------------------------------------------
+      const style = getComputedStyle(document.documentElement);
+      const COLORS = {
+        accent: style.getPropertyValue('--color-accent').trim(),
+        surface: style.getPropertyValue('--color-surface').trim(),
+        text: style.getPropertyValue('--color-text').trim(),
+        rocket: style.getPropertyValue('--color-rocket').trim() || '#ff8c42',
+      };
+      // Difficulty configuration
+      const DIFFICULTY_CONFIG = {
+        easy: { speedMul: 0.8, gap: 80 },
+        medium: { speedMul: 1.0, gap: 60 },
+        hard: { speedMul: 1.2, gap: 45 },
+      };
+
+      // -------- State Machine ------------------------------------------------
+      const STATE = { MENU: 'MENU', PLAYING: 'PLAYING', GAMEOVER: 'GAMEOVER' };
+      let currentState = STATE.MENU;
+      let difficulty = 'medium'; // default
+      let lives = 5;
+      const MAX_LIVES = 5;
+
+      // -------- Player --------------------------------------------------------
+      const player = { x: 0, y: 0, w: 20, h: 30, speed: 200 };
+
+      // -------- Terrain --------------------------------------------------------
+      const terrain = [];
+      const BLOCK_HEIGHT = 20;
+      const BLOCK_MIN_WIDTH = 40;
+      const BLOCK_MAX_WIDTH = 80;
+      const GAP_MIN = 60; // vertical spacing between rows
+      function generateTerrain(maxDepth) {
+        const gap = DIFFICULTY_CONFIG[difficulty].gap;
+        for (let y = gap; y < maxDepth; y += gap) {
+          const w = BLOCK_MIN_WIDTH + Math.random() * (BLOCK_MAX_WIDTH - BLOCK_MIN_WIDTH);
+          const x = Math.random() * (canvas.width - w);
+          terrain.push({ x, y, w, h: BLOCK_HEIGHT });
+        }
+      }
+      generateTerrain(5000);
+
+      // -------- Input ----------------------------------------------------------
+      const inputs = { mouse: { x: canvas.width / 2, y: 0, down: false }, keys: new Set() };
+      function updateMouse(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        inputs.mouse.x = (e.clientX - rect.left) * scaleX / (window.devicePixelRatio || 1);
+      }
+      canvas.addEventListener('mousemove', updateMouse);
+      canvas.addEventListener('mousedown', (e) => { inputs.mouse.down = true; updateMouse(e); });
+      canvas.addEventListener('mouseup', () => { inputs.mouse.down = false; });
+      // Touch support
+      canvas.addEventListener('touchstart', (e) => { inputs.mouse.down = true; updateMouse(e.touches[0]); e.preventDefault(); });
+      canvas.addEventListener('touchmove', (e) => { updateMouse(e.touches[0]); e.preventDefault(); });
+      canvas.addEventListener('touchend', () => { inputs.mouse.down = false; });
+      // Difficulty selector change
+      document.getElementById('ui-difficulty').addEventListener('change', (e) => {
+        difficulty = e.target.value;
+        // reset terrain with new gap
+        terrain.length = 0;
+        generateTerrain(5000);
+      });
+      window.addEventListener('keydown', (e) => inputs.keys.add(e.key));
+      window.addEventListener('keyup', (e) => inputs.keys.delete(e.key));
+
+      // -------- Score ----------------------------------------------------------
+      let depth = 0;
+      let highDepth = Number(localStorage.getItem('dig-deep-high')) || 0;
+      const uiScore = document.getElementById('ui-score');
+      const uiHigh = document.getElementById('ui-high');
+      const uiLives = document.getElementById('ui-lives');
+      uiHigh.textContent = highDepth;
+      const renderLives = () => {
+        uiLives.innerHTML = '';
+        for (let i = 0; i < lives; i++) {
+          const span = document.createElement('span');
+          span.textContent = '❤️';
+          span.style.marginRight = '2px';
+          uiLives.appendChild(span);
+        }
+      };
+      renderLives();
+      function updateScore() {
+        uiScore.textContent = depth;
+        if (depth > highDepth) {
+          highDepth = depth;
+          uiHigh.textContent = highDepth;
+          localStorage.setItem('dig-deep-high', highDepth);
+        }
+      }
+
+      // -------- Core Loop ------------------------------------------------------
+      let lastTimestamp = 0;
+      function gameLoop(timestamp) {
+        const dt = (timestamp - lastTimestamp) / 1000;
+        lastTimestamp = timestamp;
+        update(dt);
+        render();
+        requestAnimationFrame(gameLoop);
+      }
+      requestAnimationFrame(gameLoop);
+
+      function update(dt) {
+        switch (currentState) {
+          case STATE.MENU:
+            if (inputs.mouse.down || inputs.keys.size) {
+              player.x = canvas.width / 2;
+              player.y = 0;
+              depth = 0;
+              lives = MAX_LIVES;
+              renderLives();
+              updateScore();
+              currentState = STATE.PLAYING;
+            }
+            break;
+          case STATE.PLAYING:
+            player.x = Math.max(0, Math.min(canvas.width - player.w, inputs.mouse.x - player.w / 2));
+            if (inputs.mouse.down) {
+              player.y += player.speed * dt * DIFFICULTY_CONFIG[difficulty].speedMul;
+            }
+            depth = Math.floor(player.y);
+            updateScore();
+            for (const block of terrain) {
+              if (
+                block.y < player.y + player.h &&
+                block.y + block.h > player.y &&
+                block.x < player.x + player.w &&
+                block.x + block.w > player.x
+              ) {
+                lives--;
+                renderLives();
+                if (lives <= 0) {
+                  currentState = STATE.GAMEOVER;
+                }
+                break;
+              }
+            }
+            break;
+          case STATE.GAMEOVER:
+            if (inputs.mouse.down || inputs.keys.size) {
+              // Reset for new game
+              player.x = canvas.width / 2;
+              player.y = 0;
+              depth = 0;
+              lives = MAX_LIVES;
+              renderLives();
+              updateScore();
+              currentState = STATE.MENU;
+            }
+            break;
+        }
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = COLORS.surface;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (currentState === STATE.MENU) {
+          ctx.fillStyle = COLORS.text;
+          ctx.font = '24px var(--font-heading)';
+          ctx.textAlign = 'center';
+          ctx.fillText('Select difficulty & click to start', canvas.width / 2, canvas.height / 2);
+          return;
+        }
+
+        // Draw terrain blocks
+        ctx.fillStyle = COLORS.accent;
+        for (const block of terrain) {
+          const screenY = block.y - player.y + canvas.height / 2;
+          if (screenY > -BLOCK_HEIGHT && screenY < canvas.height + BLOCK_HEIGHT) {
+            ctx.fillRect(block.x, screenY, block.w, block.h);
+          }
+        }
+
+        // Draw rocket ship with simple flame animation when thrusting
+        const playerScreenY = canvas.height / 2;
+        // Rocket body
+        ctx.fillStyle = COLORS.rocket;
+        ctx.beginPath();
+        ctx.moveTo(player.x + player.w / 2, playerScreenY);
+        ctx.lineTo(player.x, playerScreenY + player.h);
+        ctx.lineTo(player.x + player.w, playerScreenY + player.h);
+        ctx.closePath();
+        ctx.fill();
+        // Flame when thrusting
+        if (inputs.mouse.down) {
+          ctx.fillStyle = '#ff4500';
+          ctx.beginPath();
+          ctx.moveTo(player.x + player.w / 2, playerScreenY + player.h + 8);
+          ctx.lineTo(player.x + player.w / 2 - 6, playerScreenY + player.h);
+          ctx.lineTo(player.x + player.w / 2 + 6, playerScreenY + player.h);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        if (currentState === STATE.GAMEOVER) {
+          ctx.fillStyle = COLORS.accent;
+          ctx.font = '28px var(--font-heading)';
+          ctx.textAlign = 'center';
+          ctx.fillText('Game Over – Click to Restart', canvas.width / 2, canvas.height / 2);
+        }
+      }
+    </script>
+  </body>
+</html>
