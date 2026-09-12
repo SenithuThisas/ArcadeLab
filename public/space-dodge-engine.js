@@ -201,6 +201,7 @@ document.addEventListener('keydown', e => {
 
 function fireLaser() {
   if (state !== S.PLAYING || player.fireCd > 0) return;
+  if (!isFinite(ch) || !isFinite(player.x)) return; // canvas not measured yet
   player.fireCd = FIRE_COOLDOWN;
   lasers.push({
     x: player.x + SHIP_W / 2 - LASER_W / 2,
@@ -574,6 +575,7 @@ function render(ts) {
 
   // lasers
   for (const l of lasers) {
+    if (!isFinite(l.x) || !isFinite(l.y)) continue; // skip corrupted bolts
     ctx.globalAlpha = 0.35;
     ctx.fillStyle = C.accent;
     ctx.fillRect(l.x - 2, l.y - 1, LASER_W + 4, l.h + 2);
@@ -628,7 +630,8 @@ function render(ts) {
 // ── Game loop ─────────────────────────────────────────────────
 let last = 0;
 function loop(ts) {
-  const dt = (ts - last) / 1000;
+  let dt = (ts - last) / 1000;
+  if (!isFinite(dt) || dt < 0) dt = 0.016; // guard against NaN/Infinity timestamps
   last = ts;
   update(dt);
   render(ts);
