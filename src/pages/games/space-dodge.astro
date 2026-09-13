@@ -12,7 +12,7 @@ const description = 'Pilot an advanced starfighter through high-density procedur
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
-    <style>
+    <style is:global>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
       :root {
@@ -231,9 +231,22 @@ const description = 'Pilot an advanced starfighter through high-density procedur
       .metric-val.minerals { color: var(--color-brand); }
       .metric-unit { font-size: 10px; color: var(--color-muted); }
 
+      .emp-timer {
+        font-family: 'Orbitron', monospace;
+        font-size: 8px;
+        font-weight: 700;
+        color: var(--color-energy);
+        text-shadow: 0 0 6px rgba(168, 85, 247, 0.6);
+        background: rgba(168, 85, 247, 0.15);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 3px;
+        padding: 0 4px;
+        line-height: 12px;
+      }
+
       .emp-pills {
         display: flex;
-        gap: 3px;
+        gap: 4px;
         align-items: center;
       }
       .emp-icon {
@@ -242,10 +255,24 @@ const description = 'Pilot an advanced starfighter through high-density procedur
         border-radius: 50%;
         background: var(--color-energy);
         box-shadow: 0 0 6px rgba(168, 85, 247, 0.8);
+        position: relative;
+        overflow: hidden;
       }
       .emp-icon.empty {
         background: rgba(255,255,255,0.1);
         box-shadow: none;
+      }
+      .emp-icon.charging {
+        background: rgba(255,255,255,0.12);
+        box-shadow: 0 0 4px rgba(168, 85, 247, 0.3);
+      }
+      .emp-icon-fill {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--color-energy);
+        box-shadow: 0 0 6px rgba(168, 85, 247, 0.8);
       }
 
       /* Sector Progress Bar */
@@ -636,17 +663,266 @@ const description = 'Pilot an advanced starfighter through high-density procedur
         filter: brightness(1.15);
       }
 
+      /* ── Left Sidebar: Mission Control Deck ── */
+      .game-container-grid {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        gap: 16px;
+      }
+
+      .game-sidebar-left {
+        background: rgba(10, 14, 26, 0.92);
+        border: 1px solid rgba(56, 219, 245, 0.16);
+        border-radius: 12px;
+        padding: 14px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(56, 219, 245, 0.05);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .sidebar-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 11.5px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        color: var(--color-brand);
+        text-transform: uppercase;
+      }
+      .sidebar-status-tag {
+        font-family: 'Orbitron', monospace;
+        font-size: 9.5px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(56, 219, 245, 0.12);
+        color: var(--color-accent);
+        border: 1px solid rgba(56, 219, 245, 0.25);
+      }
+      .sidebar-status-tag.all-unlocked {
+        background: rgba(245, 185, 66, 0.15);
+        color: var(--color-brand);
+        border-color: rgba(245, 185, 66, 0.4);
+      }
+
+      /* Endless Mode Hero Tile */
+      button.endless-pill-btn {
+        all: unset;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(147, 51, 234, 0.25), rgba(56, 219, 245, 0.15));
+        border: 1px solid rgba(168, 85, 247, 0.45);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: left;
+        box-shadow: 0 4px 14px rgba(147, 51, 234, 0.2);
+      }
+      button.endless-pill-btn:hover {
+        background: linear-gradient(135deg, rgba(147, 51, 234, 0.45), rgba(56, 219, 245, 0.3));
+        border-color: #e879f9;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45);
+      }
+      button.endless-pill-btn.active {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(56, 219, 245, 0.35));
+        border-color: #e879f9;
+        box-shadow: 0 0 20px rgba(232, 121, 249, 0.6);
+      }
+      .endless-pill-icon {
+        font-size: 18px;
+        line-height: 1;
+        filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.8));
+      }
+      .endless-pill-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .endless-pill-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 11px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 0.04em;
+      }
+      .endless-pill-sub {
+        font-size: 9px;
+        color: #c084fc;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .endless-pill-badge {
+        font-family: 'Orbitron', monospace;
+        font-size: 8.5px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(168, 85, 247, 0.3);
+        color: #e879f9;
+        border: 1px solid rgba(168, 85, 247, 0.6);
+      }
+
+      .sidebar-section-divider {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: 'Orbitron', monospace;
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--color-muted);
+        letter-spacing: 0.08em;
+        padding: 2px 2px;
+      }
+
+      /* Sidebar Levels List */
+      .sidebar-levels-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      button.sector-tile-btn {
+        all: unset;
+        box-sizing: border-box;
+        width: 100%;
+        background: rgba(20, 26, 45, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 8px 10px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        cursor: pointer;
+        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: left;
+      }
+      button.sector-tile-btn:hover:not(.locked) {
+        background: rgba(56, 219, 245, 0.12);
+        border-color: rgba(56, 219, 245, 0.5);
+        transform: translateX(3px);
+      }
+      button.sector-tile-btn.active {
+        background: linear-gradient(90deg, rgba(245, 185, 66, 0.2), rgba(20, 26, 45, 0.85));
+        border-color: var(--color-brand);
+        box-shadow: 0 0 14px rgba(245, 185, 66, 0.3);
+      }
+      button.sector-tile-btn.locked {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .sector-tile-num {
+        font-family: 'Orbitron', monospace;
+        font-size: 10px;
+        font-weight: 800;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--color-muted);
+        flex-shrink: 0;
+      }
+      button.sector-tile-btn.active .sector-tile-num {
+        background: rgba(245, 185, 66, 0.25);
+        border-color: var(--color-brand);
+        color: var(--color-brand);
+      }
+
+      .sector-tile-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .sector-tile-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sector-tile-gun {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .sector-tile-action {
+        font-family: 'Orbitron', monospace;
+        font-size: 8.5px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+      }
+      .sector-tile-action.active {
+        background: var(--color-brand);
+        color: #03050b;
+      }
+      .sector-tile-action.play {
+        background: rgba(56, 219, 245, 0.15);
+        color: var(--color-accent);
+        border: 1px solid rgba(56, 219, 245, 0.35);
+      }
+      .sector-tile-action.locked {
+        color: var(--color-muted);
+      }
+
       /* ══════════════════════════════════════════════════════
-         DESKTOP (≥640px)
+         DESKTOP (≥960px)
          ══════════════════════════════════════════════════════ */
-      @media (min-width: 640px) {
+      @media (min-width: 960px) {
         html, body { overflow: auto; }
 
         .game-shell {
-          max-width: 980px;
+          max-width: 1360px;
           margin: 0 auto;
-          padding: 20px 20px 0;
+          padding: 16px 16px 0;
           height: auto;
+        }
+
+        .game-container-grid {
+          display: grid;
+          grid-template-columns: 290px 1fr;
+          gap: 16px;
+          align-items: start;
+        }
+
+        .game-sidebar-left {
+          height: fit-content;
+        }
+
+        .game-viewport-wrap {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
         }
 
         #game-wrapper {
@@ -667,6 +943,16 @@ const description = 'Pilot an advanced starfighter through high-density procedur
         }
       }
 
+      #game-wrapper:fullscreen,
+      #game-wrapper:-webkit-full-screen {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        aspect-ratio: auto !important;
+      }
+
       @media (pointer: coarse) {
         #touch-controls { display: flex; }
       }
@@ -682,14 +968,46 @@ const description = 'Pilot an advanced starfighter through high-density procedur
 
       <div class="nav-actions">
         <button id="btn-achievements" class="nav-btn gold" title="View Achievements">🏆 Trophies (<span id="ach-count">0/10</span>)</button>
+        <button id="btn-fullscreen" class="nav-btn" title="Toggle Fullscreen (F)">⛶ Fullscreen</button>
         <button id="btn-pause" class="nav-btn" title="Pause Game (ESC / P)">⏸ Pause</button>
         <button id="btn-vol-mute" class="nav-btn" title="Toggle Audio">🔊</button>
       </div>
     </nav>
 
     <div class="game-shell">
+      <div class="game-container-grid">
+        <!-- Left Sidebar: Level Cards & Endless Mode -->
+        <aside class="game-sidebar-left" id="game-sidebar-left">
+          <div class="sidebar-header">
+            <span class="sidebar-title">MISSION SELECT</span>
+            <span class="sidebar-status-tag" id="sidebar-progress-tag">SECTOR 1/5</span>
+          </div>
 
-      <section id="game-wrapper">
+          <!-- Endless Mode Button -->
+          <button class="endless-pill-btn" id="btn-sidebar-endless">
+            <span class="endless-pill-icon">⚡</span>
+            <div class="endless-pill-info">
+              <span class="endless-pill-title">INFINITY ENDLESS</span>
+              <span class="endless-pill-sub">Auto-Cycling Guns & Sectors</span>
+            </div>
+            <span class="endless-pill-badge" id="endless-badge-status">RUN</span>
+          </button>
+
+          <!-- Campaign Divider -->
+          <div class="sidebar-section-divider">
+            <span>CAMPAIGN</span>
+            <span id="sidebar-unlocked-pill">1/5</span>
+          </div>
+
+          <!-- Level Buttons Container -->
+          <div class="sidebar-levels-list" id="sidebar-levels-list">
+            <!-- Populated cleanly by JS -->
+          </div>
+        </aside>
+
+        <!-- Right / Main Viewport -->
+        <div class="game-viewport-wrap">
+          <section id="game-wrapper">
         <!-- Holographic Cockpit HUD -->
         <div id="hud">
           <div class="hud-main-row">
@@ -729,7 +1047,10 @@ const description = 'Pilot an advanced starfighter through high-density procedur
             <!-- Right: EMP Bombs & Top Highscore -->
             <div class="hud-cluster">
               <div class="gauge-box" style="align-items: flex-end;">
-                <span class="gauge-label">EMP BOMBS</span>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                  <span class="gauge-label">EMP BOMBS</span>
+                  <span id="ui-emp-timer" class="emp-timer">FULL</span>
+                </div>
                 <div class="emp-pills" id="emp-icons">
                   <div class="emp-icon"></div>
                   <div class="emp-icon"></div>
@@ -859,6 +1180,7 @@ const description = 'Pilot an advanced starfighter through high-density procedur
               Systems on standby. Adjust trajectory or resume flight.
             </p>
             <button id="btn-resume" class="modal-btn accent">Resume Flight</button>
+            <button id="btn-pause-fullscreen" class="modal-btn">⛶ Toggle Fullscreen</button>
             <button id="btn-restart" class="modal-btn">Restart Mission</button>
           </div>
         </div>
@@ -866,19 +1188,21 @@ const description = 'Pilot an advanced starfighter through high-density procedur
 
       <!-- Keybinding & Control Hints -->
       <div class="hints">
-        <div class="hints-keys">
-          <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>Mouse</kbd> Maneuver</span>
-          <span><kbd>Space</kbd> / <kbd>Click</kbd> Blasters</span>
-          <span><kbd>Shift</kbd> / <kbd>Right Click</kbd> Boost</span>
-          <span><kbd>B</kbd> / <kbd>E</kbd> EMP Nova Bomb</span>
-          <span><kbd>P</kbd> / <kbd>ESC</kbd> Pause</span>
-        </div>
-        <div style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--color-muted);">
-          60 FPS Pure Canvas Engine
-        </div>
-      </div>
-
-    </div>
+            <div class="hints-keys">
+              <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>Mouse</kbd> Maneuver</span>
+              <span><kbd>Space</kbd> / <kbd>Click</kbd> Blasters</span>
+              <span><kbd>Shift</kbd> / <kbd>Right Click</kbd> Boost</span>
+              <span><kbd>B</kbd> / <kbd>E</kbd> EMP Nova Bomb</span>
+              <span><kbd>F</kbd> Fullscreen</span>
+              <span><kbd>P</kbd> / <kbd>ESC</kbd> Pause</span>
+            </div>
+            <div style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--color-muted);">
+              60 FPS Pure Canvas Engine
+            </div>
+          </div>
+        </div> <!-- /.game-viewport-wrap -->
+      </div> <!-- /.game-container-grid -->
+    </div> <!-- /.game-shell -->
 
     <script src="/space-dodge-engine.js" defer></script>
   </body>

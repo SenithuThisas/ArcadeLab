@@ -23,11 +23,13 @@
   const elBoostVal = document.getElementById('val-boost');
   const elBoostBar = document.getElementById('bar-boost');
   const elEmpIcons = document.getElementById('emp-icons');
+  const elEmpTimer = document.getElementById('ui-emp-timer');
   const elAchCount = document.getElementById('ach-count');
 
   // Sector Progress
   const elSectorProgressLabel = document.getElementById('sector-progress-label');
   const elSectorProgressFill = document.getElementById('sector-progress-fill');
+  const elSectorProgressWrap = document.querySelector('.sector-progress-bar-wrap');
 
   // Modals & Navigation
   const elPauseModal = document.getElementById('pause-modal');
@@ -36,6 +38,10 @@
   const elLevelCompleteModal = document.getElementById('modal-level-complete');
   const elAchContainer = document.getElementById('achievements-container');
   const elLevelsContainer = document.getElementById('levels-container');
+  const elSidebarLevelsList = document.getElementById('sidebar-levels-list');
+  const btnSidebarEndless = document.getElementById('btn-sidebar-endless');
+  const elSidebarProgressTag = document.getElementById('sidebar-progress-tag');
+  const elSidebarUnlockedPill = document.getElementById('sidebar-unlocked-pill');
 
   // Level Complete UI fields
   const elLcTitle = document.getElementById('lc-title');
@@ -56,6 +62,9 @@
   const btnAchievements = document.getElementById('btn-achievements');
   const btnCloseAch = document.getElementById('btn-close-ach');
   const btnCloseLevels = document.getElementById('btn-close-levels');
+  const btnFullscreen = document.getElementById('btn-fullscreen');
+  const btnPauseFullscreen = document.getElementById('btn-pause-fullscreen');
+  const gameWrapper = document.getElementById('game-wrapper');
   const btnVolMute = document.getElementById('btn-vol-mute');
 
   // Toasts
@@ -159,7 +168,7 @@
       level: 1,
       name: 'SECTOR 1: PERIMETER',
       title: 'Kuiper Outskirts',
-      desc: 'Calm asteroid corridor. Slow-tumbling basalt debris & gold rocks.',
+      desc: 'Calm asteroid corridor. Fast basalt debris & gold ore fields.',
       targetDistance: 900,
       scrollSpeed: 280,
       hazards: ['basalt', 'gold_ore'],
@@ -168,6 +177,7 @@
       dustColor: '#80e9ff',
       shipColor: { hull1: '#eef2f9', hull2: '#9fa8bf', wing: '#38dbf5', flame: '#f5b942' },
       gunName: 'Dual Blue Plasma Blasters',
+      gunStyleDesc: 'Twin precision cyan plasma pulses',
       gunColor: '#38dbf5',
       gunSoundPitch: 840,
       mineralVal: 10,
@@ -177,8 +187,8 @@
       level: 2,
       name: 'SECTOR 2: MAGMA BELT',
       title: 'Solar Magma Belt',
-      desc: 'Fiery solar flare field. Molten Magma Asteroids that explode into flame sparks on death.',
-      targetDistance: 1200,
+      desc: 'Fiery solar flare belt. Molten magma asteroids with fiery explosive death bursts.',
+      targetDistance: 1250,
       scrollSpeed: 340,
       hazards: ['magma', 'gold_ore'],
       bgGradient: ['#0a0303', '#240808', '#380e0e'],
@@ -186,6 +196,7 @@
       dustColor: '#ff8c42',
       shipColor: { hull1: '#ffeedd', hull2: '#d48850', wing: '#ff5722', flame: '#ff3d00' },
       gunName: 'Magma Incendiary Repeaters',
+      gunStyleDesc: 'Ultra rapid-fire twin molten thermite rounds',
       gunColor: '#ff7700',
       gunSoundPitch: 980,
       mineralVal: 25,
@@ -195,8 +206,8 @@
       level: 3,
       name: 'SECTOR 3: CRYO VOID',
       title: 'Glacial Cryo Void',
-      desc: 'Frost blizzard void. High-velocity Ice Comets that shatter into crystalline shrapnel & Cryo-Mines.',
-      targetDistance: 1550,
+      desc: 'Frost blizzard void. High-velocity ice comets & cryo mines.',
+      targetDistance: 1600,
       scrollSpeed: 400,
       hazards: ['ice_comet', 'cryo_mine', 'gold_ore'],
       bgGradient: ['#020912', '#061a29', '#0d2d42'],
@@ -204,6 +215,7 @@
       dustColor: '#c8f5ff',
       shipColor: { hull1: '#f0fdff', hull2: '#7dd3fc', wing: '#0284c7', flame: '#38dbf5' },
       gunName: 'Cryo-Frost Triple Split Cannon',
+      gunStyleDesc: '3-Way cone spread crystalline frost shards',
       gunColor: '#38dbf5',
       gunSoundPitch: 1100,
       mineralVal: 45,
@@ -213,8 +225,8 @@
       level: 4,
       name: 'SECTOR 4: DRONE HIVE',
       title: 'Rogue Alien Drone Hive',
-      desc: 'Hostile warzone. Zig-zagging Hunter Drones firing tracking laser bolts & Shielded Heavy Drones.',
-      targetDistance: 1950,
+      desc: 'Hostile warzone. Zig-zagging Hunter Drones & heavy shielded sentinels.',
+      targetDistance: 2100,
       scrollSpeed: 460,
       hazards: ['hunter_drone', 'heavy_drone', 'magma', 'gold_ore'],
       bgGradient: ['#12020e', '#2b0722', '#3d0a30'],
@@ -222,6 +234,7 @@
       dustColor: '#f43f5e',
       shipColor: { hull1: '#1f2937', hull2: '#4b5563', wing: '#e11d48', flame: '#f43f5e' },
       gunName: 'Alien Quad-Plasma Shredder',
+      gunStyleDesc: '4x Heavy converging alien plasma shredder volleys',
       gunColor: '#f43f5e',
       gunSoundPitch: 1250,
       mineralVal: 75,
@@ -231,15 +244,16 @@
       level: 5,
       name: 'SECTOR 5: SINGULARITY',
       title: 'Singularity Horizon',
-      desc: 'Gravitational vortex anomaly. Gravitational Pulsars, Sentinel Mothership Drones, and maximum warp.',
-      targetDistance: 2400,
-      scrollSpeed: 530,
+      desc: 'Epic 2-Minute Warp Gauntlet! Gravitational Pulsars, Sentinel Motherships & maximum overdrive.',
+      targetDistance: 3000,
+      scrollSpeed: 500,
       hazards: ['pulsar', 'sentinel_boss', 'hunter_drone', 'ice_comet', 'gold_ore'],
       bgGradient: ['#0c0214', '#1f0633', '#330a54'],
       nebulaColor: '#a855f7',
       dustColor: '#c084fc',
       shipColor: { hull1: '#fef08a', hull2: '#eab308', wing: '#a855f7', flame: '#e879f9' },
       gunName: 'Singularity Oblivion Overcharger',
+      gunStyleDesc: 'Piercing Tachyon Lance + Dual Gravitational Pulsar Orbs',
       gunColor: '#c084fc',
       gunSoundPitch: 1400,
       mineralVal: 120,
@@ -248,32 +262,154 @@
   ];
 
   let currentLevelIdx = 0;
+  let isEndlessMode = false;
+  let endlessPhase = 0;
+
+  function getActiveLevelConfig() {
+    if (isEndlessMode) {
+      const phaseIdx = Math.floor(sectorDistance / 500) % LEVELS.length;
+      return LEVELS[phaseIdx];
+    }
+    return LEVELS[currentLevelIdx];
+  }
+
+  function renderSidebarLevelCards() {
+    if (!elSidebarLevelsList) return;
+    elSidebarLevelsList.innerHTML = '';
+
+    const allCleared = localStorage.getItem('space-dodge-all-cleared') === 'true' || unlockedMaxLevel >= 5;
+
+    if (elSidebarProgressTag) {
+      if (allCleared) {
+        elSidebarProgressTag.textContent = 'FREE PLAY (5/5)';
+        elSidebarProgressTag.classList.add('all-unlocked');
+      } else {
+        elSidebarProgressTag.textContent = `SECTOR ${unlockedMaxLevel}/5`;
+        elSidebarProgressTag.classList.remove('all-unlocked');
+      }
+    }
+
+    if (elSidebarUnlockedPill) {
+      elSidebarUnlockedPill.textContent = allCleared ? 'ALL UNLOCKED' : `${unlockedMaxLevel}/5`;
+    }
+
+    if (btnSidebarEndless) {
+      const badge = document.getElementById('endless-badge-status');
+      if (isEndlessMode && gameState === STATES.PLAYING) {
+        btnSidebarEndless.classList.add('active');
+        if (badge) badge.textContent = 'ACTIVE';
+      } else {
+        btnSidebarEndless.classList.remove('active');
+        if (badge) badge.textContent = 'RUN';
+      }
+    }
+
+    const shortNames = [
+      'PERIMETER',
+      'MAGMA BELT',
+      'CRYO VOID',
+      'DRONE HIVE',
+      'SINGULARITY (2M)'
+    ];
+
+    const shortGuns = [
+      'Twin Plasma',
+      'Molten Rapid',
+      '3-Way Cryo',
+      'Quad Shredder',
+      'Tachyon Lance'
+    ];
+
+    LEVELS.forEach(lvl => {
+      const idx = lvl.level - 1;
+      const isUnlocked = allCleared || lvl.level <= unlockedMaxLevel;
+      const isCurrent = !isEndlessMode && lvl.level === currentLevelIdx + 1;
+
+      const btn = document.createElement('button');
+      btn.className = `sector-tile-btn ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
+      btn.dataset.level = String(lvl.level);
+
+      let actionHtml = '';
+      if (isCurrent) {
+        actionHtml = '<span class="sector-tile-action active">ACTIVE</span>';
+      } else if (isUnlocked) {
+        actionHtml = '<span class="sector-tile-action play">PLAY</span>';
+      } else {
+        actionHtml = '<span class="sector-tile-action locked">🔒</span>';
+      }
+
+      btn.innerHTML = `
+        <div class="sector-tile-num">0${lvl.level}</div>
+        <div class="sector-tile-info">
+          <span class="sector-tile-title">${shortNames[idx]}</span>
+          <span class="sector-tile-gun" style="color:${lvl.gunColor}">◆ ${shortGuns[idx]}</span>
+        </div>
+        ${actionHtml}
+      `;
+
+      if (isUnlocked && !isCurrent) {
+        btn.addEventListener('click', () => {
+          isEndlessMode = false;
+          currentLevelIdx = idx;
+          startMission();
+        });
+      }
+
+      elSidebarLevelsList.appendChild(btn);
+    });
+  }
 
   function renderLevelsModal() {
     if (!elLevelsContainer) return;
     elLevelsContainer.innerHTML = '';
 
+    const allCleared = localStorage.getItem('space-dodge-all-cleared') === 'true' || unlockedMaxLevel >= 5;
+
+    // Endless Mode Banner Option in Modal
+    const endlessCard = document.createElement('div');
+    endlessCard.className = `level-card ${isEndlessMode ? 'current' : ''}`;
+    endlessCard.style.borderColor = '#e879f9';
+    endlessCard.innerHTML = `
+      <div class="level-meta">
+        <h4 style="color:#e879f9;">INFINITY: ENDLESS VOYAGE ⚡</h4>
+        <p>Infinite gauntlet with auto-shifting cosmic backdrops & evolving weapon powers!</p>
+      </div>
+      <div>
+        <span style="font-family:'Orbitron', monospace; font-size:11px; font-weight:700; color:#e879f9;">
+          ${isEndlessMode ? 'ACTIVE' : 'LAUNCH ENDLESS'}
+        </span>
+      </div>
+    `;
+    endlessCard.addEventListener('click', () => {
+      toggleLevelsModal(false);
+      startEndlessMission();
+    });
+    elLevelsContainer.appendChild(endlessCard);
+
     LEVELS.forEach(lvl => {
-      const isUnlocked = lvl.level <= unlockedMaxLevel;
-      const isSelected = lvl.level === currentLevelIdx + 1;
+      const isUnlocked = allCleared || lvl.level <= unlockedMaxLevel;
+      const isSelected = !isEndlessMode && lvl.level === currentLevelIdx + 1;
 
       const card = document.createElement('div');
       card.className = `level-card ${!isUnlocked ? 'locked' : ''} ${isSelected ? 'current' : ''}`;
       card.innerHTML = `
         <div class="level-meta">
-          <h4>${lvl.name} ${!isUnlocked ? '🔒' : ''}</h4>
+          <h4>${lvl.name} ${!isUnlocked ? '🔒' : (allCleared ? '✨' : '')}</h4>
           <p>${lvl.desc}</p>
-          <p style="color:var(--color-brand); font-size:10px; margin-top:2px;">Gun: ${lvl.gunName} • Reward: 💎 +${lvl.mineralVal}</p>
+          <p style="color:var(--color-brand); font-size:10px; margin-top:2px;">
+            ◆ <strong>${lvl.gunName}</strong> (${lvl.gunStyleDesc}) • 💎 +${lvl.mineralVal}
+          </p>
         </div>
         <div>
-          <span style="font-family:'Orbitron', monospace; font-size:11px; font-weight:700; color:${isUnlocked ? 'var(--color-accent)' : 'var(--color-muted)'}">
-            ${isUnlocked ? (isSelected ? 'ACTIVE' : 'SELECT') : 'LOCKED'}
+          <span style="font-family:'Orbitron', monospace; font-size:11px; font-weight:700; color:${isUnlocked ? (isSelected ? 'var(--color-brand)' : 'var(--color-accent)') : 'var(--color-muted)'}">
+            ${isUnlocked ? (isSelected ? 'ACTIVE' : 'SELECT & PLAY') : 'LOCKED'}
           </span>
         </div>
       `;
 
       if (isUnlocked) {
         card.addEventListener('click', () => {
+          isEndlessMode = false;
           currentLevelIdx = lvl.level - 1;
           if (elSectorBadge) elSectorBadge.textContent = `${lvl.name} ▾`;
           toggleLevelsModal(false);
@@ -283,6 +419,14 @@
 
       elLevelsContainer.appendChild(card);
     });
+  }
+
+  function startEndlessMission() {
+    isEndlessMode = true;
+    endlessPhase = 0;
+    startMission();
+    const phaseConfig = LEVELS[0];
+    spawnPraiseText(phaseConfig.title.toUpperCase(), player.x, player.y - 35, phaseConfig.gunColor || '#f5b942', phaseConfig.gunColor || 'rgba(245, 185, 66, 1)', 16, true);
   }
 
   // ── Next-Gen Web Audio Synthesizer ─────────────────────────────────────────
@@ -477,6 +621,58 @@
       osc.stop(t + 0.6);
     }
 
+    playEmpCharged() {
+      if (!this.ctx || this.isMuted) return;
+      this.resume();
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, t);
+      osc.frequency.exponentialRampToValueAtTime(1174.66, t + 0.18);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+      osc.start(t);
+      osc.stop(t + 0.22);
+    }
+
+    playComboSound(tier = 1) {
+      if (!this.ctx || this.isMuted) return;
+      this.resume();
+      const t = this.ctx.currentTime;
+      const baseFreq = 440 * Math.pow(1.15, Math.min(7, tier));
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(baseFreq, t);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, t + 0.16);
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+      osc.start(t);
+      osc.stop(t + 0.2);
+    }
+
+    playGrazeChime() {
+      if (!this.ctx || this.isMuted) return;
+      this.resume();
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1174.66, t);
+      osc.frequency.exponentialRampToValueAtTime(1760, t + 0.12);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+      osc.start(t);
+      osc.stop(t + 0.14);
+    }
+
     playAchievementChime() {
       if (!this.ctx || this.isMuted) return;
       this.resume();
@@ -495,6 +691,27 @@
         gain.connect(this.sfxGain);
         osc.start(t + i * 0.09);
         osc.stop(t + i * 0.09 + 0.35);
+      });
+    }
+
+    playHeal() {
+      if (!this.ctx || this.isMuted) return;
+      this.resume();
+      const t = this.ctx.currentTime;
+      const notes = [440.00, 554.37, 659.25, 880.00];
+      notes.forEach((freq, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + i * 0.05);
+
+        gain.gain.setValueAtTime(0.3, t + i * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.05 + 0.28);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+        osc.start(t + i * 0.05);
+        osc.stop(t + i * 0.05 + 0.28);
       });
     }
 
@@ -672,6 +889,7 @@
     weaponTime: 0,
     empBombs: 3,
     maxEmp: 3,
+    empRechargeTimer: 15,
     flashHit: 0,
     strobeTimer: 0
   };
@@ -776,7 +994,7 @@
   function spawnHazards(dt) {
     hazardSpawnTimer -= dt;
     if (hazardSpawnTimer <= 0) {
-      const currentLevel = LEVELS[currentLevelIdx];
+      const currentLevel = getActiveLevelConfig();
       const spawnInterval = Math.max(0.32, 0.9 - currentLevel.level * 0.1);
       hazardSpawnTimer = spawnInterval * (0.8 + Math.random() * 0.4);
 
@@ -807,103 +1025,205 @@
   const particles = [];
   const pickups = [];
   const shockwaves = [];
+  const floatingTexts = [];
+
+  let killStreak = 0;
+  let killStreakTimer = 0;
+  let lastGrazeTime = 0;
+  let lastPraiseTime = 0;
+
+  function spawnPraiseText(text, x, y, color = '#ffd76b', glow = 'rgba(255, 215, 107, 0.9)', fontSize = 16, force = false) {
+    const now = Date.now();
+    if (!force && now - lastPraiseTime < 3200) {
+      return;
+    }
+    lastPraiseTime = now;
+
+    // Remove any accidental emojis or unicode symbols
+    const cleanText = String(text).replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}]/gu, '').trim();
+
+    floatingTexts.push({
+      text: cleanText,
+      x: x !== undefined ? x : player.x,
+      y: y !== undefined ? y : player.y - 30,
+      vy: -40 - Math.random() * 15,
+      vx: (Math.random() - 0.5) * 15,
+      life: 1.1,
+      maxLife: 1.1,
+      color,
+      glow,
+      fontSize,
+      scale: 0.2
+    });
+  }
 
   function fireWeapon() {
     if (player.fireTimer > 0 || gameState !== STATES.PLAYING) return;
 
-    const currentLevel = LEVELS[currentLevelIdx];
-    const lvlIdx = currentLevelIdx;
+    const currentLevel = getActiveLevelConfig();
+    const lvlIdx = isEndlessMode ? (Math.floor(sectorDistance / 500) % LEVELS.length) : currentLevelIdx;
 
-    if (player.weaponType === 'spread' || lvlIdx === 2) {
-      // Level 3 inherent spread or powerup
+    // ── Weapon Powerup Override: Spread Cannon ──
+    if (player.weaponType === 'spread') {
       audio.playLaser(true);
-      player.fireTimer = 0.12;
-      const angles = [-0.18, 0, 0.18];
+      player.fireTimer = 0.11;
+      const angles = [-0.32, -0.16, 0, 0.16, 0.32];
       angles.forEach(ang => {
         projectiles.push({
           x: player.x,
           y: player.y - SHIP_H * 0.4,
-          vx: Math.sin(ang) * 750,
-          vy: -Math.cos(ang) * 750,
-          damage: 1.8,
-          color: currentLevel.gunColor,
-          glow: currentLevel.nebulaColor,
-          radius: 3.5,
-          isPlayer: true
+          vx: Math.sin(ang) * 920,
+          vy: -Math.cos(ang) * 920,
+          damage: 2.2,
+          color: '#f5b942',
+          glow: 'rgba(245, 185, 66, 0.9)',
+          radius: 4,
+          isPlayer: true,
+          style: 'spread'
         });
       });
-    } else if (player.weaponType === 'beam' || lvlIdx === 4) {
-      // Level 5 Singularity Oblivion Overcharger or beam powerup
+      return;
+    }
+
+    // ── Weapon Powerup Override: Tachyon Hyper-Beam ──
+    if (player.weaponType === 'beam') {
       audio.playRailgun();
-      player.fireTimer = 0.18;
+      player.fireTimer = 0.14;
       projectiles.push({
         x: player.x,
-        y: player.y - SHIP_H * 0.4,
+        y: player.y - SHIP_H * 0.45,
         vx: 0,
-        vy: -1150,
-        damage: 5.5,
-        color: currentLevel.gunColor,
-        glow: currentLevel.nebulaColor,
-        radius: 7,
+        vy: -1400,
+        damage: 8.5,
+        color: '#38dbf5',
+        glow: 'rgba(56, 219, 245, 0.95)',
+        radius: 9,
         isBeam: true,
-        penetrates: 4,
-        isPlayer: true
+        penetrates: 6,
+        isPlayer: true,
+        style: 'beam'
       });
-    } else if (lvlIdx === 3) {
-      // Level 4 Quad-Plasma Shredder
+      return;
+    }
+
+    // ── Level-Specific Unique Gun Powers & Shooting Styles ──
+    if (lvlIdx === 0) {
+      // ✦ SECTOR 1: Dual Blue Plasma Blasters (Balanced Twin Wing Pulses)
       audio.playLaser(false);
-      player.fireTimer = 0.09;
-      [-14, -5, 5, 14].forEach(offset => {
+      player.fireTimer = 0.12;
+      const wingOffset = SHIP_W * 0.38;
+      [-wingOffset, wingOffset].forEach(offset => {
         projectiles.push({
           x: player.x + offset,
-          y: player.y - SHIP_H * 0.25,
-          vx: offset * 4,
-          vy: -880,
-          damage: 1.4,
-          color: currentLevel.gunColor,
-          glow: currentLevel.nebulaColor,
-          radius: 3,
-          isPlayer: true
+          y: player.y - SHIP_H * 0.22,
+          vx: 0,
+          vy: -900,
+          damage: 1.2,
+          color: '#38dbf5',
+          glow: 'rgba(56, 219, 245, 0.8)',
+          radius: 3.5,
+          isPlayer: true,
+          style: 'plasma'
         });
       });
     } else if (lvlIdx === 1) {
-      // Level 2 Magma Repeaters (Rapid Fire + Splash)
+      // ✦ SECTOR 2: Magma Incendiary Repeaters (High DPS Rapid-Fire Molten Rounds)
       audio.playLaser(false);
-      player.fireTimer = 0.08;
-      const wingOffset = SHIP_W * 0.38;
+      player.fireTimer = 0.075; // Fast rapid-fire cycling
+      const wingOffset = SHIP_W * 0.36;
       [-wingOffset, wingOffset].forEach(offset => {
         projectiles.push({
           x: player.x + offset,
           y: player.y - SHIP_H * 0.2,
-          vx: 0,
-          vy: -900,
-          damage: 1.3,
-          color: currentLevel.gunColor,
-          glow: currentLevel.nebulaColor,
-          radius: 3.5,
-          isPlayer: true
+          vx: (Math.random() - 0.5) * 25,
+          vy: -1050,
+          damage: 1.6,
+          color: '#ff7700',
+          glow: 'rgba(255, 119, 0, 0.9)',
+          radius: 4,
+          isPlayer: true,
+          style: 'magma'
         });
       });
-    } else {
-      // Level 1 Standard Dual Blue Plasma Blasters
+    } else if (lvlIdx === 2) {
+      // ✦ SECTOR 3: Cryo-Frost Triple Split Cannon (3-Way Angle Cone Shards)
+      audio.playLaser(true);
+      player.fireTimer = 0.12;
+      const spreadAngles = [-0.22, 0, 0.22];
+      spreadAngles.forEach((ang, idx) => {
+        const isCenter = idx === 1;
+        projectiles.push({
+          x: player.x,
+          y: player.y - SHIP_H * 0.35,
+          vx: Math.sin(ang) * 950,
+          vy: -Math.cos(ang) * 950,
+          damage: isCenter ? 2.6 : 2.0,
+          color: '#56c6e8',
+          glow: 'rgba(200, 245, 255, 0.9)',
+          radius: isCenter ? 5 : 4,
+          isPlayer: true,
+          style: 'cryo'
+        });
+      });
+    } else if (lvlIdx === 3) {
+      // ✦ SECTOR 4: Alien Quad-Plasma Shredder (4 Converging Heavy Bolts)
       audio.playLaser(false);
-      player.fireTimer = 0.11;
-      const wingOffset = SHIP_W * 0.38;
-      [-wingOffset, wingOffset].forEach(offset => {
+      player.fireTimer = 0.10;
+      const offsets = [-16, -6, 6, 16];
+      offsets.forEach(offset => {
+        const isOuter = Math.abs(offset) > 10;
         projectiles.push({
           x: player.x + offset,
-          y: player.y - SHIP_H * 0.2,
-          vx: 0,
-          vy: -850,
-          damage: 1,
-          color: currentLevel.gunColor,
-          glow: currentLevel.nebulaColor,
-          radius: 3,
-          isPlayer: true
+          y: player.y - SHIP_H * (isOuter ? 0.2 : 0.35),
+          vx: offset * 3.5,
+          vy: -1100,
+          damage: 2.8,
+          color: '#f43f5e',
+          glow: 'rgba(244, 63, 94, 0.9)',
+          radius: 4,
+          isPlayer: true,
+          style: 'shredder'
+        });
+      });
+    } else if (lvlIdx === 4) {
+      // ✦ SECTOR 5: Singularity Oblivion Overcharger (Penetrating Tachyon Lance + Pulsar Orbs)
+      audio.playRailgun();
+      player.fireTimer = 0.13;
+
+      // Central Piercing Hyper Lance
+      projectiles.push({
+        x: player.x,
+        y: player.y - SHIP_H * 0.45,
+        vx: 0,
+        vy: -1400,
+        damage: 7.0,
+        color: '#c084fc',
+        glow: 'rgba(232, 121, 249, 0.95)',
+        radius: 8,
+        isBeam: true,
+        penetrates: 5,
+        isPlayer: true,
+        style: 'singularity_lance'
+      });
+
+      // Dual Wing-Tip Gravitational Pulsar Orbs
+      [-22, 22].forEach(offset => {
+        projectiles.push({
+          x: player.x + offset,
+          y: player.y - SHIP_H * 0.25,
+          vx: offset * 2.5,
+          vy: -1150,
+          damage: 3.5,
+          color: '#e879f9',
+          glow: 'rgba(192, 132, 252, 0.9)',
+          radius: 5.5,
+          isPlayer: true,
+          style: 'singularity_orb'
         });
       });
     }
 
+    // Muzzle flash particles
     for (let i = 0; i < 4; i++) {
       particles.push({
         x: player.x + (Math.random() - 0.5) * SHIP_W,
@@ -921,6 +1241,9 @@
   function triggerEMP() {
     if (player.empBombs <= 0 || gameState !== STATES.PLAYING) return;
     player.empBombs--;
+    if (player.empBombs < player.maxEmp && player.empRechargeTimer <= 0) {
+      player.empRechargeTimer = 15;
+    }
     updateEMPUI();
     audio.playEMP();
     triggerAchievement('emp_master');
@@ -970,6 +1293,34 @@
     totalAsteroidsBlasted++;
     localStorage.setItem('space-dodge-total-rocks', totalAsteroidsBlasted);
 
+    killStreak++;
+    killStreakTimer = 1.8;
+
+    // Encouraging Praise Callouts & Sound Chimes (Clean text without emojis, throttled)
+    if (ast.type.isBoss) {
+      spawnPraiseText('BOSS OBLITERATED', ast.x, ast.y, '#e879f9', 'rgba(232, 121, 249, 1)', 22, true);
+      audio.playComboSound(5);
+      screenShake = Math.min(2.0, screenShake + 0.8);
+    } else if (ast.type.isHeavy) {
+      spawnPraiseText('HEAVY DRONE DESTROYED', ast.x, ast.y, '#f43f5e', 'rgba(244, 63, 94, 1)', 18);
+      audio.playComboSound(4);
+    } else if (ast.type.isPulsar) {
+      spawnPraiseText('SINGULARITY DESTROYED', ast.x, ast.y, '#c084fc', 'rgba(192, 132, 252, 1)', 20);
+      audio.playComboSound(5);
+    } else if (killStreak === 4) {
+      spawnPraiseText('PERFECT', player.x, player.y - 35, '#38dbf5', 'rgba(56, 219, 245, 0.95)', 18);
+      audio.playComboSound(1);
+    } else if (killStreak === 8) {
+      spawnPraiseText('EXCELLENT', player.x, player.y - 35, '#f5b942', 'rgba(245, 185, 66, 0.95)', 20);
+      audio.playComboSound(2);
+    } else if (killStreak === 14) {
+      spawnPraiseText('INCREDIBLE', player.x, player.y - 40, '#ff4154', 'rgba(255, 65, 84, 1)', 22);
+      audio.playComboSound(3);
+    } else if (killStreak === 20 || (killStreak > 20 && killStreak % 8 === 0)) {
+      spawnPraiseText('UNSTOPPABLE', player.x, player.y - 40, '#a855f7', 'rgba(168, 85, 247, 1)', 24);
+      audio.playComboSound(4);
+    }
+
     if (ast.type.isDrone || ast.type.isBoss) {
       runDronesDestroyed++;
       totalDronesDestroyed++;
@@ -983,7 +1334,7 @@
     if (elDestroyed) elDestroyed.textContent = runAsteroidsDestroyed;
 
     const isLarge = ast.radius >= 26;
-    const currentLevel = LEVELS[currentLevelIdx];
+    const currentLevel = getActiveLevelConfig();
     let palette = ['#ff8c42', '#f59e0b', '#9ba0b5', '#ff4154'];
 
     if (ast.type.isIce) palette = ['#c8f5ff', '#56c6e8', '#38dbf5', '#ffffff'];
@@ -1007,8 +1358,9 @@
           sparkle: Math.random() * Math.PI * 2
         });
       }
-    } else if (Math.random() < 0.15) {
-      const pTypes = ['spread', 'beam', 'shield', 'emp'];
+    } else if (Math.random() < 0.14) {
+      // Balanced rare powerup drop: mostly weapon enhancements and EMPs, with only occasional rare 5% nanite heal
+      const pTypes = ['spread', 'spread', 'beam', 'beam', 'emp', 'heal'];
       const pType = pTypes[Math.floor(Math.random() * pTypes.length)];
       pickups.push({
         x: ast.x,
@@ -1016,7 +1368,8 @@
         vx: (Math.random() - 0.5) * 40,
         vy: 50 + Math.random() * 40,
         type: pType,
-        radius: 11,
+        healAmount: 5,
+        radius: pType === 'heal' ? 13 : 11,
         sparkle: 0
       });
     }
@@ -1046,6 +1399,10 @@
         unlockedMaxLevel = currentLevel.level + 1;
         localStorage.setItem('space-dodge-unlocked-level', unlockedMaxLevel);
       }
+    } else if (currentLevel.level === 5) {
+      unlockedMaxLevel = 5;
+      localStorage.setItem('space-dodge-unlocked-level', 5);
+      localStorage.setItem('space-dodge-all-cleared', 'true');
     }
 
     if (!player.tookDamageThisSector) {
@@ -1062,8 +1419,14 @@
     if (player.shield >= 40) stars = 2;
     if (player.shield >= 75 && runMineralsCollected >= currentLevel.mineralsTarget * 0.5) stars = 3;
 
-    if (elLcTitle) elLcTitle.textContent = `${currentLevel.name} CLEARED!`;
-    if (elLcSubtitle) elLcSubtitle.textContent = `Warp Gate Reached. ${stars === 3 ? 'Flawless Flight Mastery!' : 'Starfighter Systems Optimal.'}`;
+    if (currentLevel.level === 5) {
+      if (elLcTitle) elLcTitle.textContent = `👑 CAMPAIGN COMPLETE!`;
+      if (elLcSubtitle) elLcSubtitle.textContent = `Singularity Horizon Conquered. Free-Play Mode Activated — Choose Any Sector to Replay!`;
+    } else {
+      if (elLcTitle) elLcTitle.textContent = `${currentLevel.name} CLEARED!`;
+      if (elLcSubtitle) elLcSubtitle.textContent = `Warp Gate Reached. ${stars === 3 ? 'Flawless Flight Mastery!' : 'Starfighter Systems Optimal.'}`;
+    }
+
     if (elLcStars) {
       elLcStars.innerHTML = '⭐'.repeat(stars) + (stars < 3 ? '☆'.repeat(3 - stars) : '');
     }
@@ -1073,13 +1436,16 @@
     if (elLcShield) elLcShield.textContent = `${Math.round(player.shield)}%`;
 
     if (btnNextLevel) {
+      btnNextLevel.style.display = 'block';
       if (currentLevelIdx < LEVELS.length - 1) {
-        btnNextLevel.style.display = 'block';
         btnNextLevel.textContent = `🚀 ENGAGE ${LEVELS[currentLevelIdx + 1].name}`;
       } else {
-        btnNextLevel.textContent = '👑 CAMPAIGN COMPLETED — RESTART ODYSSEY';
+        btnNextLevel.textContent = '🌌 CHOOSE ANY SECTOR TO PLAY';
       }
     }
+
+    renderSidebarLevelCards();
+    renderLevelsModal();
 
     if (elLevelCompleteModal) elLevelCompleteModal.classList.add('active');
   }
@@ -1112,7 +1478,43 @@
     }
   }
 
+  function toggleFullscreen() {
+    const target = gameWrapper || document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (target.requestFullscreen) {
+        target.requestFullscreen().catch(err => console.warn(err));
+      } else if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.warn(err));
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  }
+
+  function updateFullscreenUI() {
+    const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    if (btnFullscreen) {
+      btnFullscreen.innerHTML = isFull ? '🗗 Window' : '⛶ Fullscreen';
+    }
+    if (btnPauseFullscreen) {
+      btnPauseFullscreen.innerHTML = isFull ? '🗗 Exit Fullscreen' : '⛶ Fullscreen Mode';
+    }
+    setTimeout(resize, 80);
+  }
+
+  document.addEventListener('fullscreenchange', updateFullscreenUI);
+  document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
   function setupInput() {
+    if (btnSidebarEndless) {
+      btnSidebarEndless.addEventListener('click', () => {
+        startEndlessMission();
+      });
+    }
     window.addEventListener('keydown', e => {
       const tag = document.activeElement && document.activeElement.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
@@ -1122,6 +1524,8 @@
 
       if (e.code === 'KeyP' || e.code === 'Escape') {
         togglePause();
+      } else if (e.code === 'KeyF') {
+        toggleFullscreen();
       } else if (e.code === 'KeyB' || e.code === 'KeyE') {
         triggerEMP();
       } else if (e.code === 'Space' && (gameState === STATES.MENU || gameState === STATES.GAMEOVER)) {
@@ -1205,6 +1609,8 @@
     }
 
     // Modal & Navigation Controls
+    if (btnFullscreen) btnFullscreen.addEventListener('click', () => toggleFullscreen());
+    if (btnPauseFullscreen) btnPauseFullscreen.addEventListener('click', () => toggleFullscreen());
     if (btnPause) btnPause.addEventListener('click', () => togglePause());
     if (btnResume) btnResume.addEventListener('click', () => togglePause(false));
     if (btnRestart) btnRestart.addEventListener('click', () => {
@@ -1225,10 +1631,10 @@
         if (elLevelCompleteModal) elLevelCompleteModal.classList.remove('active');
         if (currentLevelIdx < LEVELS.length - 1) {
           currentLevelIdx++;
+          startMission();
         } else {
-          currentLevelIdx = 0;
+          toggleLevelsModal(true);
         }
-        startMission();
       });
     }
 
@@ -1278,10 +1684,10 @@
   // ── Mission Initialization ────────────────────────────────────────────────
   function startMission() {
     audio.init();
-    audio.startBGM(currentLevelIdx);
+    audio.startBGM(isEndlessMode ? (endlessPhase % LEVELS.length) : currentLevelIdx);
     triggerAchievement('first_flight');
 
-    const levelConfig = LEVELS[currentLevelIdx];
+    const levelConfig = getActiveLevelConfig();
 
     player.x = cw / 2;
     player.y = ch * 0.78;
@@ -1293,22 +1699,30 @@
     player.weaponType = 'standard';
     player.weaponTime = 0;
     player.empBombs = 3;
+    player.empRechargeTimer = 15;
     player.invincibleTimer = 1.5;
 
     sectorDistance = 0;
     runAsteroidsDestroyed = 0;
     runMineralsCollected = 0;
     runDronesDestroyed = 0;
+    killStreak = 0;
+    killStreakTimer = 0;
 
     asteroids.length = 0;
     projectiles.length = 0;
     particles.length = 0;
     pickups.length = 0;
     shockwaves.length = 0;
+    floatingTexts.length = 0;
 
-    if (elSectorBadge) elSectorBadge.textContent = `${levelConfig.name} ▾`;
+    if (elSectorBadge) {
+      elSectorBadge.textContent = isEndlessMode ? 'INFINITY: ENDLESS VOYAGE ▾' : `${levelConfig.name} ▾`;
+    }
     updateHUD();
     updateEMPUI();
+    renderSidebarLevelCards();
+    renderLevelsModal();
     if (elPauseModal) elPauseModal.classList.remove('active');
     if (elAchModal) elAchModal.classList.remove('active');
     if (elLevelsModal) elLevelsModal.classList.remove('active');
@@ -1317,8 +1731,7 @@
   }
 
   function updateHUD() {
-    const currentLevel = LEVELS[currentLevelIdx];
-    const pct = Math.min(100, Math.floor((sectorDistance / currentLevel.targetDistance) * 100));
+    const currentLevel = getActiveLevelConfig();
 
     if (elScore) elScore.textContent = Math.floor(sectorDistance);
     if (elMinerals) elMinerals.textContent = runMineralsCollected;
@@ -1328,17 +1741,71 @@
     if (elBoostVal) elBoostVal.textContent = Math.round(player.boost);
     if (elBoostBar) elBoostBar.style.width = Math.max(0, Math.min(100, player.boost)) + '%';
 
-    if (elSectorProgressLabel) elSectorProgressLabel.textContent = `WARP GATE: ${pct}%`;
-    if (elSectorProgressFill) elSectorProgressFill.style.width = `${pct}%`;
+    if (isEndlessMode) {
+      if (elSectorProgressWrap) elSectorProgressWrap.style.display = 'none';
+    } else {
+      if (elSectorProgressWrap) elSectorProgressWrap.style.display = 'flex';
+      const pct = Math.min(100, Math.floor((sectorDistance / currentLevel.targetDistance) * 100));
+      if (elSectorProgressLabel) elSectorProgressLabel.textContent = `WARP GATE: ${pct}%`;
+      if (elSectorProgressFill) elSectorProgressFill.style.width = `${pct}%`;
+    }
+
+    updateEMPUI();
   }
 
   function updateEMPUI() {
-    if (!elEmpIcons) return;
-    elEmpIcons.innerHTML = '';
-    for (let i = 0; i < player.maxEmp; i++) {
-      const pill = document.createElement('div');
-      pill.className = `emp-icon ${i < player.empBombs ? '' : 'empty'}`;
-      elEmpIcons.appendChild(pill);
+    if (elEmpIcons) {
+      if (elEmpIcons.children.length !== player.maxEmp) {
+        elEmpIcons.innerHTML = '';
+        for (let i = 0; i < player.maxEmp; i++) {
+          const pill = document.createElement('div');
+          pill.className = 'emp-icon';
+          const fill = document.createElement('div');
+          fill.className = 'emp-icon-fill';
+          pill.appendChild(fill);
+          elEmpIcons.appendChild(pill);
+        }
+      }
+
+      const chargeProgress = Math.max(0, Math.min(100, ((15 - player.empRechargeTimer) / 15) * 100));
+
+      for (let i = 0; i < player.maxEmp; i++) {
+        const pill = elEmpIcons.children[i];
+        const fill = pill.firstElementChild;
+        if (i < player.empBombs) {
+          pill.className = 'emp-icon';
+          if (fill) fill.style.height = '100%';
+        } else if (i === player.empBombs && player.empBombs < player.maxEmp) {
+          pill.className = 'emp-icon charging';
+          if (fill) fill.style.height = `${chargeProgress.toFixed(1)}%`;
+        } else {
+          pill.className = 'emp-icon empty';
+          if (fill) fill.style.height = '0%';
+        }
+      }
+    }
+
+    if (elEmpTimer) {
+      if (player.empBombs < player.maxEmp) {
+        const secs = Math.ceil(Math.max(0, player.empRechargeTimer));
+        elEmpTimer.textContent = `${secs}s`;
+      } else {
+        elEmpTimer.textContent = 'FULL';
+      }
+    }
+
+    if (btnTouchEmp) {
+      const label = btnTouchEmp.querySelector('span:last-child');
+      if (label) {
+        if (player.empBombs > 0) {
+          label.textContent = `EMP (${player.empBombs})`;
+          btnTouchEmp.style.opacity = '1';
+        } else {
+          const secs = Math.ceil(Math.max(0, player.empRechargeTimer));
+          label.textContent = `EMP ${secs}s`;
+          btnTouchEmp.style.opacity = '0.65';
+        }
+      }
     }
   }
 
@@ -1346,14 +1813,26 @@
   function update(dt) {
     if (gameState !== STATES.PLAYING) return;
 
-    const currentLevel = LEVELS[currentLevelIdx];
+    const currentLevel = getActiveLevelConfig();
 
     const speedMult = player.isBoosting ? 1.8 : 1.0;
     sectorDistance += (currentLevel.scrollSpeed * speedMult * dt) / 20;
 
-    if (sectorDistance >= currentLevel.targetDistance) {
-      triggerLevelComplete();
-      return;
+    if (isEndlessMode) {
+      const newPhase = Math.floor(sectorDistance / 500);
+      if (newPhase !== endlessPhase) {
+        endlessPhase = newPhase;
+        const phaseConfig = LEVELS[endlessPhase % LEVELS.length];
+        audio.playAchievementChime();
+        spawnPraiseText(phaseConfig.title.toUpperCase(), player.x, player.y - 35, phaseConfig.gunColor || '#f5b942', phaseConfig.gunColor || 'rgba(245, 185, 66, 1)', 16, true);
+        screenShake = Math.min(1.6, screenShake + 0.5);
+        renderSidebarLevelCards();
+      }
+    } else {
+      if (sectorDistance >= currentLevel.targetDistance) {
+        triggerLevelComplete();
+        return;
+      }
     }
 
     if (sectorDistance > highDist) {
@@ -1372,6 +1851,32 @@
     if (player.weaponTime > 0) {
       player.weaponTime -= dt;
       if (player.weaponTime <= 0) player.weaponType = 'standard';
+    }
+
+    // EMP Bomb Auto-Loading / Recharge (15s loading time per bomb)
+    if (player.empBombs < player.maxEmp) {
+      player.empRechargeTimer -= dt;
+      if (player.empRechargeTimer <= 0) {
+        player.empBombs = Math.min(player.maxEmp, player.empBombs + 1);
+        player.empRechargeTimer = 15;
+        audio.playEmpCharged();
+
+        for (let i = 0; i < 12; i++) {
+          const angle = (i / 12) * Math.PI * 2;
+          particles.push({
+            x: player.x,
+            y: player.y,
+            vx: Math.cos(angle) * 90,
+            vy: Math.sin(angle) * 90,
+            life: 0.35,
+            maxLife: 0.35,
+            color: '#c084fc',
+            size: 2.5
+          });
+        }
+      }
+    } else {
+      player.empRechargeTimer = 15;
     }
 
     player.shieldRegenTimer -= dt;
@@ -1492,12 +1997,22 @@
         const dy = player.y - ast.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const hitDist = ast.radius + SHIP_W * 0.4;
+        const grazeDist = ast.radius + SHIP_W * 0.8;
 
         if (dist < hitDist) {
           const dmg = ast.radius > 24 ? 35 : 20;
           damagePlayer(dmg, ast.x, ast.y);
           destroyHazard(ast, i, false);
           continue;
+        } else if (dist < grazeDist && !ast.hasGrazed && gameState === STATES.PLAYING) {
+          const now = Date.now();
+          if (now - lastGrazeTime > 800) {
+            ast.hasGrazed = true;
+            lastGrazeTime = now;
+            spawnPraiseText('PERFECT DODGE', player.x, player.y - 25, '#38dbf5', 'rgba(56, 219, 245, 0.95)', 16);
+            audio.playGrazeChime();
+            sectorDistance += 3;
+          }
         }
       }
     }
@@ -1595,12 +2110,27 @@
       if (pt.life <= 0) particles.splice(i, 1);
     }
 
+    if (killStreakTimer > 0) {
+      killStreakTimer -= dt;
+      if (killStreakTimer <= 0) killStreak = 0;
+    }
+
     // Shockwaves
     for (let i = shockwaves.length - 1; i >= 0; i--) {
       const sw = shockwaves[i];
       sw.radius += sw.speed * dt;
       sw.alpha = Math.max(0, 1 - sw.radius / sw.maxRadius);
       if (sw.radius >= sw.maxRadius) shockwaves.splice(i, 1);
+    }
+
+    // Floating Encouragement Texts
+    for (let i = floatingTexts.length - 1; i >= 0; i--) {
+      const ft = floatingTexts[i];
+      ft.x += (ft.vx || 0) * dt;
+      ft.y += (ft.vy || -40) * dt;
+      ft.life -= dt;
+      ft.scale = Math.min(1.25, ft.scale + dt * 6);
+      if (ft.life <= 0) floatingTexts.splice(i, 1);
     }
 
     updateHUD();
@@ -1655,11 +2185,32 @@
       player.weaponType = 'beam';
       player.weaponTime = 10;
       audio.playPickup('powerup');
+    } else if (pu.type === 'heal') {
+      const healAmt = 5; // Exactly 5% one-time instant heal
+      player.shield = Math.min(player.maxShield, player.shield + healAmt);
+      player.shieldRegenTimer = 0;
+      audio.playHeal();
+      spawnPraiseText('+5% REPAIR', player.x, player.y - 25, '#10b981', 'rgba(16, 185, 129, 0.95)', 16);
+
+      shockwaves.push({
+        x: player.x,
+        y: player.y,
+        radius: 10,
+        maxRadius: 80,
+        speed: 320,
+        color: '#10b981',
+        alpha: 0.95
+      });
     } else if (pu.type === 'shield') {
-      player.shield = Math.min(player.maxShield, player.shield + 40);
+      const healAmt = 5; // 5% shield boost
+      player.shield = Math.min(player.maxShield, player.shield + healAmt);
       audio.playPickup('powerup');
+      spawnPraiseText('+5% SHIELD', player.x, player.y - 25, '#38dbf5', 'rgba(56, 219, 245, 0.95)', 16);
     } else if (pu.type === 'emp') {
       player.empBombs = Math.min(player.maxEmp, player.empBombs + 1);
+      if (player.empBombs >= player.maxEmp) {
+        player.empRechargeTimer = 15;
+      }
       updateEMPUI();
       audio.playPickup('powerup');
     }
@@ -1687,7 +2238,7 @@
       ctx.translate((Math.random() - 0.5) * shakeMagnitude, (Math.random() - 0.5) * shakeMagnitude);
     }
 
-    const currentLevel = LEVELS[currentLevelIdx];
+    const currentLevel = getActiveLevelConfig();
 
     // 1. Dynamic Sector Cosmic Backdrop Gradient
     const bgGrad = ctx.createLinearGradient(0, 0, 0, ch);
@@ -1742,33 +2293,110 @@
       ctx.globalAlpha = sw.alpha;
       ctx.strokeStyle = sw.color;
       ctx.lineWidth = 4;
-      ctx.shadowColor = sw.color;
-      ctx.shadowBlur = 16;
       ctx.beginPath();
       ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
 
-    // 5. Asteroids / Hazards
-    for (const ast of asteroids) drawHazard(ast);
+    // 5. Pickups
+    for (const pu of pickups) {
+      drawPickup(pu, ts);
+    }
 
-    // 6. Pickups
-    for (const pu of pickups) drawPickup(pu, ts);
+    // 6. Asteroids and Dynamic Hazards
+    for (const ast of asteroids) {
+      drawHazard(ast);
+    }
 
     // 7. Projectiles
     for (const p of projectiles) {
       ctx.save();
-      ctx.shadowColor = p.glow;
+      ctx.shadowColor = p.glow || p.color;
       ctx.shadowBlur = 10;
-      ctx.fillStyle = p.color;
 
       if (p.isBeam) {
-        ctx.fillRect(p.x - p.radius / 2, p.y - 20, p.radius, 40);
-      } else {
+        // High-Energy Tachyon Laser Beam
+        const beamGrad = ctx.createLinearGradient(p.x - p.radius, 0, p.x + p.radius, 0);
+        beamGrad.addColorStop(0, 'rgba(56, 219, 245, 0.2)');
+        beamGrad.addColorStop(0.5, '#ffffff');
+        beamGrad.addColorStop(1, 'rgba(56, 219, 245, 0.2)');
+        ctx.fillStyle = beamGrad;
+        ctx.fillRect(p.x - p.radius * 0.8, p.y - 30, p.radius * 1.6, 60);
+
+        ctx.strokeStyle = '#38dbf5';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(p.x - p.radius * 0.8, p.y - 30, p.radius * 1.6, 60);
+      } else if (p.style === 'singularity_lance') {
+        // Piercing Hyper Tachyon Lance
+        const beamGrad = ctx.createLinearGradient(p.x - p.radius, 0, p.x + p.radius, 0);
+        beamGrad.addColorStop(0, 'rgba(192, 132, 252, 0.2)');
+        beamGrad.addColorStop(0.5, '#ffffff');
+        beamGrad.addColorStop(1, 'rgba(232, 121, 249, 0.2)');
+        ctx.fillStyle = beamGrad;
+        ctx.fillRect(p.x - p.radius * 0.7, p.y - 36, p.radius * 1.4, 72);
+
+        ctx.strokeStyle = '#e879f9';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(p.x - p.radius * 0.7, p.y - 36, p.radius * 1.4, 72);
+      } else if (p.style === 'magma') {
+        // Molten Thermite Round
+        const mGrad = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, p.radius * 1.8);
+        mGrad.addColorStop(0, '#ffffff');
+        mGrad.addColorStop(0.4, '#ff9900');
+        mGrad.addColorStop(0.8, '#ff3300');
+        mGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = mGrad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (p.style === 'cryo') {
+        // Cryo Crystalline Shard (Diamond projectile)
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y - p.radius * 2);
+        ctx.lineTo(p.x + p.radius * 1.1, p.y + p.radius * 0.8);
+        ctx.lineTo(p.x - p.radius * 1.1, p.y + p.radius * 0.8);
+        ctx.closePath();
+        ctx.fill();
+      } else if (p.style === 'shredder') {
+        // Heavy alien plasma spike
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y - p.radius * 2);
+        ctx.lineTo(p.x + p.radius * 1.1, p.y + p.radius * 0.8);
+        ctx.lineTo(p.x - p.radius * 1.1, p.y + p.radius * 0.8);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y - p.radius * 0.3, p.radius * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (p.style === 'singularity_orb') {
+        // Gravitational vortex orb
+        ctx.fillStyle = '#a855f7';
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.fillStyle = '#fdf4ff';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 0.48, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Standard Plasma Bolt (Elongated glowing pulse)
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.ellipse ? ctx.ellipse(p.x, p.y, p.radius, p.radius * 1.6, 0, 0, Math.PI * 2) : ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (p.isPlayer) {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y - 1, p.radius * 0.45, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
       ctx.restore();
     }
@@ -1789,7 +2417,33 @@
       drawStarfighter(player.x, player.y, player.bankAngle, ts);
     }
 
-    // 10. Menu / Game Over Screens
+    // 10. Floating Encouragement & Praise Callouts
+    for (let i = floatingTexts.length - 1; i >= 0; i--) {
+      const ft = floatingTexts[i];
+      ctx.save();
+      const alpha = Math.min(1, ft.life / 0.35);
+      ctx.globalAlpha = Math.max(0, alpha);
+      ctx.textAlign = 'center';
+      ctx.font = `900 ${ft.fontSize}px 'Orbitron', monospace`;
+      ctx.shadowColor = ft.glow || ft.color;
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = ft.color;
+
+      ctx.translate(ft.x, ft.y);
+      const curScale = ft.life > ft.maxLife * 0.7 ? ft.scale : 1.0;
+      ctx.scale(curScale, curScale);
+      ctx.fillText(ft.text, 0, 0);
+
+      // Bright inner core text
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `700 ${Math.round(ft.fontSize * 0.95)}px 'Orbitron', monospace`;
+      ctx.fillText(ft.text, 0, 0);
+
+      ctx.restore();
+    }
+
+    // 11. Menu / Game Over Screens
     if (gameState === STATES.MENU) renderMenu(ts);
     else if (gameState === STATES.GAMEOVER) renderGameOver(ts);
 
@@ -1801,7 +2455,7 @@
     ctx.save();
     ctx.translate(px, py);
 
-    const currentLevel = LEVELS[currentLevelIdx];
+    const currentLevel = getActiveLevelConfig();
     const shipSkin = currentLevel.shipColor;
 
     if (player.invincibleTimer > 0 && Math.sin(ts * 0.03) > 0) {
@@ -1983,6 +2637,48 @@
       ctx.lineTo(-pu.radius * 0.8, 0);
       ctx.closePath();
       ctx.fill();
+    } else if (pu.type === 'heal') {
+      // High-Tech Emerald Nanite Medical Pod
+      const healPulse = 1 + 0.12 * Math.sin(ts * 0.008 + pu.x);
+      const rad = pu.radius * healPulse;
+
+      const glowGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, rad * 1.8);
+      glowGrad.addColorStop(0, 'rgba(52, 211, 153, 0.9)');
+      glowGrad.addColorStop(0.5, 'rgba(16, 185, 129, 0.4)');
+      glowGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, rad * 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#34d399';
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 16;
+      ctx.fillStyle = 'rgba(6, 78, 59, 0.9)';
+      ctx.beginPath();
+      ctx.arc(0, 0, rad, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#34d399';
+      ctx.shadowBlur = 10;
+      const crossSize = rad * 0.55;
+      const crossThick = rad * 0.22;
+      ctx.fillRect(-crossThick / 2, -crossSize, crossThick, crossSize * 2);
+      ctx.fillRect(-crossSize, -crossThick / 2, crossSize * 2, crossThick);
+
+      const orbitAng = ts * 0.006;
+      for (let o = 0; o < 3; o++) {
+        const a = orbitAng + (o * Math.PI * 2) / 3;
+        const ox = Math.cos(a) * (rad + 5);
+        const oy = Math.sin(a) * (rad + 5);
+        ctx.fillStyle = '#6ee7b7';
+        ctx.beginPath();
+        ctx.arc(ox, oy, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else {
       ctx.strokeStyle = glowColor;
       ctx.lineWidth = 2;
@@ -1994,7 +2690,7 @@
       ctx.font = 'bold 9px Orbitron, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      const label = pu.type === 'spread' ? '3X' : pu.type === 'beam' ? 'BM' : pu.type === 'shield' ? 'SH' : '⚡';
+      const label = pu.type === 'spread' ? '3X' : pu.type === 'beam' ? 'BM' : pu.type === 'shield' ? 'SH' : 'EMP';
       ctx.fillText(label, 0, 0);
     }
     ctx.restore();
@@ -2079,6 +2775,7 @@
   updateEMPUI();
   renderAchievementsModal();
   renderLevelsModal();
+  renderSidebarLevelCards();
   requestAnimationFrame(gameLoop);
 
 })();
