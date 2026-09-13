@@ -1,29 +1,34 @@
 ---
-const title = 'Space Dodge';
-const description = 'Pilot your ship through a procedurally generated asteroid belt. Pure canvas, zero dependencies.';
+const title = 'Space Dodge: Starfighter Odyssey';
+const description = 'Pilot an advanced starfighter through high-density procedural asteroid belts and rogue drone sectors. Pure canvas, high-performance physics.';
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <title>{title} | arcadelab.</title>
     <meta name="description" content={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
       :root {
-        --color-base:    #04060d;
-        --color-surface: #0b0e1a;
+        --color-base:    #03050b;
+        --color-surface: #0a0e1a;
+        --color-surface-2: #141a2d;
         --color-text:    #eef1f5;
-        --color-muted:   #8b93a1;
-        --color-brand:   #f2b84b;
-        --color-accent:  #4dd9f0;
-        --color-border:  #2a2f3d;
-        --nav-h: 44px;
+        --color-muted:   #8893a7;
+        --color-brand:   #f5b942;
+        --color-accent:  #38dbf5;
+        --color-shield:  #3b82f6;
+        --color-danger:  #ff4154;
+        --color-energy:  #a855f7;
+        --color-success: #10b981;
+        --color-border:  #1d2438;
+        --nav-h: 46px;
       }
 
       html, body {
@@ -32,8 +37,9 @@ const description = 'Pilot your ship through a procedurally generated asteroid b
         color: var(--color-text);
         font-family: 'Inter', system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
-        /* prevent scroll on mobile so game fills screen */
         overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       /* ── slim top nav ── */
@@ -41,40 +47,99 @@ const description = 'Pilot your ship through a procedurally generated asteroid b
         height: var(--nav-h);
         display: flex;
         align-items: center;
-        padding: 0 14px;
+        justify-content: space-between;
+        padding: 0 16px;
         border-bottom: 1px solid var(--color-border);
-        background: rgba(2,3,10,0.92);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        background: rgba(3, 5, 11, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         flex-shrink: 0;
-        z-index: 20;
+        z-index: 40;
+      }
+      .game-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
       }
       .game-nav a {
         color: var(--color-brand);
         font-size: 13px;
-        font-family: 'Inter', sans-serif;
+        font-weight: 500;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
+        transition: opacity 0.2s;
       }
-      .game-nav a:hover { text-decoration: underline; }
+      .game-nav a:hover { opacity: 0.85; }
 
-      /* ── shell: column flex, fills screen below nav ── */
+      .sector-badge {
+        font-family: 'Orbitron', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--color-accent);
+        background: rgba(56, 219, 245, 0.08);
+        border: 1px solid rgba(56, 219, 245, 0.25);
+        padding: 3px 10px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .sector-badge:hover {
+        background: rgba(56, 219, 245, 0.18);
+        border-color: var(--color-accent);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn {
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+      }
+      .nav-btn:hover {
+        background: #1e263e;
+        border-color: var(--color-accent);
+      }
+      .nav-btn.gold {
+        color: var(--color-brand);
+        border-color: rgba(245, 185, 66, 0.3);
+      }
+      .nav-btn.gold:hover {
+        background: rgba(245, 185, 66, 0.15);
+        border-color: var(--color-brand);
+      }
+
+      /* ── shell: column flex ── */
       .game-shell {
         display: flex;
         flex-direction: column;
-        /* 100dvh accounts for mobile browser chrome */
         height: calc(100dvh - var(--nav-h));
+        position: relative;
       }
 
-      /* ── game wrapper: expands to fill ALL remaining vertical space ── */
+      /* ── game wrapper ── */
       #game-wrapper {
         position: relative;
         flex: 1 1 auto;
-        min-height: 0;   /* critical — lets flex child shrink below its content size */
+        min-height: 0;
         overflow: hidden;
-        background: #04060d;
+        background: #03050b;
       }
 
       canvas {
@@ -89,152 +154,728 @@ const description = 'Pilot your ship through a procedurally generated asteroid b
         position: absolute;
         top: 0; left: 0; right: 0;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 5px 12px;
-        background: rgba(2, 3, 10, 0.76);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        flex-direction: column;
+        padding: 8px 14px 4px;
+        background: linear-gradient(180deg, rgba(3, 5, 11, 0.88) 0%, rgba(3, 5, 11, 0.4) 80%, transparent 100%);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border-bottom: 1px solid rgba(56, 219, 245, 0.12);
         font-family: 'JetBrains Mono', monospace;
         font-size: 12px;
-        z-index: 10;
+        z-index: 20;
+        pointer-events: none;
         gap: 6px;
       }
 
-      #ui-lives {
+      #hud > * { pointer-events: auto; }
+
+      .hud-main-row {
         display: flex;
-        gap: 1px;
-        flex-shrink: 0;
         align-items: center;
+        justify-content: space-between;
+        width: 100%;
       }
-      #ui-lives span { font-size: 12px; }
+
+      .hud-cluster {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      /* Gauges */
+      .gauge-box {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .gauge-label {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--color-muted);
+        text-transform: uppercase;
+      }
+      .gauge-bar-bg {
+        width: 68px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .gauge-bar-fill {
+        height: 100%;
+        width: 100%;
+        transition: width 0.15s ease-out;
+      }
+      .gauge-shield { background: linear-gradient(90deg, #2563eb, #38dbf5); box-shadow: 0 0 8px rgba(56, 219, 245, 0.6); }
+      .gauge-boost  { background: linear-gradient(90deg, #f59e0b, #f5b942); box-shadow: 0 0 8px rgba(245, 185, 66, 0.6); }
 
       #hud-center {
-        flex: 1;
-        text-align: center;
-        color: var(--color-text);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: 'Orbitron', monospace;
       }
-      #ui-score { color: var(--color-accent); font-weight: 700; }
-      #ui-high  { color: var(--color-muted); }
-      #ui-destroyed { color: var(--color-accent); font-weight: 700; }
+      .hud-metric {
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+      }
+      .metric-val {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--color-text);
+      }
+      .metric-val.score { color: var(--color-accent); text-shadow: 0 0 10px rgba(56, 219, 245, 0.5); }
+      .metric-val.minerals { color: var(--color-brand); }
+      .metric-unit { font-size: 10px; color: var(--color-muted); }
 
-      select#ui-difficulty {
-        -webkit-appearance: none;
-        appearance: none;
-        background: #141a2e;
-        color: var(--color-text);
-        border: 1px solid var(--color-border);
-        border-radius: 6px;
-        padding: 3px 8px;
-        font-size: 11px;
-        font-family: 'Inter', sans-serif;
-        cursor: pointer;
-        outline: none;
-        flex-shrink: 0;
+      .emp-pills {
+        display: flex;
+        gap: 3px;
+        align-items: center;
       }
-      select#ui-difficulty:focus { border-color: var(--color-accent); }
+      .emp-icon {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--color-energy);
+        box-shadow: 0 0 6px rgba(168, 85, 247, 0.8);
+      }
+      .emp-icon.empty {
+        background: rgba(255,255,255,0.1);
+        box-shadow: none;
+      }
+
+      /* Sector Progress Bar */
+      .sector-progress-bar-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+      }
+      .sector-progress-label {
+        font-family: 'Orbitron', monospace;
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--color-accent);
+        white-space: nowrap;
+        letter-spacing: 0.05em;
+      }
+      .sector-progress-bg {
+        flex: 1;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 2px;
+        overflow: hidden;
+        border: 1px solid rgba(56, 219, 245, 0.15);
+      }
+      .sector-progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #38dbf5, #f5b942);
+        box-shadow: 0 0 8px rgba(245, 185, 66, 0.6);
+        transition: width 0.1s ease-out;
+      }
+
+      /* ── Achievement Toast Notifications ── */
+      #achievement-toast {
+        position: absolute;
+        top: 70px;
+        right: 16px;
+        background: linear-gradient(135deg, rgba(14, 20, 36, 0.95), rgba(8, 12, 24, 0.95));
+        border: 1px solid var(--color-brand);
+        box-shadow: 0 0 24px rgba(245, 185, 66, 0.35), 0 12px 30px rgba(0,0,0,0.8);
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 60;
+        transform: translateX(120%);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: none;
+        backdrop-filter: blur(10px);
+        max-width: 320px;
+      }
+      #achievement-toast.show {
+        transform: translateX(0);
+      }
+      .toast-icon {
+        font-size: 26px;
+        line-height: 1;
+        filter: drop-shadow(0 0 8px rgba(245, 185, 66, 0.6));
+      }
+      .toast-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .toast-tag {
+        font-family: 'Orbitron', monospace;
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--color-brand);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .toast-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--color-text);
+      }
+      .toast-desc {
+        font-size: 11px;
+        color: var(--color-muted);
+      }
 
       /* ── hint strip pinned at bottom ── */
       .hints {
         flex-shrink: 0;
         display: flex;
         align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        padding: 7px 12px;
+        justify-content: space-between;
+        padding: 8px 16px;
         font-size: 11px;
         color: var(--color-muted);
         border-top: 1px solid var(--color-border);
         background: var(--color-surface);
-        line-height: 1.2;
+        z-index: 20;
       }
-      .hints span {
-        display: inline-flex;
+      .hints-keys {
+        display: flex;
         align-items: center;
-        gap: 3px;
-        white-space: nowrap;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .hints-keys kbd {
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--color-text);
+      }
+
+      /* Mobile on-screen control overlay */
+      #touch-controls {
+        display: none;
+        position: absolute;
+        bottom: 12px;
+        left: 0; right: 0;
+        padding: 0 20px;
+        justify-content: space-between;
+        align-items: flex-end;
+        pointer-events: none;
+        z-index: 30;
+      }
+      .touch-action-btn {
+        pointer-events: auto;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(10, 14, 26, 0.7);
+        border: 2px solid rgba(56, 219, 245, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: #fff;
+        font-family: 'Orbitron', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        box-shadow: 0 0 16px rgba(0,0,0,0.5);
+        touch-action: manipulation;
+        user-select: none;
+      }
+      .touch-action-btn:active {
+        transform: scale(0.92);
+        background: rgba(56, 219, 245, 0.3);
+      }
+      .touch-action-btn.boost {
+        border-color: rgba(245, 185, 66, 0.6);
+      }
+      .touch-action-btn.emp {
+        width: 48px;
+        height: 48px;
+        border-color: rgba(168, 85, 247, 0.6);
+        font-size: 9px;
+      }
+
+      /* Modals (Achievements, Level Select, Pause, Level Complete) */
+      .game-modal {
+        display: none;
+        position: absolute;
+        inset: 0;
+        background: rgba(3, 5, 11, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 50;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .game-modal.active { display: flex !important; }
+
+      .modal-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 14px;
+        padding: 24px;
+        width: 100%;
+        max-width: 480px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 50px rgba(56, 219, 245, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 12px;
+      }
+      .modal-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--color-accent);
+      }
+      .modal-close {
+        background: transparent;
+        border: none;
+        color: var(--color-muted);
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .modal-close:hover { color: var(--color-text); }
+
+      /* Level Complete Modal Specifics */
+      .level-complete-stars {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        font-size: 32px;
+        filter: drop-shadow(0 0 12px rgba(245, 185, 66, 0.8));
+        margin: 4px 0;
+      }
+      .level-complete-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .stat-card {
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+      }
+      .stat-label {
+        font-size: 10px;
+        color: var(--color-muted);
+        text-transform: uppercase;
+        font-family: 'Orbitron', monospace;
+      }
+      .stat-number {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--color-text);
+        margin-top: 2px;
+        font-family: 'Orbitron', monospace;
+      }
+      .stat-number.gold { color: var(--color-brand); }
+      .stat-number.accent { color: var(--color-accent); }
+      .stat-number.green { color: var(--color-success); }
+
+      /* Achievements Grid */
+      .achievements-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .achievement-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        padding: 12px;
+        transition: border-color 0.2s;
+      }
+      .achievement-item.unlocked {
+        border-color: rgba(245, 185, 66, 0.5);
+        background: linear-gradient(90deg, rgba(245, 185, 66, 0.08), var(--color-surface-2));
+      }
+      .achievement-item.locked {
+        opacity: 0.55;
+      }
+      .ach-icon {
+        font-size: 26px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: rgba(0,0,0,0.3);
+      }
+      .ach-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .ach-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--color-text);
+      }
+      .ach-desc {
+        font-size: 11px;
+        color: var(--color-muted);
+      }
+      .ach-status {
+        font-family: 'Orbitron', monospace;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 4px;
+      }
+      .ach-status.unlocked {
+        background: rgba(245, 185, 66, 0.15);
+        color: var(--color-brand);
+        border: 1px solid rgba(245, 185, 66, 0.3);
+      }
+      .ach-status.locked {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--color-muted);
+      }
+
+      /* Level Select Grid */
+      .level-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .level-card {
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .level-card:hover:not(.locked) {
+        border-color: var(--color-accent);
+        transform: translateY(-2px);
+      }
+      .level-card.locked {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .level-card.current {
+        border-color: var(--color-brand);
+        background: linear-gradient(90deg, rgba(245, 185, 66, 0.1), var(--color-surface-2));
+      }
+      .level-meta h4 {
+        font-family: 'Orbitron', monospace;
+        font-size: 13px;
+        color: var(--color-text);
+      }
+      .level-meta p {
+        font-size: 11px;
+        color: var(--color-muted);
+        margin-top: 2px;
+      }
+
+      .modal-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-top: 6px;
+        border-radius: 8px;
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        letter-spacing: 0.05em;
+      }
+      .modal-btn.primary {
+        background: linear-gradient(90deg, #f5b942, #f59e0b);
+        color: #03050b;
+        border: none;
+        box-shadow: 0 0 20px rgba(245, 185, 66, 0.4);
+      }
+      .modal-btn.accent {
+        background: linear-gradient(90deg, #38dbf5, #2563eb);
+        color: #03050b;
+        border: none;
+      }
+      .modal-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.15);
       }
 
       /* ══════════════════════════════════════════════════════
-         DESKTOP (≥640px) — restore 16:9 card with padding
+         DESKTOP (≥640px)
          ══════════════════════════════════════════════════════ */
       @media (min-width: 640px) {
         html, body { overflow: auto; }
 
         .game-shell {
-          max-width: 900px;
+          max-width: 980px;
           margin: 0 auto;
-          padding: 24px 20px 0;
-          height: auto; /* let content define height */
+          padding: 20px 20px 0;
+          height: auto;
         }
 
         #game-wrapper {
           flex: none;
           aspect-ratio: 16 / 9;
           border-radius: 14px;
+          border: 1px solid var(--color-border);
           box-shadow:
-            0 0 0 1px #2a2f3d,
-            0 24px 60px rgba(0, 0, 0, 0.7),
-            0 0 80px rgba(77, 217, 240, 0.08);
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            0 24px 60px rgba(0, 0, 0, 0.85),
+            0 0 100px rgba(56, 219, 245, 0.12);
         }
 
         .hints {
           background: transparent;
           border-top: none;
-          padding: 10px 0 24px;
-          font-size: 12px;
+          padding: 12px 0 24px;
         }
       }
 
-      /* ── very narrow phones (≤390px): tighten HUD ── */
-      @media (max-width: 390px) {
-        #hud { font-size: 10px; padding: 4px 8px; }
-        #ui-lives span { font-size: 10px; }
-        .hud-high, .hud-destroyed { display: none; }
+      @media (pointer: coarse) {
+        #touch-controls { display: flex; }
       }
     </style>
   </head>
   <body>
 
     <nav class="game-nav">
-      <a href="/">← Arcade</a>
+      <div class="game-nav-left">
+        <a href="/">← Arcade</a>
+        <button id="btn-select-sector" class="sector-badge" title="Select Sector / Level">SECTOR 1: PERIMETER ▾</button>
+      </div>
+
+      <div class="nav-actions">
+        <button id="btn-achievements" class="nav-btn gold" title="View Achievements">🏆 Trophies (<span id="ach-count">0/10</span>)</button>
+        <button id="btn-pause" class="nav-btn" title="Pause Game (ESC / P)">⏸ Pause</button>
+        <button id="btn-vol-mute" class="nav-btn" title="Toggle Audio">🔊</button>
+      </div>
     </nav>
 
     <div class="game-shell">
 
       <section id="game-wrapper">
+        <!-- Holographic Cockpit HUD -->
         <div id="hud">
-          <div id="ui-lives"></div>
-          <div id="hud-center">
-            Distance:&nbsp;<span id="ui-score">0</span>m
-            <span class="hud-destroyed">&nbsp;|&nbsp;☄️&nbsp;<span id="ui-destroyed">0</span></span>
-            <span class="hud-high">&nbsp;|&nbsp;Top:&nbsp;<span id="ui-high">0</span>m</span>
+          <div class="hud-main-row">
+            <!-- Left: Shield & Thruster Energy Bars -->
+            <div class="hud-cluster">
+              <div class="gauge-box">
+                <span class="gauge-label">SHIELD <span id="val-shield">100</span>%</span>
+                <div class="gauge-bar-bg">
+                  <div id="bar-shield" class="gauge-bar-fill gauge-shield" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <div class="gauge-box">
+                <span class="gauge-label">BOOST <span id="val-boost">100</span>%</span>
+                <div class="gauge-bar-bg">
+                  <div id="bar-boost" class="gauge-bar-fill gauge-boost" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Center: Distance & Mineral Counters -->
+            <div id="hud-center">
+              <div class="hud-metric">
+                <span class="metric-val score" id="ui-score">0</span>
+                <span class="metric-unit">M</span>
+              </div>
+              <div class="hud-metric">
+                <span class="metric-unit">💎</span>
+                <span class="metric-val minerals" id="ui-minerals">0</span>
+              </div>
+              <div class="hud-metric">
+                <span class="metric-unit">💥</span>
+                <span class="metric-val" id="ui-destroyed">0</span>
+              </div>
+            </div>
+
+            <!-- Right: EMP Bombs & Top Highscore -->
+            <div class="hud-cluster">
+              <div class="gauge-box" style="align-items: flex-end;">
+                <span class="gauge-label">EMP BOMBS</span>
+                <div class="emp-pills" id="emp-icons">
+                  <div class="emp-icon"></div>
+                  <div class="emp-icon"></div>
+                  <div class="emp-icon"></div>
+                </div>
+              </div>
+
+              <div class="gauge-box" style="align-items: flex-end;">
+                <span class="gauge-label">TOP RUN</span>
+                <span style="font-size:12px; font-weight:700; color:var(--color-brand); font-family:'Orbitron', monospace;" id="ui-high">0m</span>
+              </div>
+            </div>
           </div>
-          <select id="ui-difficulty">
-            <option value="easy">🟢 Easy</option>
-            <option value="medium" selected>🟡 Med</option>
-            <option value="hard">🔴 Hard</option>
-          </select>
+
+          <!-- Sector Completion Progress Bar -->
+          <div class="sector-progress-bar-wrap">
+            <span class="sector-progress-label" id="sector-progress-label">WARP GATE: 0%</span>
+            <div class="sector-progress-bg">
+              <div id="sector-progress-fill" class="sector-progress-fill"></div>
+            </div>
+          </div>
         </div>
+
+        <!-- Achievement Unlock Toast -->
+        <div id="achievement-toast">
+          <div class="toast-icon" id="toast-icon">🏆</div>
+          <div class="toast-content">
+            <span class="toast-tag">ACHIEVEMENT UNLOCKED</span>
+            <span class="toast-title" id="toast-title">First Flight</span>
+            <span class="toast-desc" id="toast-desc">Launch your first starfighter mission</span>
+          </div>
+        </div>
+
+        <!-- Canvas Game Screen -->
         <canvas id="gameCanvas" tabindex="0"></canvas>
+
+        <!-- Mobile Touch Controls -->
+        <div id="touch-controls">
+          <button id="btn-touch-emp" class="touch-action-btn emp" aria-label="Trigger EMP">
+            <span>⚡</span>
+            <span>EMP</span>
+          </button>
+          <div style="display: flex; gap: 12px;">
+            <button id="btn-touch-boost" class="touch-action-btn boost" aria-label="Afterburner Boost">
+              <span>🚀</span>
+              <span>BOOST</span>
+            </button>
+            <button id="btn-touch-fire" class="touch-action-btn fire" aria-label="Fire Plasma Cannons">
+              <span>🔥</span>
+              <span>FIRE</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Level Completed Modal -->
+        <div id="modal-level-complete" class="game-modal">
+          <div class="modal-card" style="text-align: center;">
+            <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+              <h2 class="modal-title" id="lc-title" style="font-size: 22px; color: var(--color-brand);">SECTOR 1 CLEARED!</h2>
+            </div>
+            
+            <div class="level-complete-stars" id="lc-stars">
+              <span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+            <p id="lc-subtitle" style="color: var(--color-muted); font-size: 13px; margin-top: -6px;">
+              Hyperdrive Gate Reached. Starfighter Systems Optimal.
+            </p>
+
+            <div class="level-complete-stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Sector Distance</div>
+                <div class="stat-number accent" id="lc-distance">500m</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Minerals Gathered</div>
+                <div class="stat-number gold" id="lc-minerals">💎 +80</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Hazards Destroyed</div>
+                <div class="stat-number" id="lc-destroyed">💥 18</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Shield Rating</div>
+                <div class="stat-number green" id="lc-shield">100%</div>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+              <button id="btn-next-level" class="modal-btn primary">🚀 ENGAGE NEXT SECTOR</button>
+              <button id="btn-replay-level" class="modal-btn">🔄 REPLAY SECTOR</button>
+              <button id="btn-sector-select" class="modal-btn">🌌 SECTOR MAP</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Achievements Modal -->
+        <div id="modal-achievements" class="game-modal">
+          <div class="modal-card">
+            <div class="modal-header">
+              <h3 class="modal-title">🏆 FLIGHT TROPHIES</h3>
+              <button class="modal-close" id="btn-close-ach">✕</button>
+            </div>
+            <div class="achievements-list" id="achievements-container">
+              <!-- Rendered dynamically by engine -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Level Select Modal -->
+        <div id="modal-levels" class="game-modal">
+          <div class="modal-card">
+            <div class="modal-header">
+              <h3 class="modal-title">🚀 SECTOR NAVIGATION</h3>
+              <button class="modal-close" id="btn-close-levels">✕</button>
+            </div>
+            <div class="level-grid" id="levels-container">
+              <!-- Rendered dynamically by engine -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Pause Modal -->
+        <div id="pause-modal" class="game-modal">
+          <div class="modal-card" style="text-align: center; max-width: 380px;">
+            <h2 class="modal-title">TACTICAL PAUSE</h2>
+            <p style="color:var(--color-muted); font-size:13px;">
+              Systems on standby. Adjust trajectory or resume flight.
+            </p>
+            <button id="btn-resume" class="modal-btn accent">Resume Flight</button>
+            <button id="btn-restart" class="modal-btn">Restart Mission</button>
+          </div>
+        </div>
       </section>
 
+      <!-- Keybinding & Control Hints -->
       <div class="hints">
-        <span>👆 Drag to steer</span>
-        <span>🖱️ Hold to thrust</span>
-        <span>☄️ Dodge asteroids</span>
-        <span>⌨️ Space to laser</span>
-        <span>❤️ 5 lives</span>
-        <span class="ml-auto flex items-center gap-2 bg-[#1e222c] px-2 py-1 rounded border border-[var(--color-border)]">
-          <button id="btn-vol-down" class="text-[var(--color-muted)] hover:text-[var(--color-text)] px-1 leading-none">-</button>
-          <button id="btn-vol-mute" class="text-[var(--color-text)] px-1 leading-none">🔊</button>
-          <button id="btn-vol-up" class="text-[var(--color-muted)] hover:text-[var(--color-text)] px-1 leading-none">+</button>
-        </span>
-
+        <div class="hints-keys">
+          <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>Mouse</kbd> Maneuver</span>
+          <span><kbd>Space</kbd> / <kbd>Click</kbd> Blasters</span>
+          <span><kbd>Shift</kbd> / <kbd>Right Click</kbd> Boost</span>
+          <span><kbd>B</kbd> / <kbd>E</kbd> EMP Nova Bomb</span>
+          <span><kbd>P</kbd> / <kbd>ESC</kbd> Pause</span>
+        </div>
+        <div style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--color-muted);">
+          60 FPS Pure Canvas Engine
+        </div>
       </div>
 
     </div>
