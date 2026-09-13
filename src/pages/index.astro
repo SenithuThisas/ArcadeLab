@@ -104,7 +104,7 @@ import Layout from '../layouts/Layout.astro';
           the arcade
         </h2>
         <span class="text-xs font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-          1 game available
+          2 games available
         </span>
       </div>
 
@@ -215,32 +215,182 @@ import Layout from '../layouts/Layout.astro';
           </a>
         </li>
 
-        <!-- ── CARD 2: Coming Soon ─────────────────────────────── -->
-        <li role="listitem" aria-hidden="true">
-          <article
-            id="card-coming-soon-1"
-            class="h-full rounded-xl border border-dashed border-[var(--color-border)]
-                   bg-[var(--color-surface)] p-5 space-y-4 opacity-50 pointer-events-none
-                   select-none"
-            aria-label="Coming soon game slot"
+        <!-- ── CARD 2: Shadow Fight: Arena of Shadows (active) ───────── -->
+        <li role="listitem">
+          <a
+            href="/games/shadow-protocol"
+            id="card-shadow-protocol"
+            class="group block h-full rounded-xl border border-[var(--color-border)]
+                   bg-[var(--color-surface)] p-5 space-y-4
+                   transition-all duration-200 ease-out
+                   hover:scale-[1.03] hover:border-[#f5b942]
+                   hover:shadow-[0_0_32px_rgba(245,185,66,0.18)]
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5b942]"
+            aria-label="Play Shadow Fight: Arena of Shadows"
           >
+            <!-- Game thumbnail -->
             <div
-              class="w-full rounded-lg"
-              style="aspect-ratio:16/9; background:var(--color-surface-2);"
-            ></div>
+              class="w-full rounded-lg overflow-hidden"
+              style="aspect-ratio:16/9; background: linear-gradient(180deg, #10040c 0%, #300a18 55%, #080a12 100%);"
+            >
+              <div class="w-full h-full flex items-center justify-center relative">
+                <svg width="100%" height="100%" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="bg-sf-japan" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#120417"/>
+                      <stop offset="45%" stop-color="#4a0e28"/>
+                      <stop offset="75%" stop-color="#962d22"/>
+                      <stop offset="90%" stop-color="#e67e22"/>
+                      <stop offset="100%" stop-color="#fad390"/>
+                    </linearGradient>
+                    <linearGradient id="blade-glow" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#ffffff"/>
+                      <stop offset="100%" stop-color="#00ff9d"/>
+                    </linearGradient>
+                  </defs>
+
+                  <!-- 1. Sunset Sky Gradient -->
+                  <rect width="160" height="90" fill="url(#bg-sf-japan)"/>
+
+                  <!-- 2. Glowing Golden Sun -->
+                  <circle cx="80" cy="36" r="22" fill="#ffeaa7" opacity="0.85"/>
+                  <circle cx="80" cy="36" r="32" fill="none" stroke="#f39c12" stroke-width="1.2" opacity="0.35"/>
+
+                  <!-- 3. Mt. Fuji Volcano & Snowcap -->
+                  <polygon points="40,70 80,26 120,70" fill="#240c2e"/>
+                  <polygon points="72,35 80,26 88,35 85,38 80,34 75,38" fill="#f8fafc"/>
+
+                  <!-- 4. Five-Story Pagoda Silhouette (Far Left) -->
+                  <g transform="translate(18, 70) scale(0.45)" fill="#0d0514">
+                    <rect x="-12" y="-10" width="24" height="10"/>
+                    <rect x="-8" y="-22" width="16" height="12"/>
+                    <polygon points="-16,-22 0,-28 16,-22 14,-20 0,-25 -14,-20"/>
+                    <rect x="-7" y="-34" width="14" height="12"/>
+                    <polygon points="-14,-34 0,-39 14,-34 12,-32 0,-36 -12,-32"/>
+                    <rect x="-6" y="-46" width="12" height="12"/>
+                    <polygon points="-12,-46 0,-50 12,-46 10,-44 0,-47 -10,-44"/>
+                    <line x1="0" y1="-50" x2="0" y2="-62" stroke="#f5b942" stroke-width="1.5"/>
+                  </g>
+
+                  <!-- 5. Shinto Torii Gate Silhouette (Far Right) -->
+                  <g transform="translate(142, 70) scale(0.4)" fill="#b71540">
+                    <rect x="-14" y="-36" width="28" height="3" rx="1"/>
+                    <polygon points="-16,-40 0,-38 16,-40 14,-37 0,-35 -14,-37"/>
+                    <rect x="-9" y="-36" width="3" height="36"/>
+                    <rect x="6" y="-36" width="3" height="36"/>
+                  </g>
+
+                  <!-- 6. Ground Dojo Platform -->
+                  <rect x="0" y="70" width="160" height="20" fill="#060912"/>
+                  <line x1="0" y1="70" x2="160" y2="70" stroke="#f5b942" stroke-width="1" opacity="0.6"/>
+
+                  <!-- 7. Ambient Sakura Petals -->
+                  <circle cx="32" cy="24" r="1" fill="#ff76a6" opacity="0.8"/>
+                  <circle cx="68" cy="18" r="1.3" fill="#ff9ebb" opacity="0.9"/>
+                  <circle cx="125" cy="28" r="1.2" fill="#ff76a6" opacity="0.75"/>
+                  <circle cx="95" cy="52" r="1" fill="#ffb8d1" opacity="0.85"/>
+
+                  <!-- 8. Player: Navy Blue Anime Martial Arts Warrior (Left) -->
+                  <g transform="translate(52, 70)">
+                    <!-- Back Leg -->
+                    <rect x="-8" y="-14" width="5" height="14" rx="2" fill="#0b1b38"/>
+                    <rect x="-9" y="-4" width="6" height="4" fill="#2563eb"/>
+                    <!-- Front Leg in dynamic lunge stance -->
+                    <rect x="2" y="-12" width="5" height="12" rx="2" fill="#0b1b38" transform="rotate(20)"/>
+                    <rect x="5" y="-3" width="7" height="4" fill="#2563eb"/>
+                    <!-- Torso with Navy Blue Gi & Royal Blue Collar -->
+                    <polygon points="-6,-13 6,-13 4,-26 -4,-26" fill="#0b1b38"/>
+                    <line x1="-4" y1="-26" x2="1" y2="-17" stroke="#2563eb" stroke-width="1.2"/>
+                    <polygon points="-2,-26 2,-26 0,-20" fill="#ffd5aa"/>
+                    <!-- Navy Blue Sash Belt -->
+                    <rect x="-5" y="-15" width="10" height="2.5" fill="#1d4ed8"/>
+                    <!-- Head, Spiky Navy Hair & Glowing Cyan Eye -->
+                    <circle cx="0" cy="-30" r="4.5" fill="#ffd5aa"/>
+                    <path d="M-4,-29 L-6,-35 L-2,-34 L0,-38 L3,-33 L5,-34 L4,-29 Z" fill="#070f22"/>
+                    <rect x="-4" y="-31" width="8" height="1.8" fill="#2563eb"/>
+                    <!-- Headband Ribbon -->
+                    <path d="M-4,-30 Q-9,-31 -13,-28" stroke="#2563eb" stroke-width="1.2" fill="none"/>
+                    <circle cx="2" cy="-30" r="0.8" fill="#38bdf8"/>
+                    <!-- Arms & Glowing Katana Blade Slash -->
+                    <rect x="-2" y="-25" width="3.5" height="8" rx="1.5" fill="#0b1b38" transform="rotate(35)"/>
+                    <circle cx="8" cy="-21" r="2" fill="#ffd5aa"/>
+                    <!-- Katana Blade -->
+                    <line x1="8" y1="-21" x2="26" y2="-34" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round"/>
+                    <line x1="9" y1="-21" x2="27" y2="-34" stroke="#00ff9d" stroke-width="1" stroke-linecap="round"/>
+                  </g>
+
+                  <!-- 9. Opponent: Master Ronin with Straw Hat & Naginata (Right) -->
+                  <g transform="translate(108, 70) scale(-1, 1)">
+                    <!-- Back Leg -->
+                    <rect x="-8" y="-14" width="5" height="14" rx="2" fill="#1e3a2b"/>
+                    <!-- Front Leg in martial arts combat stance -->
+                    <rect x="2" y="-12" width="5" height="12" rx="2" fill="#1e3a2b" transform="rotate(18)"/>
+                    <!-- Torso with Bamboo Green Robes -->
+                    <polygon points="-6,-13 6,-13 4,-26 -4,-26" fill="#1e3a2b"/>
+                    <polygon points="-2,-26 2,-26 0,-20" fill="#eec59a"/>
+                    <!-- Brown Sash -->
+                    <rect x="-5" y="-15" width="10" height="2.5" fill="#78350f"/>
+                    <!-- Head & Conical Bamboo Straw Hat (Kasa) -->
+                    <circle cx="0" cy="-30" r="4.5" fill="#eec59a"/>
+                    <polygon points="-8,-30 0,-37 8,-30" fill="#78350f"/>
+                    <line x1="-8" y1="-30" x2="8" y2="-30" stroke="#d97706" stroke-width="0.8"/>
+                    <circle cx="2" cy="-30" r="0.8" fill="#ff0055"/>
+                    <!-- Arms & Naginata Polearm Strike -->
+                    <rect x="-2" y="-25" width="3.5" height="8" rx="1.5" fill="#1e3a2b" transform="rotate(30)"/>
+                    <circle cx="8" cy="-21" r="2" fill="#eec59a"/>
+                    <!-- Naginata Long Shaft & Curved Blade -->
+                    <line x1="2" y1="-14" x2="26" y2="-33" stroke="#451a03" stroke-width="1.4" stroke-linecap="round"/>
+                    <path d="M26,-33 Q31,-37 34,-34 L32,-32 Q28,-34 26,-33 Z" fill="#f1f5f9" stroke="#f5b942" stroke-width="0.8"/>
+                  </g>
+
+                  <!-- 10. Central Blade Clash Spark Burst -->
+                  <circle cx="80" cy="40" r="3.5" fill="#ffffff"/>
+                  <circle cx="80" cy="40" r="7" fill="none" stroke="#ffeaa7" stroke-width="1" opacity="0.8"/>
+                  <line x1="72" y1="40" x2="88" y2="40" stroke="#ffd700" stroke-width="1.8"/>
+                  <line x1="80" y1="32" x2="80" y2="48" stroke="#00ff9d" stroke-width="1.8"/>
+                  <line x1="74" y1="34" x2="86" y2="46" stroke="#fff" stroke-width="1"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Card body -->
             <div class="space-y-2">
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-muted)]"
-                style="font-family:var(--font-mono);">
-                soon
-              </span>
-              <h3 class="text-base text-[var(--color-muted)]" style="font-family:var(--font-heading); font-weight:700;">
-                ??? — redacted
+              <div class="flex items-center gap-2">
+                <span
+                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[#f5b942] text-[#f5b942]"
+                  style="font-family:var(--font-mono);"
+                >
+                  playable
+                </span>
+              </div>
+
+              <h3
+                class="text-base text-[var(--color-text)] transition-colors duration-200
+                       group-hover:text-[#f5b942]"
+                style="font-family:var(--font-heading); font-weight:700;"
+              >
+                Shadow Fight: Arena
               </h3>
+
               <p class="text-xs text-[var(--color-muted)] leading-relaxed">
-                something's brewing underground. check back soon.
+                2D 1v1 shadow martial arts duel. master punches, roundhouse kicks, katana slashes, and kusarigama chains.
               </p>
             </div>
-          </article>
+
+            <!-- Footer row -->
+            <div class="flex items-center justify-between pt-1 border-t border-[var(--color-border)]">
+              <span class="text-[10px] font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
+                canvas · 1v1 martial arts
+              </span>
+              <svg
+                width="14" height="14" viewBox="0 0 24 24" fill="none"
+                class="text-[#f5b942] opacity-0 group-hover:opacity-100 transition-opacity duration-200 -translate-x-1 group-hover:translate-x-0 transition-transform"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </a>
         </li>
 
         <!-- ── CARD 3: Coming Soon ─────────────────────────────── -->

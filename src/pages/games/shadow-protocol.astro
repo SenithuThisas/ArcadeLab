@@ -1,0 +1,941 @@
+---
+const title = 'Shadow Fight: Arena of Shadows';
+const description = '2D 1v1 Shadow Martial Arts Fighting Game. Master Katana, Kusarigama, Nunchaku, and Naginata combos. Pure Canvas, zero dependencies.';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <title>{title} | arcadelab.</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --color-base:       #030508;
+        --color-surface:    #070a12;
+        --color-surface-2:  #0f1524;
+        --color-text:       #eef1f5;
+        --color-muted:      #8893a7;
+        --color-player:     #00f0ff;
+        --color-player-glow: rgba(0, 240, 255, 0.4);
+        --color-enemy:      #ff0055;
+        --color-enemy-glow:  rgba(255, 0, 85, 0.4);
+        --color-katana:     #00ff9d;
+        --color-gold:       #f5b942;
+        --color-border:     #161d30;
+        --nav-h: 46px;
+      }
+
+      html, body {
+        height: 100%;
+        background: var(--color-base);
+        color: var(--color-text);
+        font-family: 'Inter', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      /* ── Top Nav ── */
+      .game-nav {
+        height: var(--nav-h);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--color-border);
+        background: rgba(3, 5, 8, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        flex-shrink: 0;
+        z-index: 40;
+      }
+      .game-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .game-nav a {
+        color: var(--color-player);
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.2s;
+      }
+      .game-nav a:hover { opacity: 0.85; }
+
+      .arena-badge {
+        font-family: 'Orbitron', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--color-gold);
+        background: rgba(245, 185, 66, 0.1);
+        border: 1px solid rgba(245, 185, 66, 0.3);
+        padding: 3px 10px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .arena-badge:hover {
+        background: rgba(245, 185, 66, 0.2);
+        border-color: var(--color-gold);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn {
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+      }
+      .nav-btn:hover {
+        background: #182038;
+        border-color: var(--color-player);
+      }
+      .nav-btn.gold {
+        color: var(--color-gold);
+        border-color: rgba(245, 185, 66, 0.35);
+      }
+
+      /* ── Shell: Column Flex ── */
+      .game-shell {
+        display: flex;
+        flex-direction: column;
+        height: calc(100dvh - var(--nav-h));
+        position: relative;
+      }
+
+      /* ── Game Wrapper ── */
+      #game-wrapper {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+        background: #000;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        outline: none;
+      }
+
+      /* ── 1v1 Fighting Game Top HUD ── */
+      #hud-fight {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 10px 18px 4px;
+        background: linear-gradient(180deg, rgba(3, 5, 8, 0.95) 0%, rgba(3, 5, 8, 0.4) 75%, transparent 100%);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        pointer-events: none;
+        z-index: 10;
+        gap: 6px;
+      }
+
+      .fight-health-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 16px;
+      }
+
+      /* Fighter Health Bars */
+      .fighter-card {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .fighter-card.enemy {
+        align-items: flex-end;
+      }
+
+      .fighter-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Orbitron', monospace;
+      }
+      .fighter-name {
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+      }
+      .fighter-name.player { color: var(--color-player); text-shadow: 0 0 10px var(--color-player-glow); }
+      .fighter-name.enemy { color: var(--color-enemy); text-shadow: 0 0 10px var(--color-enemy-glow); }
+
+      .fighter-weapon-tag {
+        font-size: 9px;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--color-muted);
+      }
+
+      .health-bar-frame {
+        width: 100%;
+        height: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+      }
+      .health-bar-fill {
+        height: 100%;
+        width: 100%;
+        transition: width 0.12s ease-out;
+      }
+      .health-bar-fill.player {
+        background: linear-gradient(90deg, #00f0ff, #00ff9d);
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+      }
+      .health-bar-fill.enemy {
+        background: linear-gradient(90deg, #ff7700, #ff0055);
+        box-shadow: 0 0 12px rgba(255, 0, 85, 0.6);
+        float: right;
+      }
+
+      /* Center Timer & Round Dots */
+      .fight-center-cluster {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .fight-timer {
+        font-family: 'Orbitron', monospace;
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--color-gold);
+        text-shadow: 0 0 14px rgba(245, 185, 66, 0.8);
+        min-width: 44px;
+        text-align: center;
+      }
+
+      .round-dots-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .round-dots-group {
+        display: flex;
+        gap: 4px;
+      }
+      .round-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .round-dot.won {
+        background: var(--color-gold);
+        border-color: var(--color-gold);
+        box-shadow: 0 0 8px rgba(245, 185, 66, 0.9);
+      }
+
+      /* Combo & Fight Announcer Overlay */
+      #fight-announcer {
+        position: absolute;
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.6);
+        font-family: 'Orbitron', monospace;
+        font-size: 46px;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-align: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 20;
+        text-shadow: 0 0 30px rgba(245, 185, 66, 0.9);
+      }
+      #fight-announcer.active {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      #fight-announcer.gold { color: var(--color-gold); }
+      #fight-announcer.red { color: #ff0055; text-shadow: 0 0 30px rgba(255,0,85,0.9); }
+      #fight-announcer.cyan { color: #00f0ff; text-shadow: 0 0 30px rgba(0,240,255,0.9); }
+
+      /* Controls hint bottom bar */
+      .hints {
+        flex-shrink: 0;
+        background: var(--color-surface);
+        border-top: 1px solid var(--color-border);
+        padding: 6px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--color-muted);
+      }
+
+      .hints-keys {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      kbd {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+
+      /* Mobile touch fight controls */
+      #touch-controls {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        right: 14px;
+        display: none;
+        align-items: flex-end;
+        justify-content: space-between;
+        pointer-events: none;
+        z-index: 15;
+      }
+
+      .touch-dpad {
+        display: grid;
+        grid-template-columns: 50px 50px 50px;
+        grid-template-rows: 50px 50px;
+        gap: 4px;
+        pointer-events: auto;
+      }
+      .touch-btn {
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        background: rgba(15, 21, 36, 0.8);
+        border: 1px solid rgba(0, 240, 255, 0.4);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Orbitron', monospace;
+        font-size: 14px;
+        font-weight: 800;
+        touch-action: manipulation;
+      }
+      .touch-btn:active {
+        background: rgba(0, 240, 255, 0.4);
+        transform: scale(0.92);
+      }
+
+      .touch-actions-group {
+        display: grid;
+        grid-template-columns: 60px 60px;
+        gap: 8px;
+        pointer-events: auto;
+      }
+      .touch-action-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(15, 21, 36, 0.85);
+        border: 1.5px solid rgba(0, 240, 255, 0.5);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Orbitron', monospace;
+        font-size: 9px;
+        font-weight: 800;
+        touch-action: manipulation;
+      }
+      .touch-action-btn.punch { border-color: #00f0ff; color: #00f0ff; }
+      .touch-action-btn.kick { border-color: #ff0055; color: #ff0055; }
+      .touch-action-btn.weapon { border-color: #00ff9d; color: #00ff9d; }
+      .touch-action-btn.roll { border-color: #f5b942; color: #f5b942; }
+
+      /* Modals */
+      .game-modal {
+        position: absolute;
+        inset: 0;
+        background: rgba(3, 5, 8, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 30;
+        padding: 16px;
+      }
+      .game-modal.active { display: flex; }
+
+      .modal-card {
+        background: rgba(10, 14, 24, 0.95);
+        border: 1px solid rgba(245, 185, 66, 0.35);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 440px;
+        width: 100%;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(245, 185, 66, 0.15);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .modal-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        color: var(--color-gold);
+        text-transform: uppercase;
+      }
+
+      .modal-btn {
+        all: unset;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 6px;
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        font-family: 'Orbitron', monospace;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .modal-btn:hover {
+        background: #1a2238;
+        border-color: var(--color-gold);
+        transform: translateY(-1px);
+      }
+      .modal-btn.primary {
+        background: linear-gradient(135deg, rgba(245, 185, 66, 0.35), rgba(0, 255, 157, 0.2));
+        border-color: var(--color-gold);
+        color: #fff;
+        box-shadow: 0 0 16px rgba(245, 185, 66, 0.3);
+      }
+
+      /* ── Left Sidebar: Weapons & Duel Masters ── */
+      .game-container-grid {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        gap: 16px;
+      }
+
+      .game-sidebar-left {
+        background: rgba(7, 10, 18, 0.94);
+        border: 1px solid rgba(245, 185, 66, 0.2);
+        border-radius: 12px;
+        padding: 14px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .sidebar-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        color: var(--color-gold);
+        text-transform: uppercase;
+      }
+
+      .sidebar-section-divider {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: 'Orbitron', monospace;
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--color-muted);
+        letter-spacing: 0.08em;
+        padding: 2px 2px;
+      }
+
+      /* Weapon Selector Cards */
+      .weapon-selector-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      button.weapon-btn {
+        all: unset;
+        box-sizing: border-box;
+        background: rgba(15, 21, 36, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        padding: 7px 8px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        transition: all 0.18s ease;
+      }
+      button.weapon-btn:hover {
+        background: rgba(0, 240, 255, 0.15);
+        border-color: rgba(0, 240, 255, 0.5);
+      }
+      button.weapon-btn.active {
+        background: linear-gradient(135deg, rgba(0, 255, 157, 0.25), rgba(0, 240, 255, 0.15));
+        border-color: var(--color-katana);
+        box-shadow: 0 0 12px rgba(0, 255, 157, 0.3);
+      }
+      button.weapon-btn.locked-weapon {
+        opacity: 0.5;
+        border-color: rgba(255, 0, 85, 0.2);
+        background: rgba(10, 14, 24, 0.5);
+      }
+      button.weapon-btn.locked-weapon:hover {
+        opacity: 0.75;
+        border-color: rgba(255, 0, 85, 0.5);
+      }
+      .weapon-name {
+        font-family: 'Orbitron', monospace;
+        font-size: 9.5px;
+        font-weight: 800;
+        color: #fff;
+      }
+      .weapon-desc {
+        font-size: 8px;
+        color: var(--color-muted);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Masters Duel List */
+      .sidebar-levels-list {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      button.master-tile-btn {
+        all: unset;
+        box-sizing: border-box;
+        width: 100%;
+        background: rgba(15, 21, 36, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 8px 10px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        cursor: pointer;
+        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: left;
+      }
+      button.master-tile-btn:hover:not(.locked) {
+        background: rgba(245, 185, 66, 0.12);
+        border-color: rgba(245, 185, 66, 0.5);
+        transform: translateX(3px);
+      }
+      button.master-tile-btn.active {
+        background: linear-gradient(90deg, rgba(245, 185, 66, 0.2), rgba(15, 21, 36, 0.85));
+        border-color: var(--color-gold);
+        box-shadow: 0 0 14px rgba(245, 185, 66, 0.3);
+      }
+      button.master-tile-btn.locked {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .master-num {
+        font-family: 'Orbitron', monospace;
+        font-size: 10px;
+        font-weight: 800;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--color-muted);
+      }
+      button.master-tile-btn.active .master-num {
+        background: rgba(245, 185, 66, 0.25);
+        border-color: var(--color-gold);
+        color: var(--color-gold);
+      }
+
+      .master-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+      .master-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .master-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 8.5px;
+        color: var(--color-muted);
+      }
+
+      .master-action {
+        font-family: 'Orbitron', monospace;
+        font-size: 8px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.05em;
+      }
+      .master-action.active {
+        background: var(--color-gold);
+        color: #030508;
+      }
+      .master-action.play {
+        background: rgba(245, 185, 66, 0.15);
+        color: var(--color-gold);
+        border: 1px solid rgba(245, 185, 66, 0.35);
+      }
+      .master-action.locked { color: var(--color-muted); }
+
+      /* ══════════════════════════════════════════════════════
+         DESKTOP (≥960px)
+         ══════════════════════════════════════════════════════ */
+      @media (min-width: 960px) {
+        html, body { overflow: auto; }
+
+        .game-shell {
+          max-width: 1360px;
+          margin: 0 auto;
+          padding: 16px 16px 0;
+          height: auto;
+        }
+
+        .game-container-grid {
+          display: grid;
+          grid-template-columns: 290px 1fr;
+          gap: 16px;
+          align-items: start;
+        }
+
+        .game-sidebar-left {
+          height: fit-content;
+        }
+
+        .game-viewport-wrap {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+        }
+
+        #game-wrapper {
+          flex: none;
+          aspect-ratio: 16 / 9;
+          border-radius: 14px;
+          border: 1px solid var(--color-border);
+          box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            0 24px 60px rgba(0, 0, 0, 0.85),
+            0 0 100px rgba(245, 185, 66, 0.12);
+        }
+
+        .hints {
+          background: transparent;
+          border-top: none;
+          padding: 12px 0 24px;
+        }
+      }
+
+      #game-wrapper:fullscreen,
+      #game-wrapper:-webkit-full-screen {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        aspect-ratio: auto !important;
+      }
+
+      @media (pointer: coarse) {
+        #touch-controls { display: flex; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav class="game-nav">
+      <div class="game-nav-left">
+        <a href="/">← Arcade</a>
+        <button id="btn-select-arena" class="arena-badge" title="Select Duel Arena">DOJO: BAMBOO TEMPLE ▾</button>
+      </div>
+
+      <div class="nav-actions">
+        <button id="btn-achievements" class="nav-btn gold" title="View Trophies">🏆 Trophies (<span id="ach-count">0/10</span>)</button>
+        <button id="btn-fullscreen" class="nav-btn" title="Toggle Fullscreen (F)">⛶ Fullscreen</button>
+        <button id="btn-pause" class="nav-btn" title="Pause Game (ESC / P)">⏸ Pause</button>
+        <button id="btn-vol-mute" class="nav-btn" title="Toggle Audio">🔊</button>
+      </div>
+    </nav>
+
+    <div class="game-shell">
+      <div class="game-container-grid">
+        <!-- Left Sidebar: Weapons Arsenal & Shadow Masters Ladder -->
+        <aside class="game-sidebar-left" id="game-sidebar-left">
+          <div class="sidebar-header">
+            <span class="sidebar-title">WEAPON ARSENAL</span>
+            <span style="font-family:'Orbitron', monospace; font-size:9px; color:var(--color-gold);" id="sidebar-weapon-active">KATANA</span>
+          </div>
+
+          <!-- 6 Handcrafted Weapon Styles -->
+          <div class="weapon-selector-grid" id="weapon-selector-grid">
+            <button class="weapon-btn active" data-weapon="katana" title="Press 1 to Equip">
+              <span class="weapon-name">🗡️ KATANA</span>
+              <span class="weapon-desc">Precision Slashes [1]</span>
+            </button>
+            <button class="weapon-btn" data-weapon="kusarigama" title="Press 2 to Equip">
+              <span class="weapon-name">⛓️ KUSARIGAMA</span>
+              <span class="weapon-desc">Whirling Chains [2]</span>
+            </button>
+            <button class="weapon-btn" data-weapon="nunchaku" title="Press 3 to Equip">
+              <span class="weapon-name">🥢 NUNCHAKU</span>
+              <span class="weapon-desc">Rapid Flurries [3]</span>
+            </button>
+            <button class="weapon-btn" data-weapon="staff" title="Press 4 to Equip">
+              <span class="weapon-name">🎋 NAGINATA</span>
+              <span class="weapon-desc">Long Polearm [4]</span>
+            </button>
+            <button class="weapon-btn" data-weapon="sai" title="Press 5 to Equip">
+              <span class="weapon-name">⚔️ DUAL SAI</span>
+              <span class="weapon-desc">Lightning Stabs [5]</span>
+            </button>
+            <button class="weapon-btn" data-weapon="hammer" title="Press 6 to Equip">
+              <span class="weapon-name">🔨 WAR HAMMER</span>
+              <span class="weapon-desc">Crushing Impact [6]</span>
+            </button>
+          </div>
+
+          <!-- Endless Survival Banner -->
+          <button class="modal-btn primary" id="btn-sidebar-endless" style="padding: 9px 12px; font-size: 10px; margin-top: 2px;">
+            ⚡ ENDLESS DOJO SURVIVAL
+          </button>
+
+          <!-- Ladder Header -->
+          <div class="sidebar-section-divider">
+            <span>SHADOW DUEL LADDER</span>
+            <span id="sidebar-unlocked-pill">1/5</span>
+          </div>
+
+          <!-- Shadow Masters List -->
+          <div class="sidebar-levels-list" id="sidebar-levels-list">
+            <!-- Populated cleanly by JS -->
+          </div>
+        </aside>
+
+        <!-- Right / Main Viewport -->
+        <div class="game-viewport-wrap">
+          <section id="game-wrapper">
+            <!-- 1v1 Top Fighting HUD -->
+            <div id="hud-fight">
+              <div class="fight-health-row">
+                <!-- Left: Player -->
+                <div class="fighter-card">
+                  <div class="fighter-meta">
+                    <span class="fighter-name player">SHADOW</span>
+                    <span class="fighter-weapon-tag" id="hud-player-weapon">[KATANA]</span>
+                  </div>
+                  <div class="health-bar-frame">
+                    <div id="player-hp-bar" class="health-bar-fill player" style="width: 100%;"></div>
+                  </div>
+                </div>
+
+                <!-- Center: Timer & Round Wins -->
+                <div class="fight-center-cluster">
+                  <div class="fight-timer" id="fight-timer">99</div>
+                  <div class="round-dots-row">
+                    <div class="round-dots-group" id="player-round-dots">
+                      <div class="round-dot"></div>
+                      <div class="round-dot"></div>
+                    </div>
+                    <span style="font-family:'Orbitron', monospace; font-size:9px; color:var(--color-muted); font-weight:800;">VS</span>
+                    <div class="round-dots-group" id="enemy-round-dots">
+                      <div class="round-dot"></div>
+                      <div class="round-dot"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right: Opponent -->
+                <div class="fighter-card enemy">
+                  <div class="fighter-meta">
+                    <span class="fighter-weapon-tag" id="hud-enemy-weapon">[KATANA]</span>
+                    <span class="fighter-name enemy" id="hud-enemy-name">SHINOBI</span>
+                  </div>
+                  <div class="health-bar-frame">
+                    <div id="enemy-hp-bar" class="health-bar-fill enemy" style="width: 100%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Announcer Banner Overlay (ROUND 1, FIGHT, K.O.) -->
+            <div id="fight-announcer" class="gold">FIGHT!</div>
+
+            <!-- Canvas Fighting Arena -->
+            <canvas id="gameCanvas" tabindex="0"></canvas>
+
+            <!-- Mobile Touch Fight Controls -->
+            <div id="touch-controls">
+              <div class="touch-dpad">
+                <div></div>
+                <button id="btn-touch-up" class="touch-btn">▲</button>
+                <div></div>
+                <button id="btn-touch-left" class="touch-btn">◄</button>
+                <button id="btn-touch-down" class="touch-btn">▼</button>
+                <button id="btn-touch-right" class="touch-btn">►</button>
+              </div>
+              <div class="touch-actions-group">
+                <button id="btn-touch-punch" class="touch-action-btn punch">
+                  <span>👊</span>
+                  <span>PUNCH</span>
+                </button>
+                <button id="btn-touch-kick" class="touch-action-btn kick">
+                  <span>🦵</span>
+                  <span>KICK</span>
+                </button>
+                <button id="btn-touch-weapon" class="touch-action-btn weapon">
+                  <span>⚔️</span>
+                  <span>WEAPON</span>
+                </button>
+                <button id="btn-touch-roll" class="touch-action-btn roll">
+                  <span>🌀</span>
+                  <span>ROLL</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Duel Victory / Defeat Modal -->
+            <div id="modal-level-complete" class="game-modal">
+              <div class="modal-card" style="text-align: center;">
+                <h2 class="modal-title" id="lc-title" style="color: var(--color-gold);">VICTORY!</h2>
+                <p id="lc-subtitle" style="color: var(--color-muted); font-size: 13px;">
+                  Shadow Master Neutralized. Honor Maintained.
+                </p>
+                <div style="display: flex; justify-content: space-around; padding: 12px 0;">
+                  <div>
+                    <div style="font-size: 10px; color: var(--color-muted); font-family:'Orbitron', monospace;">ROUNDS</div>
+                    <div id="lc-rounds" style="font-size: 18px; font-weight: 800; color: var(--color-gold); font-family:'Orbitron', monospace;">2 - 0</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 10px; color: var(--color-muted); font-family:'Orbitron', monospace;">MAX COMBO</div>
+                    <div id="lc-combo" style="font-size: 18px; font-weight: 800; color: var(--color-player); font-family:'Orbitron', monospace;">6x</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 10px; color: var(--color-muted); font-family:'Orbitron', monospace;">RATING</div>
+                    <div id="lc-rating" style="font-size: 18px; font-weight: 800; color: var(--color-katana); font-family:'Orbitron', monospace;">PERFECT</div>
+                  </div>
+                </div>
+                <button id="btn-next-level" class="modal-btn primary">⚔️ CHALLENGE NEXT MASTER</button>
+                <button id="btn-replay-level" class="modal-btn">🔄 REMATCH</button>
+              </div>
+            </div>
+
+            <!-- Pause Modal -->
+            <div id="pause-modal" class="game-modal">
+              <div class="modal-card" style="text-align: center; max-width: 360px;">
+                <h2 class="modal-title">DUEL PAUSED</h2>
+                <p style="color:var(--color-muted); font-size:13px;">
+                  Combat suspended. Regain focus or resume duel.
+                </p>
+                <button id="btn-resume" class="modal-btn primary">Resume Duel</button>
+                <button id="btn-pause-fullscreen" class="modal-btn">⛶ Toggle Fullscreen</button>
+                <button id="btn-restart" class="modal-btn">Restart Match</button>
+              </div>
+            </div>
+
+            <!-- Trophies Modal -->
+            <div id="modal-achievements" class="game-modal">
+              <div class="modal-card" style="max-width: 500px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                  <h3 class="modal-title">🏆 SHADOW TROPHIES</h3>
+                  <button id="btn-close-ach" style="all:unset; cursor:pointer; color:var(--color-muted); font-size:16px;">✕</button>
+                </div>
+                <div id="achievements-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; padding-right: 4px;">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Control hints footer -->
+          <div class="hints">
+            <div class="hints-keys">
+              <span><kbd>A</kbd><kbd>D</kbd> Move</span>
+              <span><kbd>W</kbd> Jump</span>
+              <span><kbd>S</kbd> Crouch</span>
+              <span><kbd>J</kbd> Punch</span>
+              <span><kbd>K</kbd> Kick</span>
+              <span><kbd>L</kbd> / <kbd>Space</kbd> Weapon</span>
+              <span><kbd>1-6</kbd> / <kbd>Q</kbd><kbd>E</kbd> Weapon</span>
+              <span><kbd>B</kbd> Scenery</span>
+              <span><kbd>Shift</kbd> Roll</span>
+              <span><kbd>P</kbd> Pause</span>
+            </div>
+            <div style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--color-muted);">
+              60 FPS Pure Canvas Martial Arts
+            </div>
+          </div>
+        </div> <!-- /.game-viewport-wrap -->
+      </div> <!-- /.game-container-grid -->
+    </div> <!-- /.game-shell -->
+
+    <script src="/shadow-protocol-engine.js" defer></script>
+  </body>
+</html>
