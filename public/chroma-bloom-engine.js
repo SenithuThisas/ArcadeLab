@@ -7,20 +7,29 @@
 (function () {
   'use strict';
 
-  // ── Web Audio Synth (Generative Crystal Chimes & Ambient Singing Bowls) ──
+  // ── Musical Song Scales and Harmonic Chord Progressions ──
+  // 8-part meditative chord progression: Cmaj9 -> Am9 -> Fmaj7#11 -> Gadd9 -> Em9 -> Dm9 -> Fmaj9 -> Cadd9
+  const SONG_PROGRESSIONS = [
+    { name: 'Cmaj9', rootFreq: 65.41, bassFreq: 130.81, notes: [261.63, 293.66, 329.63, 392.00, 493.88, 523.25, 587.33, 659.25, 783.99, 987.77, 1046.50, 1174.66] },
+    { name: 'Am9', rootFreq: 55.00, bassFreq: 110.00, notes: [220.00, 261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50] },
+    { name: 'Fmaj7#11', rootFreq: 87.31, bassFreq: 174.61, notes: [174.61, 220.00, 261.63, 329.63, 370.00, 440.00, 523.25, 659.25, 740.00, 880.00, 1046.50, 1318.51] },
+    { name: 'Gadd9', rootFreq: 98.00, bassFreq: 196.00, notes: [196.00, 220.00, 246.94, 293.66, 392.00, 440.00, 493.88, 587.33, 783.99, 880.00, 987.77, 1174.66] },
+    { name: 'Em9', rootFreq: 82.41, bassFreq: 164.81, notes: [164.81, 196.00, 246.94, 293.66, 329.63, 392.00, 493.88, 587.33, 659.25, 783.99, 987.77, 1174.66] },
+    { name: 'Dm9', rootFreq: 73.42, bassFreq: 146.83, notes: [146.83, 174.61, 220.00, 261.63, 293.66, 349.23, 440.00, 523.25, 587.33, 698.46, 880.00, 1046.50] },
+    { name: 'Fmaj9', rootFreq: 87.31, bassFreq: 174.61, notes: [174.61, 220.00, 261.63, 293.66, 329.63, 349.23, 440.00, 523.25, 587.33, 659.25, 880.00, 1046.50] },
+    { name: 'Cadd9', rootFreq: 65.41, bassFreq: 130.81, notes: [130.81, 196.00, 261.63, 293.66, 329.63, 392.00, 523.25, 587.33, 659.25, 783.99, 1046.50, 1174.66] }
+  ];
+
+  // ── Generative Web Audio Synth Engine ──
   class ZenAudio {
     constructor() {
       this.ctx = null;
       this.masterGain = null;
       this.muted = false;
       this.isInitialized = false;
-      // Pentatonic harmonic scale frequencies (C major / A minor pentatonic: C, D, E, G, A in multiple octaves)
-      this.scale = [
-        130.81, 146.83, 164.81, 196.00, 220.00, // C3 - A3
-        261.63, 293.66, 329.63, 392.00, 440.00, // C4 - A4
-        523.25, 587.33, 659.25, 783.99, 880.00, // C5 - A5
-        1046.50, 1174.66, 1318.51, 1567.98, 1760.00 // C6 - A6
-      ];
+      this.progression = SONG_PROGRESSIONS;
+      this.chordIndex = 0;
+      this.songHitCount = 0;
       this.droneOsc = null;
     }
 
@@ -31,7 +40,7 @@
         if (!AudioContext) return;
         this.ctx = new AudioContext();
         this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(0.28, this.ctx.currentTime);
+        this.masterGain.gain.setValueAtTime(0.32, this.ctx.currentTime);
         this.masterGain.connect(this.ctx.destination);
         this.isInitialized = true;
         this.startAmbientDrone();
@@ -49,29 +58,43 @@
     toggleMute() {
       this.muted = !this.muted;
       if (this.masterGain && this.ctx) {
-        this.masterGain.gain.setTargetAtTime(this.muted ? 0 : 0.28, this.ctx.currentTime, 0.05);
+        this.masterGain.gain.setTargetAtTime(this.muted ? 0 : 0.32, this.ctx.currentTime, 0.05);
       }
       return this.muted;
+    }
+
+    getCurrentChord() {
+      return this.progression[this.chordIndex % this.progression.length];
+    }
+
+    advanceChord() {
+      this.chordIndex = (this.chordIndex + 1) % this.progression.length;
+      const nextChord = this.getCurrentChord();
+      if (this.droneOsc && this.ctx) {
+        const now = this.ctx.currentTime;
+        this.droneOsc.osc1.frequency.setTargetAtTime(nextChord.rootFreq, now, 1.2);
+        this.droneOsc.osc2.frequency.setTargetAtTime(nextChord.rootFreq * 1.5, now, 1.2);
+      }
     }
 
     startAmbientDrone() {
       if (!this.ctx || this.droneOsc) return;
       try {
-        // Soft warm background root drone
+        const chord = this.getCurrentChord();
         const osc1 = this.ctx.createOscillator();
         const osc2 = this.ctx.createOscillator();
         const droneGain = this.ctx.createGain();
         const filter = this.ctx.createBiquadFilter();
 
         osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(65.41, this.ctx.currentTime); // C2
+        osc1.frequency.setValueAtTime(chord.rootFreq, this.ctx.currentTime);
         osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(98.00, this.ctx.currentTime); // G2 (Fifth)
+        osc2.frequency.setValueAtTime(chord.rootFreq * 1.5, this.ctx.currentTime);
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(240, this.ctx.currentTime);
+        filter.frequency.setValueAtTime(260, this.ctx.currentTime);
 
-        droneGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+        droneGain.gain.setValueAtTime(0.045, this.ctx.currentTime);
 
         osc1.connect(filter);
         osc2.connect(filter);
@@ -80,43 +103,37 @@
 
         osc1.start();
         osc2.start();
-        this.droneOsc = { osc1, osc2, gain: droneGain };
+        this.droneOsc = { osc1, osc2, gain: droneGain, filter };
       } catch (e) {}
     }
 
-    // Play soft crystal chime on bloom / collision
-    playChime(noteIndex = 5, resonanceDuration = 1.2, brightness = 1.0) {
+    playTone(freq, duration = 1.2, volume = 0.3, type = 'sine', brightness = 1.0) {
       if (!this.ctx || this.muted) return;
       try {
-        const freq = this.scale[Math.max(0, Math.min(this.scale.length - 1, noteIndex))];
         const now = this.ctx.currentTime;
-
-        // Primary Bell Oscillator
         const osc = this.ctx.createOscillator();
+        const overtone = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
+        const overtoneGain = this.ctx.createGain();
         const filter = this.ctx.createBiquadFilter();
 
-        // Harmonic shimmer overtone
-        const overtone = this.ctx.createOscillator();
-        const overtoneGain = this.ctx.createGain();
-
-        osc.type = 'sine';
+        osc.type = type;
         osc.frequency.setValueAtTime(freq, now);
 
         overtone.type = 'sine';
-        overtone.frequency.setValueAtTime(freq * 2.76, now); // Natural crystal inharmonic
+        overtone.frequency.setValueAtTime(freq * 2.76, now);
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(2500 * brightness, now);
+        filter.frequency.setValueAtTime(Math.min(12000, 2400 * brightness), now);
 
-        // Bell envelope
+        // Exponential envelope for natural crystalline bell decay
         gain.gain.setValueAtTime(0.001, now);
-        gain.gain.exponentialRampToValueAtTime(0.35, now + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + resonanceDuration);
+        gain.gain.exponentialRampToValueAtTime(volume, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
         overtoneGain.gain.setValueAtTime(0.001, now);
-        overtoneGain.gain.exponentialRampToValueAtTime(0.08 * brightness, now + 0.01);
-        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + (resonanceDuration * 0.6));
+        overtoneGain.gain.exponentialRampToValueAtTime(volume * 0.25 * brightness, now + 0.01);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.55));
 
         osc.connect(filter);
         overtone.connect(filter);
@@ -125,22 +142,72 @@
 
         osc.start(now);
         overtone.start(now);
-        osc.stop(now + resonanceDuration);
-        overtone.stop(now + resonanceDuration);
+        osc.stop(now + duration);
+        overtone.stop(now + duration);
       } catch (e) {}
     }
 
-    // Soft orbital launch sound
+    // ── Main Song & Chord Event: Called on each node hit ──
+    playHarmonicHit(harmonyType = 'normal', combo = 1, noteIdx = 5, mode = 'flow') {
+      if (!this.ctx || this.muted) return;
+
+      this.songHitCount++;
+      // In Flow Mode, advance the musical chord every 4-5 hits to continuously compose a living song
+      if (this.songHitCount % 4 === 0) {
+        this.advanceChord();
+      }
+
+      const chord = this.getCurrentChord();
+      const notes = chord.notes;
+      const noteCount = notes.length;
+
+      // Pitch climbs gracefully with combo streak
+      const comboOffset = Math.min(6, Math.floor((combo - 1) / 2));
+      const melodicIdx = (noteIdx + comboOffset) % noteCount;
+      const primaryFreq = notes[melodicIdx];
+
+      if (harmonyType === 'repulsor') {
+        // Red repulsor: Plays a rich resonant bass chord note + warm singing bowl gong
+        this.playTone(chord.bassFreq, 2.2, 0.45, 'triangle', 0.8);
+        this.playTone(chord.rootFreq * 2, 1.8, 0.25, 'sine', 0.9);
+      } else if (harmonyType === 'multiplier') {
+        // Multiplier (2x): Plays an ascending dual arpeggio sparkle chord
+        const note1 = notes[melodicIdx];
+        const note2 = notes[(melodicIdx + 3) % noteCount];
+        this.playTone(note1, 1.6, 0.35, 'sine', 1.3);
+        setTimeout(() => {
+          this.playTone(note2, 1.8, 0.38, 'sine', 1.5);
+        }, 55);
+      } else if (harmonyType === 'prism') {
+        // Prism (❖): Plays a lush 3-note harmonic shimmer chord in key
+        const chordPitches = [
+          notes[melodicIdx],
+          notes[(melodicIdx + 2) % noteCount],
+          notes[(melodicIdx + 4) % noteCount]
+        ];
+        chordPitches.forEach((f, i) => {
+          setTimeout(() => {
+            this.playTone(f, 2.0 + i * 0.2, 0.28, 'sine', 1.4);
+          }, i * 45);
+        });
+      } else {
+        // Normal Node: Crystal bell chime matching the current active chord note
+        this.playTone(primaryFreq, 1.4 + Math.min(0.6, combo * 0.08), 0.35, 'sine', 1.1 + combo * 0.05);
+      }
+    }
+
     playLaunch(pitch = 1.0) {
       if (!this.ctx || this.muted) return;
       try {
+        const chord = this.getCurrentChord();
+        const baseFreq = chord.bassFreq || 130.81;
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(180 * pitch, now);
-        osc.frequency.exponentialRampToValueAtTime(420 * pitch, now + 0.22);
+        osc.frequency.setValueAtTime(baseFreq * pitch, now);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.5 * pitch, now + 0.22);
 
         gain.gain.setValueAtTime(0.001, now);
         gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
@@ -154,13 +221,13 @@
       } catch (e) {}
     }
 
-    // Resonance Cascade chord
     playChord(baseIndex = 5) {
-      const chordOffsets = [0, 2, 4, 7];
-      chordOffsets.forEach((offset, idx) => {
+      const chord = this.getCurrentChord();
+      const notes = chord.notes;
+      [0, 2, 4, 6].forEach((idx, i) => {
         setTimeout(() => {
-          this.playChime(baseIndex + offset, 1.8 + idx * 0.2, 1.2);
-        }, idx * 60);
+          this.playTone(notes[idx % notes.length], 2.2 + i * 0.2, 0.32, 'sine', 1.2);
+        }, i * 70);
       });
     }
   }
@@ -293,13 +360,18 @@
       this.targetY = y;
       this.radius = radius;
       this.baseRadius = radius;
-      this.mass = mass; // Gravitational pull strength
+      this.mass = mass;
       this.color = color;
-      this.harmonyType = harmonyType; // 'normal', 'multiplier', 'repulsor', 'prism'
+      this.harmonyType = harmonyType;
       this.noteIdx = noteIdx;
 
       this.bloomed = false;
-      this.bloomProgress = 0; // 0 to 1
+      this.bloomProgress = 0;
+      this.bloomLife = 0; // For Flow Mode auto-dissolve and refresh
+      this.isDissolving = false;
+      this.dissolveProgress = 0;
+      this.birthProgress = 0; // Smooth entry fade-in
+
       this.pulsePhase = Math.random() * Math.PI * 2;
       this.pulseSpeed = 1.5 + Math.random() * 0.8;
       this.scale = 1.0;
@@ -307,16 +379,24 @@
       this.requiredHits = harmonyType === 'prism' ? 2 : 1;
       this.currentHits = 0;
 
-      // Outer orbit aesthetic ring
+      // Cosmic gentle drift in Flow Mode
+      this.driftAngle = Math.random() * Math.PI * 2;
+      this.driftSpeed = 0.15 + Math.random() * 0.2;
+
       this.ringRotation = Math.random() * Math.PI;
-      this.petals = harmonyType === 'prism' ? 6 : (harmonyType === 'multiplier' ? 8 : 5);
+      this.petals = harmonyType === 'prism' ? 6 : (harmonyType === 'multiplier' ? 8 : (harmonyType === 'repulsor' ? 4 : 5));
     }
 
-    update(dt) {
+    update(dt, mode = 'journey') {
       this.pulsePhase += this.pulseSpeed * dt;
       this.ringRotation += 0.4 * dt;
 
-      // Spring physics for soft bounce when touched/bloomed
+      // Smooth birth fade in
+      if (this.birthProgress < 1.0) {
+        this.birthProgress = Math.min(1.0, this.birthProgress + dt * 2.5);
+      }
+
+      // Spring physics
       const targetScale = this.bloomed ? 1.25 : 1.0;
       const springK = 18.0;
       const damping = 0.72;
@@ -328,9 +408,24 @@
       if (this.bloomed && this.bloomProgress < 1.0) {
         this.bloomProgress = Math.min(1.0, this.bloomProgress + dt * 2.0);
       }
+
+      // Flow Mode: Gentle cosmic floating drift & auto-dissolve after blooming
+      if (mode === 'flow') {
+        this.driftAngle += 0.25 * dt;
+        this.x += Math.cos(this.driftAngle) * this.driftSpeed;
+        this.y += Math.sin(this.driftAngle) * this.driftSpeed;
+
+        if (this.bloomed) {
+          this.bloomLife += dt;
+          if (this.bloomLife > 2.5) {
+            this.isDissolving = true;
+            this.dissolveProgress = Math.min(1.0, this.dissolveProgress + dt * 1.6);
+          }
+        }
+      }
     }
 
-    triggerBloom(audio) {
+    triggerBloom(audio, combo = 1, mode = 'flow') {
       this.currentHits++;
       this.scale = 1.55;
       this.velocityScale = 3.0;
@@ -340,16 +435,22 @@
       }
 
       if (audio) {
-        audio.playChime(this.noteIdx, 1.6, this.harmonyType === 'multiplier' ? 1.4 : 1.0);
+        audio.playHarmonicHit(this.harmonyType, combo, this.noteIdx, mode);
       }
     }
 
     draw(ctx) {
-      ctx.save();
-      const pulse = Math.sin(this.pulsePhase) * 3;
-      const r = (this.radius + pulse) * this.scale;
+      if (this.dissolveProgress >= 1.0) return;
 
-      // 1. Soft Gravitational Aura / Outer Glow
+      const nodeAlpha = (this.birthProgress || 1.0) * (1.0 - this.dissolveProgress);
+      if (nodeAlpha <= 0) return;
+
+      ctx.save();
+      ctx.globalAlpha = nodeAlpha;
+
+      const pulse = Math.sin(this.pulsePhase) * 3;
+      const r = (this.radius + pulse) * this.scale * (1.0 - this.dissolveProgress * 0.3);
+
       const glowGrad = ctx.createRadialGradient(this.x, this.y, r * 0.2, this.x, this.y, r * 3.5);
       const isRepulsor = this.mass < 0;
 
@@ -362,7 +463,7 @@
       ctx.arc(this.x, this.y, r * 3.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. Geometric Bloom Petals / Orbit Rings
+      // Bloom Petals / Orbit Rings
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.ringRotation);
@@ -374,7 +475,6 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Flower petal geometry
       for (let i = 0; i < this.petals; i++) {
         const angle = (i / this.petals) * Math.PI * 2;
         const px = Math.cos(angle) * r * 1.35;
@@ -386,7 +486,7 @@
       }
       ctx.restore();
 
-      // 3. Central Core (Soft Frosted Sphere with Glass Reflection)
+      // Central Core
       const coreGrad = ctx.createRadialGradient(this.x - r * 0.3, this.y - r * 0.3, r * 0.1, this.x, this.y, r);
       if (this.bloomed) {
         coreGrad.addColorStop(0, '#ffffff');
@@ -406,14 +506,12 @@
       ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
       ctx.fill();
 
-      // Glass specular rim
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
       ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.arc(this.x, this.y, r - 1, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Center symbol / icon for special node types
       if (this.harmonyType === 'multiplier') {
         ctx.fillStyle = '#ffffff';
         ctx.font = `bold ${Math.round(r * 0.9)}px 'Space Grotesk', sans-serif`;
@@ -426,6 +524,12 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('❖', this.x, this.y + 1);
+      } else if (this.harmonyType === 'repulsor') {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${Math.round(r * 0.9)}px 'Space Grotesk', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('−', this.x, this.y);
       }
 
       ctx.restore();
@@ -454,14 +558,14 @@
     update(dt, resonators, bounds, gravityConst = 1800) {
       this.age += dt;
 
-      // Gravity simulation towards all active resonators
       for (const node of resonators) {
+        if (node.isDissolving) continue;
+
         const dx = node.x - this.x;
         const dy = node.y - this.y;
         const distSq = dx * dx + dy * dy;
         const dist = Math.sqrt(distSq);
 
-        // Gravitational attraction / repulsion
         if (dist > 8 && dist < 500) {
           const force = (node.mass * gravityConst) / Math.max(400, distSq);
           const nx = dx / dist;
@@ -470,11 +574,12 @@
           this.vy += ny * force * dt;
         }
 
-        // Collision / Bloom check
         if (dist < node.radius + this.radius + 6) {
           if (!this.visitedNodes.has(node)) {
             this.visitedNodes.add(node);
-            node.triggerBloom(window.chromaEngine ? window.chromaEngine.audio : null);
+            const comboCount = window.chromaEngine ? window.chromaEngine.combo + 1 : this.visitedNodes.size;
+            const currentMode = window.chromaEngine ? window.chromaEngine.mode : 'flow';
+            node.triggerBloom(window.chromaEngine ? window.chromaEngine.audio : null, comboCount, currentMode);
             this.resonanceScore += node.harmonyType === 'multiplier' ? 200 : 100;
 
             if (window.chromaEngine) {
@@ -485,24 +590,19 @@
         }
       }
 
-      // Physics integration
       this.x += this.vx * dt * 60;
       this.y += this.vy * dt * 60;
 
-      // Gentle atmospheric friction
       this.vx *= 0.9985;
       this.vy *= 0.9985;
 
-      // Update trail ribbon points
       this.trail.unshift({ x: this.x, y: this.y, color: this.color });
       if (this.trail.length > this.maxTrail) {
         this.trail.pop();
       }
 
-      // Energy / life decay
       this.energy -= dt * 12.5;
 
-      // Screen edge soft bounce
       const pad = this.radius;
       if (this.x < pad) { this.x = pad; this.vx = -this.vx * 0.85; }
       if (this.x > bounds.width - pad) { this.x = bounds.width - pad; this.vx = -this.vx * 0.85; }
@@ -515,7 +615,6 @@
     }
 
     draw(ctx) {
-      // 1. Draw smooth ribbon trail
       if (this.trail.length > 2) {
         ctx.save();
         for (let i = 0; i < this.trail.length - 1; i++) {
@@ -539,14 +638,12 @@
         ctx.restore();
       }
 
-      // 2. Draw Orb Core
       ctx.save();
       const alpha = Math.max(0.2, this.energy / this.maxEnergy);
       ctx.globalAlpha = alpha;
       ctx.shadowColor = this.color;
       ctx.shadowBlur = 20;
 
-      // Outer radiant glow
       const grad = ctx.createRadialGradient(this.x, this.y, this.radius * 0.2, this.x, this.y, this.radius * 2.2);
       grad.addColorStop(0, '#ffffff');
       grad.addColorStop(0.5, this.color);
@@ -557,7 +654,6 @@
       ctx.arc(this.x, this.y, this.radius * 2.2, 0, Math.PI * 2);
       ctx.fill();
 
-      // Solid central pearl
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius * 0.85, 0, Math.PI * 2);
@@ -587,6 +683,10 @@
       this.paletteKey = 'lavender';
       this.palette = PALETTES[this.paletteKey];
 
+      // Transitions & Flags
+      this.levelCompleted = false;
+      this.levelTransitioning = false;
+
       // Physics Settings
       this.gravityStrength = 1.0;
       this.trailLength = 36;
@@ -609,7 +709,7 @@
       // Mouse & Pointer
       this.pointer = { x: -100, y: -100, isDown: false, downX: 0, downY: 0 };
 
-      // Sandbox tools: 'well', 'repulsor', 'multiplier', 'prism'
+      // Sandbox tools
       this.sandboxTool = 'well';
 
       this.lastTime = performance.now();
@@ -625,7 +725,6 @@
       this.loadLevel(this.currentLevel);
       this.updateUI();
 
-      // Start animation loop
       requestAnimationFrame((t) => this.loop(t));
     }
 
@@ -642,7 +741,6 @@
       this.canvas.height = Math.round(rect.height * dpr);
       this.ctx.scale(dpr, dpr);
 
-      // Default launch origin at bottom center
       this.launchOrigin = { x: this.width * 0.5, y: this.height * 0.88 };
     }
 
@@ -671,57 +769,57 @@
       }
     }
 
-    // Load handcrafted levels for Zen Journey
     loadLevel(lvl) {
-      this.currentLevel = lvl;
+      this.currentLevel = Math.max(1, Math.min(this.maxLevel, lvl));
+      this.levelCompleted = false;
       this.resonators = [];
       this.orbs = [];
       this.particles = [];
       this.waves = [];
-      this.shotsRemaining = Math.max(3, 7 - Math.floor(lvl / 3));
+      this.shotsRemaining = Math.max(3, 7 - Math.floor(this.currentLevel / 3));
 
       const cx = this.width * 0.5;
       const cy = this.height * 0.42;
 
       if (this.mode === 'journey') {
-        switch (lvl) {
-          case 1: // Gentle Trio
+        switch (this.currentLevel) {
+          case 1:
             this.resonators.push(new ResonatorNode(cx, cy - 80, 24, 1.2, this.palette.primary, 'normal', 5));
             this.resonators.push(new ResonatorNode(cx - 120, cy + 40, 20, 1.0, this.palette.secondary, 'normal', 7));
             this.resonators.push(new ResonatorNode(cx + 120, cy + 40, 20, 1.0, this.palette.secondary, 'normal', 9));
             break;
-          case 2: // Diamond Cascade
+          case 2:
             this.resonators.push(new ResonatorNode(cx, cy - 110, 22, 1.1, this.palette.accent, 'multiplier', 10));
             this.resonators.push(new ResonatorNode(cx - 130, cy, 20, 1.0, this.palette.primary, 'normal', 6));
             this.resonators.push(new ResonatorNode(cx + 130, cy, 20, 1.0, this.palette.primary, 'normal', 8));
             this.resonators.push(new ResonatorNode(cx, cy + 110, 25, 1.4, this.palette.secondary, 'normal', 4));
             break;
-          case 3: // The Yin-Yang Gravity Ring
-            this.resonators.push(new ResonatorNode(cx - 80, cy, 26, 1.6, this.palette.primary, 'normal', 5));
-            this.resonators.push(new ResonatorNode(cx + 80, cy, 26, 1.6, this.palette.accent, 'normal', 9));
-            this.resonators.push(new ResonatorNode(cx, cy - 130, 18, 0.8, this.palette.secondary, 'normal', 11));
-            this.resonators.push(new ResonatorNode(cx, cy + 130, 18, 0.8, this.palette.secondary, 'normal', 3));
+          case 3:
+            this.resonators.push(new ResonatorNode(cx - 85, cy, 26, 1.6, this.palette.primary, 'normal', 5));
+            this.resonators.push(new ResonatorNode(cx + 85, cy, 26, 1.6, this.palette.accent, 'normal', 9));
+            this.resonators.push(new ResonatorNode(cx, cy - 130, 19, 0.8, this.palette.secondary, 'normal', 11));
+            this.resonators.push(new ResonatorNode(cx, cy + 130, 19, 0.8, this.palette.secondary, 'normal', 3));
             break;
-          case 4: // Prism Sanctuary
+          case 4:
             this.resonators.push(new ResonatorNode(cx, cy, 32, 2.0, this.palette.accent, 'prism', 7));
             for (let i = 0; i < 5; i++) {
               const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
-              const px = cx + Math.cos(angle) * 140;
-              const py = cy + Math.sin(angle) * 140;
+              const px = cx + Math.cos(angle) * 135;
+              const py = cy + Math.sin(angle) * 135;
               this.resonators.push(new ResonatorNode(px, py, 18, 0.9, this.palette.primary, 'normal', 5 + i * 2));
             }
             break;
-          case 5: // Repulsor Nebula
-            this.resonators.push(new ResonatorNode(cx, cy, 26, -1.8, '#ff477e', 'repulsor', 4)); // Repels!
+          case 5:
+            this.resonators.push(new ResonatorNode(cx, cy, 26, -1.8, '#ff477e', 'repulsor', 4));
             this.resonators.push(new ResonatorNode(cx - 150, cy - 60, 22, 1.2, this.palette.primary, 'normal', 6));
             this.resonators.push(new ResonatorNode(cx + 150, cy - 60, 22, 1.2, this.palette.primary, 'normal', 8));
             this.resonators.push(new ResonatorNode(cx - 100, cy + 100, 20, 1.1, this.palette.accent, 'multiplier', 10));
             this.resonators.push(new ResonatorNode(cx + 100, cy + 100, 20, 1.1, this.palette.secondary, 'normal', 12));
             break;
-          default: // Procedural orbital flower for levels 6+
-            const count = 4 + (lvl % 5);
-            const radius = 110 + (lvl % 3) * 25;
-            this.resonators.push(new ResonatorNode(cx, cy, 28, 1.8, this.palette.accent, (lvl % 2 === 0) ? 'multiplier' : 'prism', 6));
+          default:
+            const count = 4 + (this.currentLevel % 5);
+            const radius = 110 + (this.currentLevel % 3) * 25;
+            this.resonators.push(new ResonatorNode(cx, cy, 28, 1.8, this.palette.accent, (this.currentLevel % 2 === 0) ? 'multiplier' : 'prism', 6));
             for (let i = 0; i < count; i++) {
               const angle = (i / count) * Math.PI * 2;
               const px = cx + Math.cos(angle) * radius;
@@ -736,7 +834,6 @@
         this.spawnFlowResonators(6);
       } else if (this.mode === 'sandbox') {
         this.shotsRemaining = 999;
-        // Seed initial sandbox with 2 balanced wells
         this.resonators.push(new ResonatorNode(cx - 90, cy, 26, 1.5, this.palette.primary, 'normal', 5));
         this.resonators.push(new ResonatorNode(cx + 90, cy, 26, 1.5, this.palette.accent, 'multiplier', 9));
       }
@@ -744,14 +841,50 @@
       this.updateUI();
     }
 
-    spawnFlowResonators(count = 6) {
+    spawnFlowResonators(count = 1) {
+      const padX = this.width * 0.14;
+      const padYTop = this.height * 0.12;
+      const padYBottom = this.height * 0.68;
+
       for (let i = 0; i < count; i++) {
-        const x = this.width * 0.15 + Math.random() * (this.width * 0.7);
-        const y = this.height * 0.15 + Math.random() * (this.height * 0.55);
-        const type = Math.random() > 0.75 ? 'multiplier' : 'normal';
-        const color = type === 'multiplier' ? this.palette.accent : (Math.random() > 0.5 ? this.palette.primary : this.palette.secondary);
+        // Find well-spaced coordinate
+        let x = padX + Math.random() * (this.width - padX * 2);
+        let y = padYTop + Math.random() * (padYBottom - padYTop);
+
+        // Avoid clustering too close to existing resonators
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const tooClose = this.resonators.some(r => Math.hypot(r.x - x, r.y - y) < 80);
+          if (!tooClose) break;
+          x = padX + Math.random() * (this.width - padX * 2);
+          y = padYTop + Math.random() * (padYBottom - padYTop);
+        }
+
+        const roll = Math.random();
+        let type = 'normal';
+        let color = Math.random() > 0.5 ? this.palette.primary : this.palette.secondary;
+        let mass = 1.0 + Math.random() * 0.6;
+        let radius = 20 + Math.random() * 6;
+
+        if (roll > 0.82) {
+          type = 'multiplier';
+          color = this.palette.accent;
+          mass = 1.3;
+          radius = 24;
+        } else if (roll > 0.66) {
+          type = 'repulsor';
+          color = '#ff477e';
+          mass = -1.6;
+          radius = 23;
+        } else if (roll > 0.48) {
+          type = 'prism';
+          color = this.palette.secondary;
+          mass = 1.6;
+          radius = 26;
+        }
+
         const note = Math.floor(Math.random() * 14) + 2;
-        this.resonators.push(new ResonatorNode(x, y, 20 + Math.random() * 8, 0.9 + Math.random() * 0.8, color, type, note));
+        const node = new ResonatorNode(x, y, radius, mass, color, type, note);
+        this.resonators.push(node);
       }
     }
 
@@ -770,7 +903,6 @@
         this.audio.init();
         this.audio.resume();
 
-        // If sandbox click on empty space with a tool
         if (this.mode === 'sandbox' && pos.y < this.height * 0.75) {
           this.placeSandboxNode(pos.x, pos.y);
           return;
@@ -799,7 +931,6 @@
         this.isAiming = false;
         this.pointer.isDown = false;
 
-        // Calculate launch vector: pull back to launch forward
         const dx = this.launchOrigin.x - this.aimPoint.x;
         const dy = this.launchOrigin.y - this.aimPoint.y;
         const dist = Math.hypot(dx, dy);
@@ -849,7 +980,7 @@
       if (node) {
         this.resonators.push(node);
         this.createBloomBurst(x, y, node.color);
-        this.audio.playChime(note, 1.4);
+        this.audio.playHarmonicHit(node.harmonyType, 1, note, this.mode);
       }
     }
 
@@ -857,8 +988,6 @@
       const orb = new LightOrb(x, y, vx, vy, this.palette.primary, 100, 6.5);
       this.orbs.push(orb);
       this.audio.playLaunch(1.0 + Math.random() * 0.2);
-
-      // Launch ripple
       this.waves.push(new RippleWave(x, y, 70, this.palette.primary, 220, 2.5));
     }
 
@@ -867,10 +996,8 @@
       this.combo++;
       if (this.combo > this.maxCombo) this.maxCombo = this.combo;
 
-      // Ripple wave
       this.waves.push(new RippleWave(x, y, 140, color, 190, 3.5));
 
-      // Particle stardust burst
       const particleCount = 24;
       for (let i = 0; i < particleCount; i++) {
         const angle = (i / particleCount) * Math.PI * 2 + (Math.random() - 0.5);
@@ -893,17 +1020,18 @@
     }
 
     checkLevelCompletion() {
-      if (this.mode !== 'journey') return;
+      if (this.mode !== 'journey' || this.levelCompleted) return;
 
       const allBloomed = this.resonators.every((n) => n.bloomed);
       if (allBloomed) {
+        this.levelCompleted = true;
         setTimeout(() => {
           this.audio.playChord(5);
           this.showVictoryModal();
         }, 400);
       } else if (this.shotsRemaining === 0 && this.orbs.length === 0) {
         setTimeout(() => {
-          if (!this.resonators.every((n) => n.bloomed)) {
+          if (!this.levelCompleted && !this.resonators.every((n) => n.bloomed)) {
             this.showDefeatModal();
           }
         }, 1200);
@@ -929,17 +1057,22 @@
     }
 
     nextLevel() {
+      if (this.levelTransitioning) return;
+      this.levelTransitioning = true;
+
       const modal = document.getElementById('victory-modal');
       if (modal) modal.classList.remove('active');
 
       if (this.currentLevel < this.maxLevel) {
-        this.currentLevel++;
-        this.loadLevel(this.currentLevel);
+        const nextLvl = this.currentLevel + 1;
+        this.loadLevel(nextLvl);
       } else {
-        // Loop back or switch to flow mode
-        this.currentLevel = 1;
         this.loadLevel(1);
       }
+
+      setTimeout(() => {
+        this.levelTransitioning = false;
+      }, 400);
     }
 
     restartLevel() {
@@ -948,6 +1081,8 @@
       if (modalV) modalV.classList.remove('active');
       if (modalD) modalD.classList.remove('active');
       this.combo = 0;
+      this.levelCompleted = false;
+      this.levelTransitioning = false;
       this.loadLevel(this.currentLevel);
     }
 
@@ -980,7 +1115,6 @@
         elCombo.style.opacity = this.combo > 1 ? '1' : '0.4';
       }
 
-      // Progress bar for active level blooms
       const elProgress = document.getElementById('level-progress-fill');
       if (elProgress && this.resonators.length > 0) {
         const bloomedCount = this.resonators.filter((n) => n.bloomed).length;
@@ -989,7 +1123,6 @@
       }
     }
 
-    // ── Simulation and Draw Loop ──
     loop(timestamp) {
       const dt = Math.min(0.06, (timestamp - this.lastTime) / 1000) * this.timeScale;
       this.lastTime = timestamp;
@@ -1005,9 +1138,28 @@
     update(dt) {
       const bounds = { width: this.width, height: this.height };
 
-      // Update Resonators
-      for (const res of this.resonators) {
-        res.update(dt);
+      // Update Resonators & handle Flow Mode auto-dissolve / replenish
+      for (let i = this.resonators.length - 1; i >= 0; i--) {
+        const res = this.resonators[i];
+        res.update(dt, this.mode);
+
+        if (this.mode === 'flow' && res.dissolveProgress >= 1.0) {
+          // Dissolve burst
+          for (let p = 0; p < 12; p++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 1.0 + Math.random() * 2.5;
+            this.particles.push(new Particle(res.x, res.y, Math.cos(angle) * speed, Math.sin(angle) * speed, res.color, 1.8, 0.7, 0.7, 1.2, true));
+          }
+          this.resonators.splice(i, 1);
+        }
+      }
+
+      // Flow Mode continuous regeneration: ensure at least 5 unbloomed resonators at all times
+      if (this.mode === 'flow') {
+        const unbloomedCount = this.resonators.filter((n) => !n.bloomed && !n.isDissolving).length;
+        if (unbloomedCount < 5) {
+          this.spawnFlowResonators(1);
+        }
       }
 
       // Update Orbs
@@ -1042,15 +1194,9 @@
         mote.y += mote.vy * dt * 60;
         mote.pulse += dt * 1.5;
 
-        // Wrap around boundaries
         if (mote.y < -10) mote.y = this.height + 10;
         if (mote.x < -10) mote.x = this.width + 10;
         if (mote.x > this.width + 10) mote.x = -10;
-      }
-
-      // Flow mode continuous resonator replenish
-      if (this.mode === 'flow' && this.resonators.length < 5) {
-        this.spawnFlowResonators(2);
       }
     }
 
@@ -1059,14 +1205,12 @@
       const w = this.width;
       const h = this.height;
 
-      // 1. Soft Dynamic Gradient Canvas Background
       const bgGrad = ctx.createRadialGradient(w * 0.5, h * 0.45, 20, w * 0.5, h * 0.5, Math.max(w, h));
       bgGrad.addColorStop(0, this.palette.bgMuted);
       bgGrad.addColorStop(1, this.palette.bgDeep);
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
 
-      // Subtle atmospheric grid
       ctx.save();
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
       ctx.lineWidth = 1;
@@ -1085,7 +1229,6 @@
       }
       ctx.restore();
 
-      // 2. Ambient Floating Motes
       for (const mote of this.ambientMotes) {
         const pulse = 0.5 + 0.5 * Math.sin(mote.pulse);
         ctx.fillStyle = mote.color;
@@ -1096,7 +1239,6 @@
       }
       ctx.globalAlpha = 1.0;
 
-      // 3. Gravitational Field Lines between Resonators
       if (this.resonators.length > 1) {
         ctx.save();
         for (let i = 0; i < this.resonators.length; i++) {
@@ -1120,27 +1262,22 @@
         ctx.restore();
       }
 
-      // 4. Render Resonators
       for (const res of this.resonators) {
         res.draw(ctx);
       }
 
-      // 5. Render Ripple Waves
       for (const wave of this.waves) {
         wave.draw(ctx);
       }
 
-      // 6. Render Particles
       for (const p of this.particles) {
         p.draw(ctx);
       }
 
-      // 7. Render Active Light Orbs
       for (const orb of this.orbs) {
         orb.draw(ctx);
       }
 
-      // 8. Render Launch Pad & Aiming Trajectory
       this.drawLauncher(ctx);
     }
 
@@ -1148,7 +1285,6 @@
       const ox = this.launchOrigin.x;
       const oy = this.launchOrigin.y;
 
-      // Draw Launch Pedestal / Base Pad
       ctx.save();
       const padGrad = ctx.createRadialGradient(ox, oy, 4, ox, oy, 28);
       padGrad.addColorStop(0, '#ffffff');
@@ -1160,14 +1296,12 @@
       ctx.arc(ox, oy, 28, 0, Math.PI * 2);
       ctx.fill();
 
-      // Frosted Glass Ring
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(ox, oy, 14, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Launch Ready Orb inside pedestal
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = this.palette.primary;
       ctx.shadowBlur = 12;
@@ -1176,7 +1310,6 @@
       ctx.fill();
       ctx.restore();
 
-      // Aiming Trajectory Preview Dots
       if (this.isAiming) {
         const dx = ox - this.aimPoint.x;
         const dy = oy - this.aimPoint.y;
@@ -1191,7 +1324,6 @@
           let simVy = Math.sin(angle) * power;
 
           ctx.save();
-          // Draw elastic drag string
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
           ctx.lineWidth = 2;
           ctx.beginPath();
@@ -1199,20 +1331,18 @@
           ctx.lineTo(this.aimPoint.x, this.aimPoint.y);
           ctx.stroke();
 
-          // Reticle at aim pull point
           ctx.strokeStyle = this.palette.accent;
           ctx.lineWidth = 1.5;
           ctx.beginPath();
           ctx.arc(this.aimPoint.x, this.aimPoint.y, 10, 0, Math.PI * 2);
           ctx.stroke();
 
-          // Simulate future trajectory dots
           const simSteps = 28;
           const simDt = 0.028;
 
           for (let s = 0; s < simSteps; s++) {
-            // Apply gravity from resonators in simulation
             for (const res of this.resonators) {
+              if (res.isDissolving) continue;
               const rdx = res.x - simX;
               const rdy = res.y - simY;
               const rDistSq = rdx * rdx + rdy * rdy;

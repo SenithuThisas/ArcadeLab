@@ -68,36 +68,55 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 16px;
+        padding: 0 18px;
         border-bottom: 1px solid var(--color-zen-border);
-        background: rgba(11, 14, 27, 0.75);
+        background: rgba(11, 14, 27, 0.85);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         position: relative;
         z-index: 50;
+        gap: 12px;
       }
 
       .zen-nav-left {
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-shrink: 0;
       }
 
       .back-btn {
         color: var(--color-zen-text);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
+        gap: 5px;
+        padding: 5px 12px;
         border-radius: 9999px;
+        white-space: nowrap;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       }
       .back-btn:hover {
         background: rgba(255, 255, 255, 0.1);
         transform: translateX(-2px);
+      }
+
+      .game-title-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+      }
+
+      .game-title-text {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        color: #fff;
+        white-space: nowrap;
+        letter-spacing: -0.01em;
       }
 
       .brand-dot {
@@ -106,6 +125,7 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
         border-radius: 50%;
         background: var(--color-zen-primary);
         box-shadow: 0 0 12px var(--color-zen-glow);
+        flex-shrink: 0;
         animation: pulseDot 3s ease-in-out infinite;
       }
 
@@ -118,22 +138,23 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
       .mode-switcher {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         padding: 3px;
         border-radius: 9999px;
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(0, 0, 0, 0.35);
         border: 1px solid var(--color-zen-border);
       }
 
       .mode-tab {
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
         color: var(--color-zen-muted);
         background: transparent;
         border: none;
-        padding: 5px 14px;
+        padding: 5px 13px;
         border-radius: 9999px;
         cursor: pointer;
+        white-space: nowrap;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       }
       .mode-tab.active {
@@ -143,6 +164,13 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
       }
       .mode-tab:hover:not(.active) {
         color: var(--color-zen-text);
+      }
+
+      .zen-nav-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
       }
 
       /* ── Shell & Canvas Container ── */
@@ -173,41 +201,95 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
       /* ── Floating Tactile HUD ── */
       .floating-hud {
         position: absolute;
-        top: 16px;
+        top: 24px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
         align-items: center;
-        gap: 16px;
-        padding: 8px 20px;
+        gap: 14px;
+        padding: 6px 18px;
+        border-radius: 9999px;
+        background: rgba(14, 18, 35, 0.72);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--color-zen-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15);
         z-index: 30;
         pointer-events: auto;
+        max-width: 92vw;
       }
 
       .hud-stat {
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-width: 54px;
+        min-width: 48px;
       }
       .hud-label {
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: var(--color-zen-muted);
+        line-height: 1.2;
       }
       .hud-value {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
         color: var(--color-zen-text);
+        line-height: 1.2;
+        white-space: nowrap;
       }
 
       .hud-divider {
         width: 1px;
-        height: 24px;
+        height: 20px;
         background: var(--color-zen-border);
+        opacity: 0.7;
+      }
+
+      /* Responsive Media Queries */
+      @media (max-width: 768px) {
+        .zen-nav {
+          padding: 0 12px;
+          gap: 8px;
+        }
+        .mode-tab {
+          padding: 4px 10px;
+          font-size: 10px;
+        }
+        .floating-hud {
+          top: 16px;
+          gap: 10px;
+          padding: 5px 14px;
+        }
+        .hud-stat {
+          min-width: 40px;
+        }
+        .hud-value {
+          font-size: 13px;
+        }
+      }
+
+      @media (max-width: 540px) {
+        .game-title-text {
+          display: none;
+        }
+        .floating-hud {
+          top: 12px;
+          gap: 8px;
+          padding: 4px 12px;
+        }
+        .hud-stat {
+          min-width: 36px;
+        }
+        .hud-label {
+          font-size: 8px;
+        }
+        .hud-value {
+          font-size: 12px;
+        }
       }
 
       /* Level progress bar */
@@ -216,7 +298,7 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
         top: 0;
         left: 0;
         right: 0;
-        height: 3px;
+        height: 2px;
         background: rgba(255, 255, 255, 0.06);
         z-index: 40;
       }
@@ -484,9 +566,9 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
           arcade
         </a>
 
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="game-title-badge">
           <span class="brand-dot"></span>
-          <span style="font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:15px; color:#fff;">
+          <span class="game-title-text">
             Chroma Bloom
           </span>
         </div>
@@ -500,7 +582,7 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
       </div>
 
       <!-- Right Actions -->
-      <div style="display:flex; align-items:center; gap:8px;">
+      <div class="zen-nav-right">
         <button id="btn-audio" class="soft-btn" title="Toggle Crystal Chimes Audio">
           <svg id="icon-sound-on" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -764,25 +846,42 @@ const description = 'A meditative orbital gravity and harmonic chain-reaction ga
           });
         }
 
-        // Level flow buttons
+        // Level flow buttons with debounce guard
+        let actionLocked = false;
+        function safeAction(fn) {
+          if (actionLocked) return;
+          actionLocked = true;
+          fn();
+          setTimeout(() => { actionLocked = false; }, 400);
+        }
+
         const btnNext = document.getElementById('btn-next-level');
         if (btnNext) {
-          btnNext.addEventListener('click', () => {
-            if (window.chromaEngine) window.chromaEngine.nextLevel();
+          btnNext.addEventListener('click', (e) => {
+            e.preventDefault();
+            safeAction(() => {
+              if (window.chromaEngine) window.chromaEngine.nextLevel();
+            });
           });
         }
 
         const btnRetry = document.getElementById('btn-retry-level');
         if (btnRetry) {
-          btnRetry.addEventListener('click', () => {
-            if (window.chromaEngine) window.chromaEngine.restartLevel();
+          btnRetry.addEventListener('click', (e) => {
+            e.preventDefault();
+            safeAction(() => {
+              if (window.chromaEngine) window.chromaEngine.restartLevel();
+            });
           });
         }
 
         const btnRestart = document.getElementById('btn-restart');
         if (btnRestart) {
-          btnRestart.addEventListener('click', () => {
-            if (window.chromaEngine) window.chromaEngine.restartLevel();
+          btnRestart.addEventListener('click', (e) => {
+            e.preventDefault();
+            safeAction(() => {
+              if (window.chromaEngine) window.chromaEngine.restartLevel();
+            });
           });
         }
       });
