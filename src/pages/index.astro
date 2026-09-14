@@ -20,13 +20,17 @@ import Layout from '../layouts/Layout.astro';
       <div class="space-y-6 text-center max-w-3xl mx-auto">
         
         <!-- Live Badge -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] shadow-inner">
-          <span class="relative flex h-2 w-2">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md border border-[var(--color-border)] shadow-sm hover:border-[var(--color-brand)]/40 transition-colors max-w-full">
+          <span class="relative flex h-2 w-2 flex-shrink-0">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
           </span>
-          <span class="text-xs font-mono font-medium tracking-wide text-[var(--color-text)]">
-            Phase 1 Release · 3 Playable Games · New Drops Coming Soon
+          <span class="text-[11px] sm:text-xs font-mono font-medium tracking-wide text-[var(--color-text)] flex items-center gap-1.5 whitespace-nowrap overflow-hidden text-ellipsis">
+            <span>Phase 1</span>
+            <span class="text-[var(--color-muted)] opacity-60">·</span>
+            <span>3 Playable Games</span>
+            <span class="hidden sm:inline text-[var(--color-muted)] opacity-60">·</span>
+            <span class="hidden sm:inline text-amber-400 font-semibold">New Drops Soon</span>
           </span>
         </div>
 
