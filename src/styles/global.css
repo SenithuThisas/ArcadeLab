@@ -40,7 +40,7 @@ body {
 /* ── Typography helpers ────────────────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
   margin: 0;
