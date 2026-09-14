@@ -1,0 +1,793 @@
+---
+const title = 'Chroma Bloom: Zen Orbital Cascade';
+const description = 'A meditative orbital gravity and harmonic chain-reaction game with frosted glassmorphism, spring physics, and generative crystal chime audio.';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <title>{title} | arcadelab.</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --color-zen-base:     #0b0e1b;
+        --color-zen-surface:  rgba(20, 24, 46, 0.65);
+        --color-zen-surface-solid: #13172e;
+        --color-zen-primary:  #9d8df1;
+        --color-zen-secondary:#b8c0ff;
+        --color-zen-accent:   #ff9a76;
+        --color-zen-glow:     rgba(157, 141, 241, 0.4);
+        --color-zen-text:     #f4f6fb;
+        --color-zen-muted:    #8e97b3;
+        --color-zen-border:   rgba(255, 255, 255, 0.12);
+        --nav-h: 52px;
+      }
+
+      html, body {
+        height: 100%;
+        width: 100%;
+        background: var(--color-zen-base);
+        color: var(--color-zen-text);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+
+      /* ── Glassmorphism Helper ── */
+      .glass-panel {
+        background: var(--color-zen-surface);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--color-zen-border);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18);
+        border-radius: 20px;
+      }
+
+      .glass-pill {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 9999px;
+      }
+
+      /* ── Slim Header Nav ── */
+      .zen-nav {
+        height: var(--nav-h);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--color-zen-border);
+        background: rgba(11, 14, 27, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        position: relative;
+        z-index: 50;
+      }
+
+      .zen-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .back-btn {
+        color: var(--color-zen-text);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 9999px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(-2px);
+      }
+
+      .brand-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-zen-primary);
+        box-shadow: 0 0 12px var(--color-zen-glow);
+        animation: pulseDot 3s ease-in-out infinite;
+      }
+
+      @keyframes pulseDot {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 8px #fff); }
+      }
+
+      /* ── Mode Pill Switcher ── */
+      .mode-switcher {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px;
+        border-radius: 9999px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--color-zen-border);
+      }
+
+      .mode-tab {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--color-zen-muted);
+        background: transparent;
+        border: none;
+        padding: 5px 14px;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .mode-tab.active {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.16);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      }
+      .mode-tab:hover:not(.active) {
+        color: var(--color-zen-text);
+      }
+
+      /* ── Shell & Canvas Container ── */
+      .game-shell {
+        display: flex;
+        flex-direction: column;
+        height: calc(100dvh - var(--nav-h));
+        position: relative;
+        overflow: hidden;
+      }
+
+      #game-wrapper {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        outline: none;
+        cursor: crosshair;
+      }
+
+      /* ── Floating Tactile HUD ── */
+      .floating-hud {
+        position: absolute;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 8px 20px;
+        z-index: 30;
+        pointer-events: auto;
+      }
+
+      .hud-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 54px;
+      }
+      .hud-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-zen-muted);
+      }
+      .hud-value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--color-zen-text);
+      }
+
+      .hud-divider {
+        width: 1px;
+        height: 24px;
+        background: var(--color-zen-border);
+      }
+
+      /* Level progress bar */
+      .level-progress-track {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.06);
+        z-index: 40;
+      }
+      .level-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--color-zen-primary), var(--color-zen-accent));
+        box-shadow: 0 0 10px var(--color-zen-glow);
+        transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* ── Quick Control Pills (Bottom-Left & Bottom-Right) ── */
+      .bottom-controls {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 30;
+      }
+
+      .bottom-actions {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 30;
+      }
+
+      .soft-btn {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--color-zen-border);
+        color: var(--color-zen-text);
+        padding: 8px 14px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      }
+      .soft-btn:hover {
+        background: rgba(255, 255, 255, 0.16);
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      .soft-btn:active {
+        transform: translateY(0);
+      }
+      .soft-btn.active {
+        background: var(--color-zen-primary);
+        color: #0b0e1b;
+        border-color: transparent;
+        box-shadow: 0 0 16px var(--color-zen-glow);
+      }
+
+      /* ── Sandbox Tool Palette (Floating dock when in Sandbox mode) ── */
+      .sandbox-dock {
+        position: absolute;
+        bottom: 74px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        z-index: 30;
+      }
+      .sandbox-dock.active {
+        display: flex;
+      }
+
+      /* ── Settings Drawer / Sheet ── */
+      .settings-drawer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 340px;
+        max-width: 90vw;
+        background: rgba(14, 18, 35, 0.92);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border-left: 1px solid var(--color-zen-border);
+        border-top: 1px solid var(--color-zen-border);
+        border-top-left-radius: 24px;
+        padding: 24px;
+        transform: translateY(105%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 60;
+        box-shadow: -8px -8px 40px rgba(0, 0, 0, 0.5);
+      }
+      .settings-drawer.open {
+        transform: translateY(0);
+      }
+
+      .drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .drawer-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+      }
+      .drawer-close {
+        background: rgba(255, 255, 255, 0.08);
+        border: none;
+        color: var(--color-zen-muted);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .drawer-close:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .setting-row {
+        margin-bottom: 16px;
+      }
+      .setting-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--color-zen-muted);
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .slider-input {
+        width: 100%;
+        accent-color: var(--color-zen-primary);
+        cursor: pointer;
+      }
+
+      /* Palette Color Circles */
+      .palette-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .palette-option {
+        height: 36px;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .palette-option.selected {
+        border-color: #ffffff;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+        transform: scale(1.05);
+      }
+
+      /* ── Modals (Victory / Defeat) ── */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(4, 6, 14, 0.7);
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 100;
+      }
+      .modal-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-card {
+        width: 90%;
+        max-width: 380px;
+        padding: 32px 24px;
+        text-align: center;
+        transform: scale(0.92) translateY(20px);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .modal-backdrop.active .modal-card {
+        transform: scale(1) translateY(0);
+      }
+
+      .modal-icon-bloom {
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--color-zen-primary) 0%, rgba(255, 255, 255, 0) 70%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: flowerPulse 2.4s ease-in-out infinite;
+      }
+
+      @keyframes flowerPulse {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 16px var(--color-zen-glow)); }
+        50% { transform: scale(1.15); filter: drop-shadow(0 0 28px #fff); }
+      }
+
+      .modal-btn-primary {
+        background: linear-gradient(135deg, var(--color-zen-primary), var(--color-zen-accent));
+        color: #0b0e1b;
+        font-weight: 700;
+        font-size: 14px;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 9999px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px var(--color-zen-glow);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        width: 100%;
+        margin-top: 18px;
+      }
+      .modal-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px var(--color-zen-glow);
+      }
+
+      /* Aim instruction prompt */
+      .aim-guide-hint {
+        position: absolute;
+        bottom: 84px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--color-zen-muted);
+        pointer-events: none;
+        opacity: 0.8;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Top Nav Header -->
+    <header class="zen-nav">
+      <div class="zen-nav-left">
+        <a href="/" class="back-btn glass-pill" aria-label="Return to arcade catalogue">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          arcade
+        </a>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="brand-dot"></span>
+          <span style="font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:15px; color:#fff;">
+            Chroma Bloom
+          </span>
+        </div>
+      </div>
+
+      <!-- Mode Selector -->
+      <div class="mode-switcher" id="mode-switcher">
+        <button class="mode-tab active" data-mode="journey">Journey</button>
+        <button class="mode-tab" data-mode="flow">Flow</button>
+        <button class="mode-tab" data-mode="sandbox">Sandbox</button>
+      </div>
+
+      <!-- Right Actions -->
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button id="btn-audio" class="soft-btn" title="Toggle Crystal Chimes Audio">
+          <svg id="icon-sound-on" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <span class="hidden sm:inline">Chimes</span>
+        </button>
+
+        <button id="btn-settings" class="soft-btn" title="Zen Settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Viewport -->
+    <main class="game-shell">
+      <!-- Top Level Progress Indicator -->
+      <div class="level-progress-track">
+        <div class="level-progress-bar" id="level-progress-fill"></div>
+      </div>
+
+      <!-- Center Floating Tactile HUD -->
+      <div class="floating-hud glass-panel">
+        <div class="hud-stat">
+          <span class="hud-label">Mode</span>
+          <span class="hud-value" id="hud-level">Level 1</span>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-stat">
+          <span class="hud-label">Harmony</span>
+          <span class="hud-value" id="hud-score">0</span>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-stat">
+          <span class="hud-label">Orbs</span>
+          <span class="hud-value" id="hud-shots">5</span>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-stat">
+          <span class="hud-label">Combo</span>
+          <span class="hud-value" id="hud-combo" style="color:var(--color-zen-accent);">1×</span>
+        </div>
+      </div>
+
+      <!-- Aiming Guidance Prompt -->
+      <div class="aim-guide-hint glass-pill" id="aim-guide">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v20M2 12h20"></path>
+        </svg>
+        drag down & release to launch light orb
+      </div>
+
+      <!-- Canvas Game Area -->
+      <div id="game-wrapper">
+        <canvas id="gameCanvas"></canvas>
+      </div>
+
+      <!-- Sandbox Dock Controls (Active only in Sandbox mode) -->
+      <div class="sandbox-dock glass-panel" id="sandbox-dock">
+        <button class="soft-btn active" data-tool="well">Gravity Well</button>
+        <button class="soft-btn" data-tool="repulsor">Repulsor</button>
+        <button class="soft-btn" data-tool="multiplier">2× Resonator</button>
+        <button class="soft-btn" data-tool="prism">Prism Core</button>
+        <button class="soft-btn" id="btn-clear-sandbox" style="color:#ff7597;">Clear</button>
+      </div>
+
+      <!-- Quick Bottom Controls -->
+      <div class="bottom-controls">
+        <button class="soft-btn" id="btn-restart" title="Restart Level">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          Restart
+        </button>
+      </div>
+    </main>
+
+    <!-- Settings & Atmosphere Drawer -->
+    <aside class="settings-drawer" id="settings-drawer">
+      <div class="drawer-header">
+        <h3 class="drawer-title">Cosmic Atmosphere</h3>
+        <button class="drawer-close" id="btn-close-drawer">✕</button>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Palette Theme</span>
+        </div>
+        <div class="palette-grid">
+          <button class="palette-option selected" data-palette="lavender" style="background: linear-gradient(135deg, #9d8df1, #ff9a76);" title="Lavender Dusk"></button>
+          <button class="palette-option" data-palette="mint" style="background: linear-gradient(135deg, #48eed6, #fed368);" title="Mint Aurora"></button>
+          <button class="palette-option" data-palette="sakura" style="background: linear-gradient(135deg, #ff7597, #70d6ff);" title="Sakura Petal"></button>
+          <button class="palette-option" data-palette="celestial" style="background: linear-gradient(135deg, #7209b7, #4cc9f0);" title="Celestial Prism"></button>
+        </div>
+      </div>
+
+      <div class="setting-row" style="margin-top: 20px;">
+        <div class="setting-label">
+          <span>Gravity Field Strength</span>
+          <span id="label-gravity">1.0×</span>
+        </div>
+        <input type="range" class="slider-input" id="slider-gravity" min="0.4" max="2.2" step="0.1" value="1.0" />
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Time Flow Dilation</span>
+          <span id="label-timescale">1.0×</span>
+        </div>
+        <input type="range" class="slider-input" id="slider-timescale" min="0.4" max="1.5" step="0.1" value="1.0" />
+      </div>
+    </aside>
+
+    <!-- Victory Modal -->
+    <div class="modal-backdrop" id="victory-modal">
+      <div class="modal-card glass-panel">
+        <div class="modal-icon-bloom">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+          </svg>
+        </div>
+        <h2 style="font-family:'Space Grotesk', sans-serif; font-size:22px; font-weight:700; color:#fff;" id="victory-level">
+          Harmony Restored
+        </h2>
+        <p style="font-size:13px; color:var(--color-zen-muted); margin-top:6px;">
+          All celestial resonators have bloomed in perfect cadence.
+        </p>
+
+        <div style="margin-top:20px; padding:12px; border-radius:14px; background:rgba(255,255,255,0.05); border:1px solid var(--color-zen-border);">
+          <span style="font-size:11px; text-transform:uppercase; color:var(--color-zen-muted); letter-spacing:0.05em;">Harmonic Resonance</span>
+          <div style="font-family:'Space Grotesk', sans-serif; font-size:24px; font-weight:700; color:var(--color-zen-accent);" id="victory-score">
+            1,200
+          </div>
+        </div>
+
+        <button class="modal-btn-primary" id="btn-next-level">
+          Proceed to Next Cascade →
+        </button>
+      </div>
+    </div>
+
+    <!-- Defeat / Out of Orbs Modal -->
+    <div class="modal-backdrop" id="defeat-modal">
+      <div class="modal-card glass-panel">
+        <h2 style="font-family:'Space Grotesk', sans-serif; font-size:20px; font-weight:700; color:#fff;">
+          Orbit Dissipated
+        </h2>
+        <p style="font-size:13px; color:var(--color-zen-muted); margin-top:6px;">
+          The resonance faded before all cores could awaken.
+        </p>
+
+        <button class="modal-btn-primary" id="btn-retry-level">
+          Try Again
+        </button>
+      </div>
+    </div>
+
+    <!-- UI Logic Hook -->
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Mode Switcher
+        const modeTabs = document.querySelectorAll('.mode-tab');
+        const sandboxDock = document.getElementById('sandbox-dock');
+        const aimGuide = document.getElementById('aim-guide');
+
+        modeTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            modeTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const mode = tab.getAttribute('data-mode');
+            if (window.chromaEngine) {
+              window.chromaEngine.mode = mode;
+              window.chromaEngine.loadLevel(window.chromaEngine.currentLevel);
+            }
+            if (sandboxDock) {
+              if (mode === 'sandbox') sandboxDock.classList.add('active');
+              else sandboxDock.classList.remove('active');
+            }
+            if (aimGuide) {
+              aimGuide.style.display = mode === 'sandbox' ? 'none' : 'flex';
+            }
+          });
+        });
+
+        // Audio Mute Toggle
+        const btnAudio = document.getElementById('btn-audio');
+        if (btnAudio) {
+          btnAudio.addEventListener('click', () => {
+            if (window.chromaEngine) {
+              const muted = window.chromaEngine.audio.toggleMute();
+              btnAudio.style.opacity = muted ? '0.5' : '1';
+            }
+          });
+        }
+
+        // Settings Drawer
+        const btnSettings = document.getElementById('btn-settings');
+        const settingsDrawer = document.getElementById('settings-drawer');
+        const btnCloseDrawer = document.getElementById('btn-close-drawer');
+
+        if (btnSettings && settingsDrawer) {
+          btnSettings.addEventListener('click', () => settingsDrawer.classList.toggle('open'));
+        }
+        if (btnCloseDrawer && settingsDrawer) {
+          btnCloseDrawer.addEventListener('click', () => settingsDrawer.classList.remove('open'));
+        }
+
+        // Palette selector
+        const paletteBtns = document.querySelectorAll('.palette-option');
+        paletteBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            paletteBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            const pal = btn.getAttribute('data-palette');
+            if (window.chromaEngine) window.chromaEngine.setPalette(pal);
+          });
+        });
+
+        // Physics Sliders
+        const sliderGravity = document.getElementById('slider-gravity');
+        const labelGravity = document.getElementById('label-gravity');
+        if (sliderGravity) {
+          sliderGravity.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (labelGravity) labelGravity.textContent = `${val.toFixed(1)}×`;
+            if (window.chromaEngine) window.chromaEngine.gravityStrength = val;
+          });
+        }
+
+        const sliderTimescale = document.getElementById('slider-timescale');
+        const labelTimescale = document.getElementById('label-timescale');
+        if (sliderTimescale) {
+          sliderTimescale.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (labelTimescale) labelTimescale.textContent = `${val.toFixed(1)}×`;
+            if (window.chromaEngine) window.chromaEngine.timeScale = val;
+          });
+        }
+
+        // Sandbox tool buttons
+        const toolBtns = document.querySelectorAll('#sandbox-dock .soft-btn[data-tool]');
+        toolBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            toolBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (window.chromaEngine) {
+              window.chromaEngine.sandboxTool = btn.getAttribute('data-tool');
+            }
+          });
+        });
+
+        const btnClearSandbox = document.getElementById('btn-clear-sandbox');
+        if (btnClearSandbox) {
+          btnClearSandbox.addEventListener('click', () => {
+            if (window.chromaEngine) window.chromaEngine.clearSandbox();
+          });
+        }
+
+        // Level flow buttons
+        const btnNext = document.getElementById('btn-next-level');
+        if (btnNext) {
+          btnNext.addEventListener('click', () => {
+            if (window.chromaEngine) window.chromaEngine.nextLevel();
+          });
+        }
+
+        const btnRetry = document.getElementById('btn-retry-level');
+        if (btnRetry) {
+          btnRetry.addEventListener('click', () => {
+            if (window.chromaEngine) window.chromaEngine.restartLevel();
+          });
+        }
+
+        const btnRestart = document.getElementById('btn-restart');
+        if (btnRestart) {
+          btnRestart.addEventListener('click', () => {
+            if (window.chromaEngine) window.chromaEngine.restartLevel();
+          });
+        }
+      });
+    </script>
+
+    <script src="/chroma-bloom-engine.js" defer></script>
+  </body>
+</html>

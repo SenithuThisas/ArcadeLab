@@ -104,7 +104,7 @@ import Layout from '../layouts/Layout.astro';
           the arcade
         </h2>
         <span class="text-xs font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-          2 games available
+          3 games available
         </span>
       </div>
 
@@ -393,32 +393,138 @@ import Layout from '../layouts/Layout.astro';
           </a>
         </li>
 
-        <!-- ── CARD 3: Coming Soon ─────────────────────────────── -->
-        <li role="listitem" aria-hidden="true">
-          <article
-            id="card-coming-soon-2"
-            class="h-full rounded-xl border border-dashed border-[var(--color-border)]
-                   bg-[var(--color-surface)] p-5 space-y-4 opacity-50 pointer-events-none
-                   select-none"
-            aria-label="Coming soon game slot"
+        <!-- ── CARD 3: Chroma Bloom (active) ─────────────────────────── -->
+        <li role="listitem">
+          <a
+            href="/games/chroma-bloom"
+            id="card-chroma-bloom"
+            class="group block h-full rounded-xl border border-[var(--color-border)]
+                   bg-[var(--color-surface)] p-5 space-y-4
+                   transition-all duration-200 ease-out
+                   hover:scale-[1.03] hover:border-[#9d8df1]
+                   hover:shadow-[0_0_32px_rgba(157,141,241,0.22)]
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9d8df1]"
+            aria-label="Play Chroma Bloom"
           >
+            <!-- Game thumbnail -->
             <div
-              class="w-full rounded-lg"
-              style="aspect-ratio:16/9; background:var(--color-surface-2);"
-            ></div>
+              class="w-full rounded-lg overflow-hidden"
+              style="aspect-ratio:16/9; background: radial-gradient(circle at center, #1b1638 0%, #0c0e1c 100%);"
+            >
+              <div class="w-full h-full flex items-center justify-center relative">
+                <svg width="100%" height="100%" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <radialGradient id="cb-glow-1" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ffffff"/>
+                      <stop offset="40%" stop-color="#9d8df1" stop-opacity="0.8"/>
+                      <stop offset="100%" stop-color="#9d8df1" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="cb-glow-2" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ffffff"/>
+                      <stop offset="45%" stop-color="#ff9a76" stop-opacity="0.85"/>
+                      <stop offset="100%" stop-color="#ff9a76" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="cb-glow-3" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ffffff"/>
+                      <stop offset="45%" stop-color="#48eed6" stop-opacity="0.85"/>
+                      <stop offset="100%" stop-color="#48eed6" stop-opacity="0"/>
+                    </radialGradient>
+                  </defs>
+
+                  <!-- Deep Cosmic Background Grid -->
+                  <g stroke="rgba(255,255,255,0.06)" stroke-width="0.5">
+                    <line x1="0" y1="20" x2="160" y2="20"/>
+                    <line x1="0" y1="45" x2="160" y2="45"/>
+                    <line x1="0" y1="70" x2="160" y2="70"/>
+                    <line x1="40" y1="0" x2="40" y2="90"/>
+                    <line x1="80" y1="0" x2="80" y2="90"/>
+                    <line x1="120" y1="0" x2="120" y2="90"/>
+                  </g>
+
+                  <!-- Gravitational Orbit Rings -->
+                  <circle cx="80" cy="42" r="32" fill="none" stroke="#9d8df1" stroke-width="0.8" stroke-dasharray="2,3" opacity="0.4"/>
+                  <circle cx="80" cy="42" r="20" fill="none" stroke="#ff9a76" stroke-width="0.8" stroke-dasharray="2,2" opacity="0.45"/>
+
+                  <!-- Harmonic Ripple Waves -->
+                  <circle cx="80" cy="42" r="26" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.3"/>
+                  <circle cx="36" cy="30" r="16" fill="none" stroke="#48eed6" stroke-width="0.8" opacity="0.4"/>
+                  <circle cx="124" cy="55" r="18" fill="none" stroke="#ff9a76" stroke-width="0.8" opacity="0.4"/>
+
+                  <!-- Resonator Nodes -->
+                  <!-- Core Center Node -->
+                  <circle cx="80" cy="42" r="14" fill="url(#cb-glow-1)"/>
+                  <circle cx="80" cy="42" r="6" fill="#ffffff"/>
+                  <circle cx="80" cy="42" r="7.5" fill="none" stroke="#9d8df1" stroke-width="1"/>
+
+                  <!-- Petal Accents -->
+                  <circle cx="80" cy="30" r="2" fill="#b8c0ff"/>
+                  <circle cx="80" cy="54" r="2" fill="#b8c0ff"/>
+                  <circle cx="68" cy="42" r="2" fill="#b8c0ff"/>
+                  <circle cx="92" cy="42" r="2" fill="#b8c0ff"/>
+
+                  <!-- Left Mint Node -->
+                  <circle cx="36" cy="30" r="10" fill="url(#cb-glow-3)"/>
+                  <circle cx="36" cy="30" r="4.5" fill="#ffffff"/>
+
+                  <!-- Right Peach Node -->
+                  <circle cx="124" cy="55" r="11" fill="url(#cb-glow-2)"/>
+                  <circle cx="124" cy="55" r="5" fill="#ffffff"/>
+
+                  <!-- Orbiting Light Trail -->
+                  <path d="M 80 78 Q 62 60 74 48 T 88 34 T 120 45" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+                  <circle cx="120" cy="45" r="3.5" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
+
+                  <!-- Stardust Motes -->
+                  <circle cx="22" cy="18" r="0.8" fill="#fff" opacity="0.8"/>
+                  <circle cx="60" cy="14" r="1.2" fill="#b8c0ff" opacity="0.9"/>
+                  <circle cx="138" cy="22" r="1" fill="#fed368" opacity="0.75"/>
+                  <circle cx="105" cy="74" r="1.1" fill="#48eed6" opacity="0.85"/>
+                  <circle cx="48" cy="72" r="0.9" fill="#ffccd5" opacity="0.7"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Card body -->
             <div class="space-y-2">
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-muted)]"
-                style="font-family:var(--font-mono);">
-                soon
-              </span>
-              <h3 class="text-base text-[var(--color-muted)]" style="font-family:var(--font-heading); font-weight:700;">
-                ??? — classified
+              <div class="flex items-center gap-2">
+                <span
+                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[#9d8df1] text-[#9d8df1]"
+                  style="font-family:var(--font-mono);"
+                >
+                  playable
+                </span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-muted)]" style="font-family:var(--font-mono);">
+                  zen · soft ui
+                </span>
+              </div>
+
+              <h3
+                class="text-base text-[var(--color-text)] transition-colors duration-200
+                       group-hover:text-[#9d8df1]"
+                style="font-family:var(--font-heading); font-weight:700;"
+              >
+                Chroma Bloom
               </h3>
+
               <p class="text-xs text-[var(--color-muted)] leading-relaxed">
-                new game in development. stay tuned.
+                orbital gravity & harmonic chain cascades. soft glassmorphism, spring physics, and procedural crystal chimes.
               </p>
             </div>
-          </article>
+
+            <!-- Footer row -->
+            <div class="flex items-center justify-between pt-1 border-t border-[var(--color-border)]">
+              <span class="text-[10px] font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
+                canvas · web audio synth
+              </span>
+              <svg
+                width="14" height="14" viewBox="0 0 24 24" fill="none"
+                class="text-[#9d8df1] opacity-0 group-hover:opacity-100 transition-opacity duration-200 -translate-x-1 group-hover:translate-x-0 transition-transform"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </a>
         </li>
       </ul>
     </section>
