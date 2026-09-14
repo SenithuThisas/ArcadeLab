@@ -57,17 +57,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
     <!-- ═══════════════════════════════════════════════════════
          HEADER / NAVIGATION
     ═══════════════════════════════════════════════════════ -->
-    <header class="border-b border-[var(--color-border)] bg-[var(--color-surface)] sticky top-0 z-50 backdrop-blur-sm">
+    <header class="border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 sticky top-0 z-50 backdrop-blur-md">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
 
         <!-- Site wordmark -->
         <a
           href="/"
           id="site-logo"
-          class="flex items-center gap-2 group focus-visible:outline-none"
+          class="flex items-center gap-2 group focus-visible:outline-none flex-shrink-0"
           aria-label="arcadelab home"
         >
-          <!-- Pixel-style dot indicator -->
           <span
             aria-hidden="true"
             class="block w-2 h-2 rounded-sm bg-[var(--color-brand)]
@@ -81,17 +80,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
           </span>
         </a>
 
-        <!-- Tagline (hidden on very small screens) -->
+        <!-- Tagline (hidden on mobile) -->
         <p
-          class="hidden sm:block text-xs text-[var(--color-muted)] tracking-wide font-mono"
+          class="hidden sm:block text-xs text-[var(--color-muted)] tracking-wide font-mono flex-1 text-center"
           style="font-family: var(--font-mono);"
         >
           built by hand.&nbsp;
           <span class="text-[var(--color-brand)] opacity-70">new games dropping soon.</span>
         </p>
 
-        <!-- Nav links -->
-        <nav aria-label="Main navigation">
+        <!-- Desktop Nav links -->
+        <nav aria-label="Main navigation" class="hidden sm:block">
           <ul class="flex items-center gap-1 list-none m-0 p-0">
             <li>
               <a
@@ -104,10 +103,106 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
                 arcade
               </a>
             </li>
+            <li>
+              <a
+                href="/games/space-dodge"
+                id="nav-space-dodge"
+                class="px-3 py-1.5 rounded text-sm text-[var(--color-muted)]
+                       hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                       transition-colors duration-150"
+              >
+                games
+              </a>
+            </li>
           </ul>
         </nav>
+
+        <!-- Hamburger button (mobile only) -->
+        <button
+          id="mobile-menu-btn"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+          class="sm:hidden flex items-center justify-center w-9 h-9 rounded-lg
+                 text-[var(--color-muted)] hover:text-[var(--color-text)]
+                 hover:bg-[var(--color-surface-2)] transition-colors duration-150
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand)]"
+        >
+          <!-- Hamburger icon -->
+          <svg id="icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+          <!-- Close icon (hidden by default) -->
+          <svg id="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+      </div>
+
+      <!-- Mobile Drawer Menu -->
+      <div
+        id="mobile-menu"
+        class="sm:hidden hidden border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 space-y-1"
+        aria-label="Mobile navigation"
+      >
+        <a
+          href="/"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
+                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                 transition-colors duration-150"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Home
+        </a>
+        <a
+          href="/games/space-dodge"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
+                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                 transition-colors duration-150"
+        >
+          <span>🚀</span>
+          Space Dodge
+        </a>
+        <a
+          href="/games/shadow-protocol"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
+                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                 transition-colors duration-150"
+        >
+          <span>⚔️</span>
+          Shadow Protocol
+        </a>
+        <a
+          href="/games/chroma-bloom"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
+                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                 transition-colors duration-150"
+        >
+          <span>🌸</span>
+          Chroma Bloom
+        </a>
       </div>
     </header>
+
+    <script is:inline>
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      const iconMenu = document.getElementById('icon-menu');
+      const iconClose = document.getElementById('icon-close');
+      if (btn && menu) {
+        btn.addEventListener('click', () => {
+          const isOpen = !menu.classList.contains('hidden');
+          menu.classList.toggle('hidden', isOpen);
+          iconMenu.classList.toggle('hidden', !isOpen);
+          iconClose.classList.toggle('hidden', isOpen);
+          btn.setAttribute('aria-expanded', String(!isOpen));
+        });
+      }
+    </script>
 
     <!-- ═══════════════════════════════════════════════════════
          PAGE SLOT
