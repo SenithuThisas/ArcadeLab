@@ -3,234 +3,208 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="Arcade"
-  description="arcadelab — hand-crafted indie mini-games, built entirely in the browser with vanilla JavaScript and HTML5 Canvas."
+  title="ArcadeLab — Handcrafted Indie Browser Games"
+  description="Instant, zero-install indie browser games crafted in pure JavaScript & HTML5 Canvas. Fast, beautiful, and ad-free."
 >
 
-  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-16">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-20">
 
     <!-- ══════════════════════════════════════════════════════
-         HERO — 16:9 video teaser placeholder
+         HERO SECTION: High-Energy, Interactive, Live Showcase
     ══════════════════════════════════════════════════════ -->
-    <section aria-label="Featured teaser" class="space-y-4">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)]">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent)] opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-accent)]"></span>
-        </span>
-        <span class="text-xs font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-          arcade is live
-        </span>
-      </div>
+    <section aria-label="Arcade Hero Showcase" class="relative">
 
-      <h1 class="text-3xl sm:text-4xl text-[var(--color-text)]" style="font-family:var(--font-heading); font-weight:700;">
-        hand-crafted games,<br />
-        <span class="text-[var(--color-brand)]">no engines. no frameworks.</span>
-      </h1>
+      <!-- Ambient Glow Blobs -->
+      <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-gradient-to-r from-[#9d8df1]/15 via-[#f2b84b]/15 to-[#38dbf5]/15 blur-3xl pointer-events-none -z-10"></div>
 
-      <p class="text-[var(--color-muted)] max-w-xl leading-relaxed">
-        every pixel pushed manually. pure canvas, pure JS.
-        new games drop regularly — follow along on YouTube.
-      </p>
-
-      <!-- 16:9 arcade-cabinet screen placeholder -->
-      <div
-        id="hero-teaser"
-        class="relative w-full rounded-xl overflow-hidden border border-[var(--color-surface-2)]"
-        style="aspect-ratio: 16/9;"
-        role="img"
-        aria-label="Game teaser video — coming soon"
-      >
-        <!-- Simulated scanlines + CRT glow -->
-        <div class="absolute inset-0 bg-[var(--color-surface)]"></div>
-
-        <!-- Grid pattern overlay -->
-        <div
-          class="absolute inset-0 opacity-[0.04]"
-          style="background-image: linear-gradient(var(--color-muted) 1px, transparent 1px),
-                                   linear-gradient(90deg, var(--color-muted) 1px, transparent 1px);
-                 background-size: 32px 32px;"
-        ></div>
-
-        <!-- CRT inner shadow -->
-        <div
-          class="absolute inset-0 rounded-xl pointer-events-none"
-          style="box-shadow: inset 0 0 80px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.5);"
-        ></div>
-
-        <!-- Scanlines animation -->
-        <div
-          aria-hidden="true"
-          class="absolute inset-0 pointer-events-none rounded-xl"
-          style="background: repeating-linear-gradient(
-            to bottom,
-            transparent,
-            transparent 3px,
-            rgba(0,0,0,0.07) 3px,
-            rgba(0,0,0,0.07) 4px
-          );"
-        ></div>
-
-        <!-- Centre content -->
-        <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center px-4">
-          <div
-            class="w-16 h-16 rounded-2xl border-2 border-[var(--color-brand)] flex items-center justify-center"
-            style="box-shadow: 0 0 24px rgba(242,184,75,0.25);"
-          >
-            <!-- Play icon -->
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M8 5.14v14l11-7-11-7z" fill="var(--color-brand)"/>
-            </svg>
-          </div>
-          <p class="text-[var(--color-muted)] text-sm font-mono" style="font-family:var(--font-mono);">
-            gameplay teaser — uploading soon
-          </p>
+      <div class="space-y-6 text-center max-w-3xl mx-auto">
+        
+        <!-- Live Badge -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] shadow-inner">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+          </span>
+          <span class="text-xs font-mono font-medium tracking-wide text-[var(--color-text)]">
+            Phase 1 Release · 3 Playable Games · New Drops Coming Soon
+          </span>
         </div>
 
-        <!-- Corner accents -->
-        <span aria-hidden="true" class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-[var(--color-brand)] opacity-60 rounded-tl"></span>
-        <span aria-hidden="true" class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-[var(--color-brand)] opacity-60 rounded-tr"></span>
-        <span aria-hidden="true" class="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-[var(--color-brand)] opacity-60 rounded-bl"></span>
-        <span aria-hidden="true" class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-[var(--color-brand)] opacity-60 rounded-br"></span>
+        <!-- Catchy Main Heading -->
+        <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-[var(--color-text)] leading-[1.1] font-heading">
+          Hand-crafted games.<br />
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-[#f2b84b] via-[#ff8c42] to-[#ff7597]">
+            Instant adrenaline in your browser.
+          </span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-[var(--color-muted)] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          No heavy engines or bloated setups. Just pure HTML5 canvas physics, responsive controls, and silky smooth 60 FPS gameplay.
+        </p>
+
+        <!-- Quick CTAs -->
+        <div class="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+          <a
+            href="/games/space-dodge"
+            id="hero-cta-featured"
+            class="px-6 py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/25 hover:shadow-xl hover:shadow-[#38dbf5]/40 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
+          >
+            <span>🚀 Play Space Dodge</span>
+            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 font-bold">Featured</span>
+          </a>
+
+          <a
+            href="/games/chroma-bloom"
+            class="px-5 py-3 rounded-full font-semibold text-sm bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[#9d8df1] text-[var(--color-text)] hover:text-[#9d8df1] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
+          >
+            <span>🌸 Chroma Bloom</span>
+            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold">New</span>
+          </a>
+
+          <button
+            id="btn-random-game"
+            class="px-4 py-3 rounded-full font-semibold text-sm bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-brand)] text-[var(--color-text)] hover:text-[var(--color-brand)] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Surprise Me</span>
+          </button>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs font-mono text-[var(--color-muted)]">
+          <div class="inline-flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>60 FPS Native Canvas</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#48eed6" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            <span>Pure Vanilla JS</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff7597" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Instant Load (&lt;1s)</span>
+          </div>
+        </div>
+
       </div>
+
     </section>
 
     <!-- ══════════════════════════════════════════════════════
-         GAME GRID
+         GAME CATALOGUE GRID
     ══════════════════════════════════════════════════════ -->
-    <section aria-label="Game catalogue" class="space-y-6">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl text-[var(--color-text)]" style="font-family:var(--font-heading); font-weight:700;">
-          the arcade
-        </h2>
-        <span class="text-xs font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-          3 games available
-        </span>
+    <section aria-label="Game catalogue" class="space-y-8" id="catalogue">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[var(--color-border)] pb-4">
+        <div>
+          <div class="text-xs font-mono text-[var(--color-brand)] uppercase tracking-wider">Play In Browser</div>
+          <h2 class="text-2xl sm:text-3xl text-[var(--color-text)] font-heading font-bold mt-1">
+            Featured Arcade Vault
+          </h2>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono text-[var(--color-muted)]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>All 3 games updated & ready</span>
+        </div>
       </div>
 
       <ul
         id="game-grid"
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 list-none m-0 p-0"
+        class="grid grid-cols-1 md:grid-cols-3 gap-6 list-none m-0 p-0"
         role="list"
       >
-        <!-- ── CARD 1: Space Dodge (active) ───────────────────── -->
+        <!-- ── CARD 1: Space Dodge (Retro High-Speed Arcade) ─────────── -->
         <li role="listitem">
           <a
             href="/games/space-dodge"
             id="card-space-dodge"
-            class="group block h-full rounded-xl border border-[var(--color-border)]
+            class="group flex flex-col h-full rounded-2xl border border-[var(--color-border)]
                    bg-[var(--color-surface)] p-5 space-y-4
-                   transition-all duration-200 ease-out
-                   hover:scale-[1.03] hover:border-[var(--color-accent)]
-                   hover:shadow-[0_0_32px_rgba(77,217,240,0.12)]
-                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+                   transition-all duration-300 ease-out
+                   hover:scale-[1.03] hover:border-[#38dbf5]
+                   hover:shadow-[0_12px_40px_rgba(56,219,245,0.22)]
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38dbf5]"
             aria-label="Play Space Dodge"
           >
-            <!-- Game thumbnail placeholder -->
+            <!-- Thumbnail -->
             <div
-              class="w-full rounded-lg overflow-hidden"
+              class="w-full rounded-xl overflow-hidden relative"
               style="aspect-ratio:16/9; background: linear-gradient(135deg, #05070f 0%, #0d1326 50%, #05070f 100%);"
             >
               <div class="w-full h-full flex items-center justify-center relative">
-                <!-- Particle dots -->
-                <div class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-                  <svg width="100%" height="100%" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
-                    <defs>
-                      <linearGradient id="space-bg" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0" stop-color="#05070f"/>
-                        <stop offset="1" stop-color="#0d1326"/>
-                      </linearGradient>
-                    </defs>
-                    <rect width="160" height="90" fill="url(#space-bg)"/>
-                    <!-- Stars -->
-                    <g fill="#fff">
-                      <circle cx="25" cy="18" r="1"/>
-                      <circle cx="57" cy="9" r="1.6"/>
-                      <circle cx="104" cy="22" r="1"/>
-                      <circle cx="140" cy="12" r="1.6"/>
-                      <circle cx="18" cy="55" r="1.6"/>
-                      <circle cx="70" cy="60" r="1"/>
-                      <circle cx="128" cy="50" r="1"/>
-                      <circle cx="45" cy="76" r="1"/>
-                    </g>
-                    <!-- Distant planet -->
-                    <circle cx="137" cy="88" r="30" fill="#1a2238"/>
-                    <circle cx="130" cy="82" r="22" fill="#151c2e"/>
-                    <!-- Asteroids -->
-                    <ellipse cx="38" cy="22" rx="14" ry="10" fill="#56586a"/>
-                    <ellipse cx="33" cy="19" rx="3" ry="2" fill="#13141c" opacity="0.8"/>
-                    <ellipse cx="44" cy="26" rx="2.5" ry="1.8" fill="#13141c" opacity="0.7"/>
-                    <ellipse cx="120" cy="64" rx="11" ry="8" fill="#47495b"/>
-                    <ellipse cx="116" cy="62" rx="2.5" ry="1.8" fill="#13141c" opacity="0.7"/>
-                    <!-- Player ship -->
-                    <g transform="translate(80,52)">
-                      <polygon points="0,-26 10,4 10,20 -10,20 -10,4" fill="#dde2f5"/>
-                      <ellipse cx="0" cy="-8" rx="4.5" ry="6" fill="#2aa6c9"/>
-                      <polygon points="-9,4 -17,19 -9,18" fill="#4dd9f0"/>
-                      <polygon points="9,4 17,19 9,18" fill="#4dd9f0"/>
-                      <polygon points="-5,19 0,30 5,19" fill="#ff8c42"/>
-                    </g>
-                  </svg>
-                </div>
+                <svg width="100%" height="100%" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
+                  <g fill="#fff">
+                    <circle cx="25" cy="18" r="1"/>
+                    <circle cx="57" cy="9" r="1.6"/>
+                    <circle cx="104" cy="22" r="1"/>
+                    <circle cx="140" cy="12" r="1.6"/>
+                    <circle cx="18" cy="55" r="1.6"/>
+                  </g>
+                  <ellipse cx="38" cy="22" rx="14" ry="10" fill="#56586a"/>
+                  <ellipse cx="120" cy="64" rx="11" ry="8" fill="#47495b"/>
+                  <!-- Starfighter -->
+                  <g transform="translate(80,52)">
+                    <polygon points="0,-24 9,4 9,18 -9,18 -9,4" fill="#dde2f5"/>
+                    <polygon points="-8,4 -15,17 -8,16" fill="#4dd9f0"/>
+                    <polygon points="8,4 15,17 8,16" fill="#4dd9f0"/>
+                    <polygon points="-4,17 0,26 4,17" fill="#ff8c42"/>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Quick Play Overlay on Hover -->
+              <div class="absolute inset-0 bg-black/40 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span class="px-4 py-2 rounded-full font-bold text-xs bg-[#38dbf5] text-[#03050b] shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                  Engage Thrusters →
+                </span>
               </div>
             </div>
 
-            <!-- Card body -->
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <span
-                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-accent)] text-[var(--color-accent)]"
-                  style="font-family:var(--font-mono);"
-                >
-                  playable
+            <!-- Body -->
+            <div class="space-y-2 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#38dbf5]/10 border border-[#38dbf5]/30 text-[#38dbf5] font-semibold">
+                  🚀 High-Speed Arcade
                 </span>
+                <span class="text-[10px] font-mono text-[var(--color-muted)]">Procedural</span>
               </div>
 
-              <h3
-                class="text-base text-[var(--color-text)] transition-colors duration-200
-                       group-hover:text-[var(--color-accent)]"
-                style="font-family:var(--font-heading); font-weight:700;"
-              >
+              <h3 class="text-lg text-[var(--color-text)] font-heading font-bold group-hover:text-[#38dbf5] transition-colors">
                 Space Dodge
               </h3>
 
               <p class="text-xs text-[var(--color-muted)] leading-relaxed">
-                pilot your ship through a procedural asteroid belt, dodge debris, and chase the deepest run. pure canvas, zero deps.
+                Pilot an agile starfighter through procedural asteroid belts, rogue defense drones, and laser hazard gates.
               </p>
             </div>
 
-            <!-- Footer row -->
-            <div class="flex items-center justify-between pt-1 border-t border-[var(--color-border)]">
-              <span class="text-[10px] font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-                canvas · vanilla js
-              </span>
-              <svg
-                width="14" height="14" viewBox="0 0 24 24" fill="none"
-                class="text-[var(--color-accent)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 -translate-x-1 group-hover:translate-x-0 transition-transform"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+            <!-- Card Footer -->
+            <div class="flex items-center justify-between pt-3 border-t border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
+              <span>Infinite Survival</span>
+              <span class="text-[#38dbf5] group-hover:translate-x-1 transition-transform">Dodge →</span>
             </div>
           </a>
         </li>
 
-        <!-- ── CARD 2: Shadow Fight: Arena of Shadows (active) ───────── -->
+        <!-- ── CARD 2: Shadow Fight: Arena (Action Martial Arts) ───────── -->
         <li role="listitem">
           <a
             href="/games/shadow-protocol"
             id="card-shadow-protocol"
-            class="group block h-full rounded-xl border border-[var(--color-border)]
+            class="group flex flex-col h-full rounded-2xl border border-[var(--color-border)]
                    bg-[var(--color-surface)] p-5 space-y-4
-                   transition-all duration-200 ease-out
+                   transition-all duration-300 ease-out
                    hover:scale-[1.03] hover:border-[#f5b942]
-                   hover:shadow-[0_0_32px_rgba(245,185,66,0.18)]
+                   hover:shadow-[0_12px_40px_rgba(245,185,66,0.22)]
                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5b942]"
             aria-label="Play Shadow Fight: Arena of Shadows"
           >
-            <!-- Game thumbnail -->
+            <!-- Thumbnail -->
             <div
-              class="w-full rounded-lg overflow-hidden"
+              class="w-full rounded-xl overflow-hidden relative"
               style="aspect-ratio:16/9; background: linear-gradient(180deg, #10040c 0%, #300a18 55%, #080a12 100%);"
             >
               <div class="w-full h-full flex items-center justify-center relative">
@@ -238,177 +212,89 @@ import Layout from '../layouts/Layout.astro';
                   <defs>
                     <linearGradient id="bg-sf-japan" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stop-color="#120417"/>
-                      <stop offset="45%" stop-color="#4a0e28"/>
-                      <stop offset="75%" stop-color="#962d22"/>
-                      <stop offset="90%" stop-color="#e67e22"/>
-                      <stop offset="100%" stop-color="#fad390"/>
-                    </linearGradient>
-                    <linearGradient id="blade-glow" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#ffffff"/>
-                      <stop offset="100%" stop-color="#00ff9d"/>
+                      <stop offset="60%" stop-color="#5a122e"/>
+                      <stop offset="100%" stop-color="#f5b942"/>
                     </linearGradient>
                   </defs>
 
-                  <!-- 1. Sunset Sky Gradient -->
                   <rect width="160" height="90" fill="url(#bg-sf-japan)"/>
+                  <circle cx="80" cy="36" r="20" fill="#ffeaa7" opacity="0.9"/>
 
-                  <!-- 2. Glowing Golden Sun -->
-                  <circle cx="80" cy="36" r="22" fill="#ffeaa7" opacity="0.85"/>
-                  <circle cx="80" cy="36" r="32" fill="none" stroke="#f39c12" stroke-width="1.2" opacity="0.35"/>
-
-                  <!-- 3. Mt. Fuji Volcano & Snowcap -->
-                  <polygon points="40,70 80,26 120,70" fill="#240c2e"/>
-                  <polygon points="72,35 80,26 88,35 85,38 80,34 75,38" fill="#f8fafc"/>
-
-                  <!-- 4. Five-Story Pagoda Silhouette (Far Left) -->
-                  <g transform="translate(18, 70) scale(0.45)" fill="#0d0514">
-                    <rect x="-12" y="-10" width="24" height="10"/>
-                    <rect x="-8" y="-22" width="16" height="12"/>
-                    <polygon points="-16,-22 0,-28 16,-22 14,-20 0,-25 -14,-20"/>
-                    <rect x="-7" y="-34" width="14" height="12"/>
-                    <polygon points="-14,-34 0,-39 14,-34 12,-32 0,-36 -12,-32"/>
-                    <rect x="-6" y="-46" width="12" height="12"/>
-                    <polygon points="-12,-46 0,-50 12,-46 10,-44 0,-47 -10,-44"/>
-                    <line x1="0" y1="-50" x2="0" y2="-62" stroke="#f5b942" stroke-width="1.5"/>
-                  </g>
-
-                  <!-- 5. Shinto Torii Gate Silhouette (Far Right) -->
-                  <g transform="translate(142, 70) scale(0.4)" fill="#b71540">
-                    <rect x="-14" y="-36" width="28" height="3" rx="1"/>
-                    <polygon points="-16,-40 0,-38 16,-40 14,-37 0,-35 -14,-37"/>
-                    <rect x="-9" y="-36" width="3" height="36"/>
-                    <rect x="6" y="-36" width="3" height="36"/>
-                  </g>
-
-                  <!-- 6. Ground Dojo Platform -->
+                  <!-- Ground -->
                   <rect x="0" y="70" width="160" height="20" fill="#060912"/>
-                  <line x1="0" y1="70" x2="160" y2="70" stroke="#f5b942" stroke-width="1" opacity="0.6"/>
+                  <line x1="0" y1="70" x2="160" y2="70" stroke="#f5b942" stroke-width="1"/>
 
-                  <!-- 7. Ambient Sakura Petals -->
-                  <circle cx="32" cy="24" r="1" fill="#ff76a6" opacity="0.8"/>
-                  <circle cx="68" cy="18" r="1.3" fill="#ff9ebb" opacity="0.9"/>
-                  <circle cx="125" cy="28" r="1.2" fill="#ff76a6" opacity="0.75"/>
-                  <circle cx="95" cy="52" r="1" fill="#ffb8d1" opacity="0.85"/>
-
-                  <!-- 8. Player: Navy Blue Anime Martial Arts Warrior (Left) -->
-                  <g transform="translate(52, 70)">
-                    <!-- Back Leg -->
-                    <rect x="-8" y="-14" width="5" height="14" rx="2" fill="#0b1b38"/>
-                    <rect x="-9" y="-4" width="6" height="4" fill="#2563eb"/>
-                    <!-- Front Leg in dynamic lunge stance -->
-                    <rect x="2" y="-12" width="5" height="12" rx="2" fill="#0b1b38" transform="rotate(20)"/>
-                    <rect x="5" y="-3" width="7" height="4" fill="#2563eb"/>
-                    <!-- Torso with Navy Blue Gi & Royal Blue Collar -->
-                    <polygon points="-6,-13 6,-13 4,-26 -4,-26" fill="#0b1b38"/>
-                    <line x1="-4" y1="-26" x2="1" y2="-17" stroke="#2563eb" stroke-width="1.2"/>
-                    <polygon points="-2,-26 2,-26 0,-20" fill="#ffd5aa"/>
-                    <!-- Navy Blue Sash Belt -->
-                    <rect x="-5" y="-15" width="10" height="2.5" fill="#1d4ed8"/>
-                    <!-- Head, Spiky Navy Hair & Glowing Cyan Eye -->
-                    <circle cx="0" cy="-30" r="4.5" fill="#ffd5aa"/>
-                    <path d="M-4,-29 L-6,-35 L-2,-34 L0,-38 L3,-33 L5,-34 L4,-29 Z" fill="#070f22"/>
-                    <rect x="-4" y="-31" width="8" height="1.8" fill="#2563eb"/>
-                    <!-- Headband Ribbon -->
-                    <path d="M-4,-30 Q-9,-31 -13,-28" stroke="#2563eb" stroke-width="1.2" fill="none"/>
-                    <circle cx="2" cy="-30" r="0.8" fill="#38bdf8"/>
-                    <!-- Arms & Glowing Katana Blade Slash -->
-                    <rect x="-2" y="-25" width="3.5" height="8" rx="1.5" fill="#0b1b38" transform="rotate(35)"/>
-                    <circle cx="8" cy="-21" r="2" fill="#ffd5aa"/>
-                    <!-- Katana Blade -->
-                    <line x1="8" y1="-21" x2="26" y2="-34" stroke="#e2e8f0" stroke-width="1.8" stroke-linecap="round"/>
-                    <line x1="9" y1="-21" x2="27" y2="-34" stroke="#00ff9d" stroke-width="1" stroke-linecap="round"/>
+                  <!-- Player Figure Left -->
+                  <g transform="translate(54, 70)">
+                    <rect x="-6" y="-14" width="4" height="14" rx="2" fill="#0b1b38"/>
+                    <rect x="2" y="-12" width="4" height="12" rx="2" fill="#0b1b38" transform="rotate(20)"/>
+                    <polygon points="-5,-13 5,-13 3,-25 -3,-25" fill="#0b1b38"/>
+                    <circle cx="0" cy="-29" r="4" fill="#ffd5aa"/>
+                    <line x1="6" y1="-20" x2="24" y2="-32" stroke="#00ff9d" stroke-width="1.8" stroke-linecap="round"/>
                   </g>
 
-                  <!-- 9. Opponent: Master Ronin with Straw Hat & Naginata (Right) -->
-                  <g transform="translate(108, 70) scale(-1, 1)">
-                    <!-- Back Leg -->
-                    <rect x="-8" y="-14" width="5" height="14" rx="2" fill="#1e3a2b"/>
-                    <!-- Front Leg in martial arts combat stance -->
-                    <rect x="2" y="-12" width="5" height="12" rx="2" fill="#1e3a2b" transform="rotate(18)"/>
-                    <!-- Torso with Bamboo Green Robes -->
-                    <polygon points="-6,-13 6,-13 4,-26 -4,-26" fill="#1e3a2b"/>
-                    <polygon points="-2,-26 2,-26 0,-20" fill="#eec59a"/>
-                    <!-- Brown Sash -->
-                    <rect x="-5" y="-15" width="10" height="2.5" fill="#78350f"/>
-                    <!-- Head & Conical Bamboo Straw Hat (Kasa) -->
-                    <circle cx="0" cy="-30" r="4.5" fill="#eec59a"/>
-                    <polygon points="-8,-30 0,-37 8,-30" fill="#78350f"/>
-                    <line x1="-8" y1="-30" x2="8" y2="-30" stroke="#d97706" stroke-width="0.8"/>
-                    <circle cx="2" cy="-30" r="0.8" fill="#ff0055"/>
-                    <!-- Arms & Naginata Polearm Strike -->
-                    <rect x="-2" y="-25" width="3.5" height="8" rx="1.5" fill="#1e3a2b" transform="rotate(30)"/>
-                    <circle cx="8" cy="-21" r="2" fill="#eec59a"/>
-                    <!-- Naginata Long Shaft & Curved Blade -->
-                    <line x1="2" y1="-14" x2="26" y2="-33" stroke="#451a03" stroke-width="1.4" stroke-linecap="round"/>
-                    <path d="M26,-33 Q31,-37 34,-34 L32,-32 Q28,-34 26,-33 Z" fill="#f1f5f9" stroke="#f5b942" stroke-width="0.8"/>
+                  <!-- Opponent Figure Right -->
+                  <g transform="translate(106, 70) scale(-1, 1)">
+                    <rect x="-6" y="-14" width="4" height="14" rx="2" fill="#1e3a2b"/>
+                    <rect x="2" y="-12" width="4" height="12" rx="2" fill="#1e3a2b" transform="rotate(18)"/>
+                    <polygon points="-5,-13 5,-13 3,-25 -3,-25" fill="#1e3a2b"/>
+                    <circle cx="0" cy="-29" r="4" fill="#eec59a"/>
+                    <polygon points="-7,-29 0,-35 7,-29" fill="#78350f"/>
+                    <line x1="2" y1="-14" x2="24" y2="-32" stroke="#f5b942" stroke-width="1.6" stroke-linecap="round"/>
                   </g>
-
-                  <!-- 10. Central Blade Clash Spark Burst -->
-                  <circle cx="80" cy="40" r="3.5" fill="#ffffff"/>
-                  <circle cx="80" cy="40" r="7" fill="none" stroke="#ffeaa7" stroke-width="1" opacity="0.8"/>
-                  <line x1="72" y1="40" x2="88" y2="40" stroke="#ffd700" stroke-width="1.8"/>
-                  <line x1="80" y1="32" x2="80" y2="48" stroke="#00ff9d" stroke-width="1.8"/>
-                  <line x1="74" y1="34" x2="86" y2="46" stroke="#fff" stroke-width="1"/>
                 </svg>
+              </div>
+
+              <!-- Quick Play Overlay on Hover -->
+              <div class="absolute inset-0 bg-black/40 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span class="px-4 py-2 rounded-full font-bold text-xs bg-[#f5b942] text-[#0b0e1b] shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                  Enter Arena →
+                </span>
               </div>
             </div>
 
-            <!-- Card body -->
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <span
-                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[#f5b942] text-[#f5b942]"
-                  style="font-family:var(--font-mono);"
-                >
-                  playable
+            <!-- Body -->
+            <div class="space-y-2 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#f5b942]/10 border border-[#f5b942]/30 text-[#f5b942] font-semibold">
+                  ⚔️ Martial Arts Duel
                 </span>
+                <span class="text-[10px] font-mono text-[var(--color-muted)]">Combos</span>
               </div>
 
-              <h3
-                class="text-base text-[var(--color-text)] transition-colors duration-200
-                       group-hover:text-[#f5b942]"
-                style="font-family:var(--font-heading); font-weight:700;"
-              >
+              <h3 class="text-lg text-[var(--color-text)] font-heading font-bold group-hover:text-[#f5b942] transition-colors">
                 Shadow Fight: Arena
               </h3>
 
               <p class="text-xs text-[var(--color-muted)] leading-relaxed">
-                2D 1v1 shadow martial arts duel. master punches, roundhouse kicks, katana slashes, and kusarigama chains.
+                2D anime shadow warrior combat. Master katana slashes, roundhouse kicks, kusarigama chains, and ultimate shadow surges.
               </p>
             </div>
 
-            <!-- Footer row -->
-            <div class="flex items-center justify-between pt-1 border-t border-[var(--color-border)]">
-              <span class="text-[10px] font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-                canvas · 1v1 martial arts
-              </span>
-              <svg
-                width="14" height="14" viewBox="0 0 24 24" fill="none"
-                class="text-[#f5b942] opacity-0 group-hover:opacity-100 transition-opacity duration-200 -translate-x-1 group-hover:translate-x-0 transition-transform"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+            <!-- Card Footer -->
+            <div class="flex items-center justify-between pt-3 border-t border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
+              <span>1v1 Fighting Engine</span>
+              <span class="text-[#f5b942] group-hover:translate-x-1 transition-transform">Fight →</span>
             </div>
           </a>
         </li>
 
-        <!-- ── CARD 3: Chroma Bloom (active) ─────────────────────────── -->
+        <!-- ── CARD 3: Chroma Bloom (Soft Zen) ─────────────────────────── -->
         <li role="listitem">
           <a
             href="/games/chroma-bloom"
             id="card-chroma-bloom"
-            class="group block h-full rounded-xl border border-[var(--color-border)]
+            class="group flex flex-col h-full rounded-2xl border border-[var(--color-border)]
                    bg-[var(--color-surface)] p-5 space-y-4
-                   transition-all duration-200 ease-out
+                   transition-all duration-300 ease-out
                    hover:scale-[1.03] hover:border-[#9d8df1]
-                   hover:shadow-[0_0_32px_rgba(157,141,241,0.22)]
+                   hover:shadow-[0_12px_40px_rgba(157,141,241,0.22)]
                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9d8df1]"
             aria-label="Play Chroma Bloom"
           >
-            <!-- Game thumbnail -->
+            <!-- Thumbnail -->
             <div
-              class="w-full rounded-lg overflow-hidden"
+              class="w-full rounded-xl overflow-hidden relative"
               style="aspect-ratio:16/9; background: radial-gradient(circle at center, #1b1638 0%, #0c0e1c 100%);"
             >
               <div class="w-full h-full flex items-center justify-center relative">
@@ -424,111 +310,342 @@ import Layout from '../layouts/Layout.astro';
                       <stop offset="45%" stop-color="#ff9a76" stop-opacity="0.85"/>
                       <stop offset="100%" stop-color="#ff9a76" stop-opacity="0"/>
                     </radialGradient>
-                    <radialGradient id="cb-glow-3" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#ffffff"/>
-                      <stop offset="45%" stop-color="#48eed6" stop-opacity="0.85"/>
-                      <stop offset="100%" stop-color="#48eed6" stop-opacity="0"/>
-                    </radialGradient>
                   </defs>
 
-                  <!-- Deep Cosmic Background Grid -->
                   <g stroke="rgba(255,255,255,0.06)" stroke-width="0.5">
                     <line x1="0" y1="20" x2="160" y2="20"/>
                     <line x1="0" y1="45" x2="160" y2="45"/>
                     <line x1="0" y1="70" x2="160" y2="70"/>
-                    <line x1="40" y1="0" x2="40" y2="90"/>
-                    <line x1="80" y1="0" x2="80" y2="90"/>
-                    <line x1="120" y1="0" x2="120" y2="90"/>
                   </g>
 
-                  <!-- Gravitational Orbit Rings -->
-                  <circle cx="80" cy="42" r="32" fill="none" stroke="#9d8df1" stroke-width="0.8" stroke-dasharray="2,3" opacity="0.4"/>
-                  <circle cx="80" cy="42" r="20" fill="none" stroke="#ff9a76" stroke-width="0.8" stroke-dasharray="2,2" opacity="0.45"/>
-
-                  <!-- Harmonic Ripple Waves -->
-                  <circle cx="80" cy="42" r="26" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.3"/>
-                  <circle cx="36" cy="30" r="16" fill="none" stroke="#48eed6" stroke-width="0.8" opacity="0.4"/>
-                  <circle cx="124" cy="55" r="18" fill="none" stroke="#ff9a76" stroke-width="0.8" opacity="0.4"/>
-
-                  <!-- Resonator Nodes -->
-                  <!-- Core Center Node -->
+                  <circle cx="80" cy="42" r="28" fill="none" stroke="#9d8df1" stroke-width="0.8" stroke-dasharray="2,3" opacity="0.4"/>
                   <circle cx="80" cy="42" r="14" fill="url(#cb-glow-1)"/>
                   <circle cx="80" cy="42" r="6" fill="#ffffff"/>
-                  <circle cx="80" cy="42" r="7.5" fill="none" stroke="#9d8df1" stroke-width="1"/>
 
-                  <!-- Petal Accents -->
-                  <circle cx="80" cy="30" r="2" fill="#b8c0ff"/>
-                  <circle cx="80" cy="54" r="2" fill="#b8c0ff"/>
-                  <circle cx="68" cy="42" r="2" fill="#b8c0ff"/>
-                  <circle cx="92" cy="42" r="2" fill="#b8c0ff"/>
+                  <circle cx="36" cy="30" r="8" fill="#48eed6" opacity="0.7"/>
+                  <circle cx="36" cy="30" r="3" fill="#ffffff"/>
 
-                  <!-- Left Mint Node -->
-                  <circle cx="36" cy="30" r="10" fill="url(#cb-glow-3)"/>
-                  <circle cx="36" cy="30" r="4.5" fill="#ffffff"/>
+                  <circle cx="124" cy="55" r="9" fill="url(#cb-glow-2)"/>
+                  <circle cx="124" cy="55" r="4" fill="#ffffff"/>
 
-                  <!-- Right Peach Node -->
-                  <circle cx="124" cy="55" r="11" fill="url(#cb-glow-2)"/>
-                  <circle cx="124" cy="55" r="5" fill="#ffffff"/>
-
-                  <!-- Orbiting Light Trail -->
                   <path d="M 80 78 Q 62 60 74 48 T 88 34 T 120 45" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
-                  <circle cx="120" cy="45" r="3.5" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
-
-                  <!-- Stardust Motes -->
-                  <circle cx="22" cy="18" r="0.8" fill="#fff" opacity="0.8"/>
-                  <circle cx="60" cy="14" r="1.2" fill="#b8c0ff" opacity="0.9"/>
-                  <circle cx="138" cy="22" r="1" fill="#fed368" opacity="0.75"/>
-                  <circle cx="105" cy="74" r="1.1" fill="#48eed6" opacity="0.85"/>
-                  <circle cx="48" cy="72" r="0.9" fill="#ffccd5" opacity="0.7"/>
+                  <circle cx="120" cy="45" r="3" fill="#ffffff"/>
                 </svg>
+              </div>
+
+              <!-- Quick Play Overlay on Hover -->
+              <div class="absolute inset-0 bg-black/40 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span class="px-4 py-2 rounded-full font-bold text-xs bg-[#9d8df1] text-[#0b0e1b] shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                  Launch Game →
+                </span>
               </div>
             </div>
 
-            <!-- Card body -->
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <span
-                  class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[#9d8df1] text-[#9d8df1]"
-                  style="font-family:var(--font-mono);"
-                >
-                  playable
+            <!-- Body -->
+            <div class="space-y-2 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#9d8df1]/10 border border-[#9d8df1]/30 text-[#9d8df1] font-semibold">
+                  🌸 Zen Cascade
                 </span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-                  zen · soft ui
-                </span>
+                <span class="text-[10px] font-mono text-[var(--color-muted)]">Web Audio</span>
               </div>
 
-              <h3
-                class="text-base text-[var(--color-text)] transition-colors duration-200
-                       group-hover:text-[#9d8df1]"
-                style="font-family:var(--font-heading); font-weight:700;"
-              >
+              <h3 class="text-lg text-[var(--color-text)] font-heading font-bold group-hover:text-[#9d8df1] transition-colors">
                 Chroma Bloom
               </h3>
 
               <p class="text-xs text-[var(--color-muted)] leading-relaxed">
-                orbital gravity & harmonic chain cascades. soft glassmorphism, spring physics, and procedural crystal chimes.
+                Launch light orbs into orbital gravity wells, triggering harmonic ripple cascades and procedural crystal bell chords.
               </p>
             </div>
 
-            <!-- Footer row -->
-            <div class="flex items-center justify-between pt-1 border-t border-[var(--color-border)]">
-              <span class="text-[10px] font-mono text-[var(--color-muted)]" style="font-family:var(--font-mono);">
-                canvas · web audio synth
-              </span>
-              <svg
-                width="14" height="14" viewBox="0 0 24 24" fill="none"
-                class="text-[#9d8df1] opacity-0 group-hover:opacity-100 transition-opacity duration-200 -translate-x-1 group-hover:translate-x-0 transition-transform"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+            <!-- Card Footer -->
+            <div class="flex items-center justify-between pt-3 border-t border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
+              <span>Frosted Soft UI</span>
+              <span class="text-[#9d8df1] group-hover:translate-x-1 transition-transform">Play →</span>
             </div>
           </a>
         </li>
       </ul>
+
+      <!-- ── In The Lab / Upcoming Drops Hint ── -->
+      <div class="mt-8 rounded-2xl border border-dashed border-[var(--color-border)] bg-gradient-to-r from-[var(--color-surface)]/80 via-[var(--color-surface-2)]/40 to-[var(--color-surface)]/80 backdrop-blur-md p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 transition-all duration-300 hover:border-[var(--color-brand)]/50 shadow-lg">
+        <div class="flex items-start gap-4">
+          <div class="w-11 h-11 rounded-xl bg-[var(--color-surface-2)] border border-[var(--color-border)] flex items-center justify-center text-xl shrink-0">
+            🧪
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[var(--color-brand)]/15 text-[var(--color-brand)] border border-[var(--color-brand)]/25">
+                In The Lab
+              </span>
+              <span class="text-xs font-mono text-[var(--color-muted)]">Phase 2 Dropping Soon</span>
+            </div>
+            <h3 class="text-base font-heading font-bold text-[var(--color-text)]">
+              More Handcrafted Games in Active Development
+            </h3>
+            <p class="text-xs text-[var(--color-muted)] leading-relaxed max-w-xl">
+              These 3 initial titles are just the beginning of ArcadeLab. We're actively building new physics-driven puzzles, rhythm experiments, and arcade survival games in pure vanilla Canvas.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 font-mono text-xs text-[var(--color-brand)] shrink-0 self-end sm:self-center bg-[var(--color-surface-2)]/80 px-3.5 py-1.5 rounded-full border border-[var(--color-border)]">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-brand)] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-brand)]"></span>
+          </span>
+          <span>Stay tuned for drops</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         COMMUNITY STATS & WHY ARCADELAB SECTION
+    ══════════════════════════════════════════════════════ -->
+    <section aria-label="Why ArcadeLab" class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
+      
+      <div class="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-2">
+        <div class="text-2xl font-heading font-bold text-[var(--color-brand)]">0ms Setup</div>
+        <h3 class="text-sm font-semibold text-[var(--color-text)]">Zero Installs or Accounts</h3>
+        <p class="text-xs text-[var(--color-muted)] leading-relaxed">
+          Click any game and start playing within half a second. No signups, no paywalls, and no complicated downloads.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-2">
+        <div class="text-2xl font-heading font-bold text-[#9d8df1]">Pure Canvas</div>
+        <h3 class="text-sm font-semibold text-[var(--color-text)]">Handcrafted Physics</h3>
+        <p class="text-xs text-[var(--color-muted)] leading-relaxed">
+          Every raycast, gravity well, and martial arts hit-box is coded from scratch in vanilla JavaScript.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] space-y-2">
+        <div class="text-2xl font-heading font-bold text-[#48eed6]">Web Audio</div>
+        <h3 class="text-sm font-semibold text-[var(--color-text)]">Procedural Soundscapes</h3>
+        <p class="text-xs text-[var(--color-muted)] leading-relaxed">
+          Real-time synth oscillators, harmonized pentatonic chimes, and responsive combat sound effects.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════
+         INTERACTIVE ARCADE PLAYGROUND SHOWCASE (Bottom Section)
+    ══════════════════════════════════════════════════════ -->
+    <section aria-label="Interactive arcade playground" class="space-y-4 pt-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs font-mono text-[var(--color-brand)] uppercase tracking-wider">Canvas Engine Lab</div>
+          <h3 class="text-xl font-heading font-bold text-[var(--color-text)]">Interactive Particle Cosmos</h3>
+        </div>
+        <div class="text-[11px] font-mono text-[var(--color-muted)] hidden sm:block">
+          💡 Click or drag cursor to spawn starbursts
+        </div>
+      </div>
+
+      <div class="relative rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-2xl bg-[var(--color-surface)] group">
+        <div class="relative w-full aspect-[16/9] sm:aspect-[21/9] min-h-[260px] overflow-hidden">
+          <canvas id="heroCanvas" class="absolute inset-0 w-full h-full block cursor-pointer"></canvas>
+
+          <!-- Floating Overlaid Game Showcase Pill -->
+          <div class="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto flex flex-wrap items-center gap-3 p-3 rounded-xl bg-[var(--color-base)]/85 backdrop-blur-md border border-[var(--color-border)] text-left shadow-lg">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#38dbf5] to-[#f2b84b] flex items-center justify-center text-lg">
+              🚀
+            </div>
+            <div>
+              <div class="text-xs font-mono text-[var(--color-muted)] flex items-center gap-2">
+                <span>FEATURED GAME</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              </div>
+              <div class="text-sm font-bold text-[var(--color-text)] font-heading" id="hero-game-title">
+                Space Dodge: Starfighter Odyssey
+              </div>
+            </div>
+            <a
+              id="hero-spotlight-btn"
+              href="/games/space-dodge"
+              class="ml-auto px-4 py-1.5 rounded-lg text-xs font-bold bg-[var(--color-brand)] text-[#0b0e1b] hover:opacity-90 transition-opacity"
+            >
+              Play Now →
+            </a>
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>
+
+  <!-- ══════════════════════════════════════════════════════
+       INTERACTIVE HERO CANVAS SCRIPT
+  ══════════════════════════════════════════════════════ -->
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Random Game Button
+      const games = ['/games/chroma-bloom', '/games/shadow-protocol', '/games/space-dodge'];
+      const btnRandom = document.getElementById('btn-random-game');
+      if (btnRandom) {
+        btnRandom.addEventListener('click', () => {
+          const target = games[Math.floor(Math.random() * games.length)];
+          window.location.href = target;
+        });
+      }
+
+      // 2. Interactive Hero Canvas Particle & Simulation Loop
+      const canvas = document.getElementById('heroCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = 0, h = 0;
+      let dpr = 1;
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = rect.width;
+        h = rect.height;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.scale(dpr, dpr);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Mouse tracking
+      const mouse = { x: w * 0.5, y: h * 0.5, targetX: w * 0.5, targetY: h * 0.5, isOver: false };
+      canvas.addEventListener('mousemove', (e) => {
+        const r = canvas.getBoundingClientRect();
+        mouse.targetX = e.clientX - r.left;
+        mouse.targetY = e.clientY - r.top;
+        mouse.isOver = true;
+      });
+      canvas.addEventListener('mouseleave', () => {
+        mouse.isOver = false;
+      });
+
+      // Sparks & Particles
+      const particles = [];
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * (w || 800),
+          y: Math.random() * (h || 350),
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          radius: 1 + Math.random() * 2.5,
+          color: ['#9d8df1', '#f2b84b', '#ff7597', '#38dbf5', '#80ffdb'][Math.floor(Math.random() * 5)],
+          alpha: 0.2 + Math.random() * 0.6
+        });
+      }
+
+      // Click ripple explosion
+      canvas.addEventListener('click', (e) => {
+        const r = canvas.getBoundingClientRect();
+        const clickX = e.clientX - r.left;
+        const clickY = e.clientY - r.top;
+        for (let i = 0; i < 18; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 2 + Math.random() * 4;
+          particles.push({
+            x: clickX,
+            y: clickY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: 2 + Math.random() * 2,
+            color: ['#f2b84b', '#9d8df1', '#ff9a76'][Math.floor(Math.random() * 3)],
+            alpha: 1.0,
+            decay: 0.025
+          });
+        }
+      });
+
+      // Animation Loop
+      function render() {
+        ctx.fillStyle = '#0a0d18';
+        ctx.fillRect(0, 0, w, h);
+
+        // Smooth mouse follow
+        mouse.x += (mouse.targetX - mouse.x) * 0.1;
+        mouse.y += (mouse.targetY - mouse.y) * 0.1;
+
+        // Draw ambient glow under cursor
+        const glow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 180);
+        glow.addColorStop(0, 'rgba(157, 141, 241, 0.22)');
+        glow.addColorStop(0.5, 'rgba(242, 184, 75, 0.08)');
+        glow.addColorStop(1, 'rgba(10, 13, 24, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, w, h);
+
+        // Grid lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < w; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+        }
+        for (let y = 0; y < h; y += 40) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        }
+
+        // Draw particles & links
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.decay) {
+            p.alpha -= p.decay;
+            if (p.alpha <= 0) {
+              particles.splice(i, 1);
+              i--;
+              continue;
+            }
+          } else {
+            if (p.x < 0) p.x = w;
+            if (p.x > w) p.x = 0;
+            if (p.y < 0) p.y = h;
+            if (p.y > h) p.y = 0;
+          }
+
+          // Gravitate slightly to cursor
+          if (mouse.isOver) {
+            const dx = mouse.x - p.x;
+            const dy = mouse.y - p.y;
+            const d = Math.hypot(dx, dy);
+            if (d < 140) {
+              p.x += (dx / d) * 0.8;
+              p.y += (dy / d) * 0.8;
+            }
+          }
+
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Connecting lines between nearby particles
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p1 = particles[i];
+            const p2 = particles[j];
+            const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            if (d < 85) {
+              ctx.strokeStyle = '#9d8df1';
+              ctx.globalAlpha = (1 - d / 85) * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        }
+        ctx.globalAlpha = 1.0;
+
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
+    });
+  </script>
 
 </Layout>
