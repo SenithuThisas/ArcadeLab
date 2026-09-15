@@ -54,35 +54,34 @@ import Layout from '../layouts/Layout.astro';
         <div class="pt-2 w-full">
 
           <!-- ─── MOBILE LAYOUT (<640px) ─── -->
-          <div class="flex flex-col items-center gap-2 sm:hidden">
-            <!-- Primary CTA — full-width gradient pill -->
+          <div class="flex flex-col items-center gap-2.5 w-full max-w-sm mx-auto sm:hidden">
+            <!-- Primary Action: Full-width vibrant pill with clear CTA -->
             <a
               href="/games/space-dodge"
               id="hero-cta-featured-mobile"
-              class="w-full px-6 py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/25 active:scale-[0.98] transition-all duration-200 inline-flex items-center justify-center gap-2 whitespace-nowrap"
+              class="w-full py-3 px-5 rounded-full font-semibold text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <span>🚀 Play Space Dodge</span>
               <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 font-bold">Featured</span>
             </a>
 
-            <!-- Secondary actions — lightweight text links, side-by-side -->
-            <div class="flex items-center justify-center">
+            <!-- Secondary Actions: Balanced 2-column tactile buttons -->
+            <div class="grid grid-cols-2 gap-2 w-full">
               <a
                 href="/games/chroma-bloom"
-                class="inline-flex items-center gap-1.5 px-4 py-2.5 text-[13px] text-[var(--color-muted)] active:text-[#9d8df1] transition-colors"
+                class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] active:border-[#9d8df1]/60 text-xs font-medium text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap"
               >
-                <span>🌸</span>
-                <span>Chroma Bloom</span>
-                <span class="text-[9px] uppercase font-mono px-1 py-px rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold leading-none">New</span>
+                <span>🌸 Chroma Bloom</span>
+                <span class="text-[9px] uppercase font-mono px-1 py-0.5 rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold">New</span>
               </a>
-
-              <span class="text-[var(--color-border)] text-xs select-none" aria-hidden="true">·</span>
 
               <button
                 id="btn-random-game-mobile"
-                class="inline-flex items-center gap-1.5 px-4 py-2.5 text-[13px] text-[var(--color-muted)] active:text-[var(--color-brand)] transition-colors"
+                class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] active:border-[var(--color-brand)]/60 text-xs font-medium text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap"
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
                 <span>Surprise Me</span>
               </button>
             </div>
