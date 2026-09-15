@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import SeasonalBackground from '../components/SeasonalBackground.astro';
-import ThemeSelector from '../components/ThemeSelector.astro';
 import SeasonalAudio from '../components/SeasonalAudio.astro';
 
 interface Props {
@@ -99,11 +98,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
           <span class="text-[var(--color-brand)] opacity-75">instant browser adrenaline.</span>
         </p>
 
-        <!-- Right Side: Live Seasonal Theme Switcher & Nav links -->
+        <!-- Right Side: Nav links -->
         <div class="flex items-center gap-2 sm:gap-3">
-          <!-- Interactive Seasonal Theme Dropdown -->
-          <ThemeSelector />
-
           <nav aria-label="Main navigation">
             <ul class="flex items-center gap-1 list-none m-0 p-0">
               <li>

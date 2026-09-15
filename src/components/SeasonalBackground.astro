@@ -112,16 +112,13 @@ const activeKey = getCurrentMonthKey();
       }
     };
 
-    let savedKey = null;
-    try {
-      savedKey = localStorage.getItem('arcadelab_seasonal_theme');
-    } catch(e) {}
-
     const container = document.getElementById('seasonal-bg-container');
     const serverKey = container ? container.getAttribute('data-active-theme') : null;
+    const currentMonthIdx = new Date().getMonth();
+    const liveMonthKey = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][currentMonthIdx];
 
-    let currentThemeKey = (savedKey && THEMES[savedKey]) ? savedKey : ((serverKey && THEMES[serverKey]) ? serverKey : 'jan');
-    let currentTheme = THEMES[currentThemeKey] || THEMES['jan'];
+    let currentThemeKey = (serverKey && THEMES[serverKey]) ? serverKey : (liveMonthKey || 'sep');
+    let currentTheme = THEMES[currentThemeKey] || THEMES['sep'];
 
     // DOM Glow Elements
     const blob1 = document.getElementById('seasonal-glow-blob-1');

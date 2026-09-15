@@ -473,11 +473,6 @@
     let currentThemeKey = 'dec'; // Will be resolved dynamically on start
 
     function resolveCurrentTheme() {
-      try {
-        const saved = localStorage.getItem('arcadelab_seasonal_theme');
-        if (saved && THEME_MAP[saved]) return saved;
-      } catch(e) {}
-
       const container = document.getElementById('seasonal-bg-container');
       const serverKey = container ? container.getAttribute('data-active-theme') : null;
       if (serverKey && THEME_MAP[serverKey]) return serverKey;
@@ -485,7 +480,9 @@
       const docTheme = document.documentElement.getAttribute('data-season-theme');
       if (docTheme && THEME_MAP[docTheme]) return docTheme;
 
-      return 'jan';
+      const monthIdx = new Date().getMonth();
+      const monthKey = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][monthIdx];
+      return monthKey || 'sep';
     }
 
     const THEME_MAP = {

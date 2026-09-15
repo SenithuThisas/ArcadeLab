@@ -265,7 +265,8 @@ export const SEASONAL_THEMES: Record<string, SeasonalTheme> = {
 export const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
 export function getCurrentMonthKey(): string {
-  return 'jan';
+  const monthIndex = new Date().getMonth();
+  return MONTH_KEYS[monthIndex] || 'sep';
 }
 
 export function getAutoThemeKey(): string {
@@ -274,5 +275,5 @@ export function getAutoThemeKey(): string {
 
 export function getCurrentTheme(): SeasonalTheme {
   const key = getCurrentMonthKey();
-  return SEASONAL_THEMES[key];
+  return SEASONAL_THEMES[key] || SEASONAL_THEMES['sep'];
 }
