@@ -127,7 +127,7 @@ h6,
 }
 
 /* Keep seasonal scenery atmospheric without competing with text on phones. */
-@media (max-width: 639px) {
+@media (max-width: 1023px) {
   #seasonal-glow-underlay {
     opacity: 0.2;
   }
