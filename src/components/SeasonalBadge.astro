@@ -1,0 +1,21 @@
+---
+// SeasonalBadge.astro - Non-interactive Live Monthly Theme Status Indicator
+import { getCurrentTheme } from '../lib/seasonalThemes';
+
+const theme = getCurrentTheme();
+---
+
+<div
+  class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono
+         bg-[var(--color-surface)]/80 backdrop-blur-md border border-[var(--color-border)]
+         text-[var(--color-brand)] shadow-sm select-none"
+  title={`Current Season: ${theme.name} (${theme.subtitle})`}
+>
+  <span class="relative flex h-2 w-2 shrink-0">
+    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-brand)] opacity-75"></span>
+    <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-brand)]"></span>
+  </span>
+  <span class="seasonal-badge-text font-semibold whitespace-nowrap text-[11px] sm:text-xs">
+    {theme.badge}
+  </span>
+</div>

@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import SeasonalBackground from '../components/SeasonalBackground.astro';
+import SeasonalAudio from '../components/SeasonalAudio.astro';
 
 interface Props {
   title: string;
@@ -43,28 +45,34 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
     <!-- ── Favicon ── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- ── Google Fonts: Space Grotesk + Inter + JetBrains Mono ── -->
+    <!-- ── Google Fonts: Space Grotesk + Orbitron + Cinzel + Outfit + Inter + JetBrains Mono ── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Orbitron:wght@500;700;800&family=Outfit:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
   </head>
 
-  <body class="min-h-screen bg-[var(--color-base)] text-[var(--color-text)]">
+  <body class="min-h-screen bg-[var(--color-base)] text-[var(--color-text)] relative selection:bg-[var(--color-brand)] selection:text-[#0b0e1b] overflow-x-hidden">
+
+    <!-- Ambient Dynamic Seasonal Background Engine -->
+    <SeasonalBackground />
+
+    <!-- Ambient Soft Procedural Seasonal Melody Engine -->
+    <SeasonalAudio />
 
     <!-- ═══════════════════════════════════════════════════════
          HEADER / NAVIGATION
     ═══════════════════════════════════════════════════════ -->
-    <header class="border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 sticky top-0 z-50 backdrop-blur-md">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+    <header class="border-b border-[var(--color-border)] bg-[var(--color-surface)]/80 sticky top-0 z-50 backdrop-blur-md">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3 sm:gap-4">
 
         <!-- Site wordmark -->
         <a
           href="/"
           id="site-logo"
-          class="flex items-center gap-2 group focus-visible:outline-none flex-shrink-0"
+          class="flex items-center gap-2 group focus-visible:outline-none shrink-0"
           aria-label="arcadelab home"
         >
           <span
@@ -80,111 +88,33 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
           </span>
         </a>
 
-        <!-- Tagline (hidden on mobile) -->
+        <!-- Tagline (hidden on small screens) -->
         <p
-          class="hidden sm:block text-xs text-[var(--color-muted)] tracking-wide font-mono flex-1 text-center"
+          class="hidden md:block text-xs text-[var(--color-muted)] tracking-wide font-mono"
           style="font-family: var(--font-mono);"
         >
           built by hand.&nbsp;
-          <span class="text-[var(--color-brand)] opacity-70">new games dropping soon.</span>
+          <span class="text-[var(--color-brand)] opacity-75">instant browser adrenaline.</span>
         </p>
 
-        <!-- Desktop Nav links -->
-        <nav aria-label="Main navigation" class="hidden sm:block">
-          <ul class="flex items-center gap-1 list-none m-0 p-0">
-            <li>
-              <a
-                href="/"
-                id="nav-home"
-                class="px-3 py-1.5 rounded text-sm text-[var(--color-muted)]
-                       hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
-                       transition-colors duration-150"
-              >
-                arcade
-              </a>
-            </li>
-            <li>
-              <a
-                href="/games/space-dodge"
-                id="nav-space-dodge"
-                class="px-3 py-1.5 rounded text-sm text-[var(--color-muted)]
-                       hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
-                       transition-colors duration-150"
-              >
-                games
-              </a>
-            </li>
-          </ul>
-        </nav>
-
-        <!-- Hamburger button (mobile only) -->
-        <button
-          id="mobile-menu-btn"
-          aria-label="Toggle menu"
-          aria-expanded="false"
-          aria-controls="mobile-menu"
-          class="sm:hidden flex items-center justify-center w-9 h-9 rounded-lg
-                 text-[var(--color-muted)] hover:text-[var(--color-text)]
-                 hover:bg-[var(--color-surface-2)] transition-colors duration-150
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand)]"
-        >
-          <!-- Hamburger icon -->
-          <svg id="icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-          <!-- Close icon (hidden by default) -->
-          <svg id="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-
-      </div>
-
-      <!-- Mobile Drawer Menu -->
-      <div
-        id="mobile-menu"
-        class="sm:hidden hidden border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 space-y-1"
-        aria-label="Mobile navigation"
-      >
-        <a
-          href="/"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
-                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
-                 transition-colors duration-150"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Home
-        </a>
-        <a
-          href="/games/space-dodge"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
-                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
-                 transition-colors duration-150"
-        >
-          <span>🚀</span>
-          Space Dodge
-        </a>
-        <a
-          href="/games/shadow-protocol"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
-                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
-                 transition-colors duration-150"
-        >
-          <span>⚔️</span>
-          Shadow Protocol
-        </a>
-        <a
-          href="/games/chroma-bloom"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
-                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
-                 transition-colors duration-150"
-        >
-          <span>🌸</span>
-          Chroma Bloom
-        </a>
+        <!-- Right Side: Nav links -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <nav aria-label="Main navigation">
+            <ul class="flex items-center gap-1 list-none m-0 p-0">
+              <li>
+                <a
+                  href="/"
+                  id="nav-home"
+                  class="px-3 py-1.5 rounded text-sm text-[var(--color-muted)]
+                         hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                         transition-colors duration-150"
+                >
+                  arcade
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
     </header>
 
@@ -228,24 +158,20 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
 </html>
 
 <style is:global>
-  /*
-   * Extra global token block — these variables are deliberately placed here so
-   * vanilla Canvas JS can read them via:
-   *   const style = getComputedStyle(document.documentElement);
-   *   const accent = style.getPropertyValue('--color-accent').trim();
-   */
   :root {
-    --color-base:        #0d0f14;
-    --color-surface:     #171a21;
-    --color-surface-2:   #1e222c;
-    --color-text:        #eef1f5;
-    --color-muted:       #8b93a1;
-    --color-brand:       #f2b84b;
-    --color-accent:      #ff8c42;
-    --color-border:      #2a2f3d;
+    --color-base:        #0d0814;
+    --color-surface:     #170f24;
+    --color-surface-2:   #211534;
+    --color-text:        #f3eef8;
+    --color-muted:       #9d8ea8;
+    --color-brand:       #f97316;
+    --color-accent:      #a855f7;
+    --color-border:      #35234d;
 
-    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-heading: 'Cinzel', 'Space Grotesk', serif;
     --font-body:    'Inter', system-ui, sans-serif;
     --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+    --headline-gradient: linear-gradient(135deg, #ffffff 0%, #fb923c 30%, #f97316 60%, #c084fc 85%, #a855f7 100%);
   }
 </style>

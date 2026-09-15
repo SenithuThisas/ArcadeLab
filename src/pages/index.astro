@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCurrentTheme } from '../lib/seasonalThemes';
+
+const currentTheme = getCurrentTheme();
 ---
 
 <Layout
@@ -12,74 +15,75 @@ import Layout from '../layouts/Layout.astro';
     <!-- ══════════════════════════════════════════════════════
          HERO SECTION: High-Energy, Interactive, Live Showcase
     ══════════════════════════════════════════════════════ -->
-    <section aria-label="Arcade Hero Showcase" class="relative overflow-hidden">
+    <section aria-label="Arcade Hero Showcase" class="relative overflow-hidden pt-2 sm:pt-6 pb-2">
 
       <!-- Ambient Glow Blobs -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-gradient-to-r from-[#9d8df1]/15 via-[#f2b84b]/15 to-[#38dbf5]/15 blur-3xl pointer-events-none -z-10"></div>
+      <div class="hidden sm:block absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-gradient-to-r from-[#9d8df1]/15 via-[#f2b84b]/15 to-[#38dbf5]/15 blur-3xl pointer-events-none -z-10"></div>
 
-      <div class="space-y-6 text-center max-w-3xl mx-auto">
+      <div class="space-y-4 sm:space-y-6 text-center max-w-3xl mx-auto px-1">
         
-        <!-- Live Badge -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md border border-[var(--color-border)] shadow-sm hover:border-[var(--color-brand)]/40 transition-colors max-w-full">
-          <span class="relative flex h-2 w-2 flex-shrink-0">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-          </span>
-          <span class="text-[11px] sm:text-xs font-mono font-medium tracking-wide text-[var(--color-text)] flex items-center gap-1.5">
-            <span>Phase 1</span>
-            <span class="text-[var(--color-muted)] opacity-60">·</span>
-            <span>3 Playable Games</span>
-            <span class="text-[var(--color-muted)] opacity-60">·</span>
-            <span class="inline-flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-              <span id="online-count">--</span> online
+        <!-- Live Seasonal & Status Badge -->
+        <div class="inline-flex flex-wrap items-center justify-center gap-2 max-w-full">
+          <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[var(--color-surface)]/85 backdrop-blur-md border border-[var(--color-border)] shadow-sm hover:border-[var(--color-brand)]/50 transition-colors">
+            <span class="relative flex h-2 w-2 flex-shrink-0">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-brand)] opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-brand)]"></span>
             </span>
-          </span>
+            <span class="seasonal-badge-text text-[10px] sm:text-xs font-mono font-semibold tracking-wide text-[var(--color-brand)]">
+              {currentTheme.badge}
+            </span>
+          </div>
+
+          <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-surface-2)]/60 backdrop-blur-md border border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
+            <span>3 Handcrafted Games</span>
+            <span class="text-[var(--color-muted)] opacity-50">·</span>
+            <span>60 FPS Native</span>
+          </div>
         </div>
 
         <!-- Catchy Main Heading -->
-        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-text)] leading-[1.15] font-heading">
+        <h1 class="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.18] sm:leading-[1.1] font-heading drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
           Hand-crafted games.<br />
-          <span class="text-[var(--color-brand)]" style="background: linear-gradient(90deg, #f2b84b, #ff8c42, #ff7597); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-            Instant adrenaline<span class="sm:hidden"><br /></span> in your browser.
+          <span class="theme-headline-gradient">
+            Instant adrenaline in your browser.
           </span>
         </h1>
 
         <!-- Subtitle -->
-        <p class="text-[var(--color-muted)] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
+        <p class="text-zinc-200 text-xs sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)] font-normal px-2">
           No heavy engines or bloated setups. Just pure HTML5 canvas physics, responsive controls, and silky smooth 60 FPS gameplay.
         </p>
 
         <!-- Quick CTAs -->
-        <div class="pt-2 w-full">
+        <div class="pt-1 sm:pt-2 w-full">
 
           <!-- ─── MOBILE LAYOUT (<640px) ─── -->
-          <div class="flex flex-col items-center gap-2.5 w-full max-w-sm mx-auto sm:hidden">
+          <div class="flex flex-col items-center gap-2 w-full max-w-xs xs:max-w-sm mx-auto sm:hidden">
             <!-- Primary Action: Full-width vibrant pill with clear CTA -->
             <a
               href="/games/space-dodge"
               id="hero-cta-featured-mobile"
-              class="w-full py-3 px-5 rounded-full font-semibold text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+              class="w-full py-2.5 px-4 rounded-full font-semibold text-xs xs:text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <span>🚀 Play Space Dodge</span>
-              <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 font-bold">Featured</span>
+              <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 font-bold">Featured</span>
             </a>
 
             <!-- Secondary Actions: Balanced 2-column tactile buttons -->
             <div class="grid grid-cols-2 gap-2 w-full">
               <a
                 href="/games/chroma-bloom"
-                class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] active:border-[#9d8df1]/60 text-xs font-medium text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap"
+                class="flex items-center justify-center gap-1 py-2 px-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] active:border-[#9d8df1]/60 text-[11px] xs:text-xs font-medium text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap"
               >
                 <span>🌸 Chroma Bloom</span>
-                <span class="text-[9px] uppercase font-mono px-1 py-0.5 rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold">New</span>
+                <span class="text-[8px] uppercase font-mono px-1 py-0.5 rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold">New</span>
               </a>
 
               <button
                 id="btn-random-game-mobile"
-                class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] active:border-[var(--color-brand)]/60 text-xs font-medium text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap"
+                class="flex items-center justify-center gap-1 py-2 px-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] active:border-[var(--color-brand)]/60 text-[11px] xs:text-xs font-medium text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap"
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
                 </svg>
                 <span>Surprise Me</span>
@@ -120,18 +124,18 @@ import Layout from '../layouts/Layout.astro';
         </div>
 
         <!-- Trust Badges: single compact row -->
-        <div class="flex items-center justify-center gap-4 sm:gap-6 pt-1 text-[10px] sm:text-xs font-mono text-[var(--color-muted)]">
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-6 pt-1 text-[10px] sm:text-xs font-mono text-[var(--color-muted)]">
           <div class="inline-flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>60 FPS</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>60 FPS Native</span>
           </div>
           <div class="inline-flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#48eed6" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-            <span>Vanilla JS</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#48eed6" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            <span>Pure Vanilla JS</span>
           </div>
           <div class="inline-flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ff7597" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>Instant Load</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff7597" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Instant Load (&lt;1s)</span>
           </div>
         </div>
 
@@ -584,7 +588,8 @@ import Layout from '../layouts/Layout.astro';
         mouse.isOver = false;
       });
 
-      // Sparks & Particles
+      // Sparks & Particles with Dynamic Theme Palette
+      let themePalette = ['#f2b84b', '#ff8c42', '#38dbf5', '#9d8df1', '#80ffdb'];
       const particles = [];
       for (let i = 0; i < 60; i++) {
         particles.push({
@@ -593,10 +598,19 @@ import Layout from '../layouts/Layout.astro';
           vx: (Math.random() - 0.5) * 0.8,
           vy: (Math.random() - 0.5) * 0.8,
           radius: 1 + Math.random() * 2.5,
-          color: ['#9d8df1', '#f2b84b', '#ff7597', '#38dbf5', '#80ffdb'][Math.floor(Math.random() * 5)],
+          color: themePalette[Math.floor(Math.random() * themePalette.length)],
           alpha: 0.2 + Math.random() * 0.6
         });
       }
+
+      window.addEventListener('arcadelab-theme-change', () => {
+        const brand = getComputedStyle(document.documentElement).getPropertyValue('--color-brand').trim();
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim();
+        if (brand) themePalette = [brand, accent, '#ffffff', brand + 'cc', accent + 'cc'];
+        particles.forEach(p => {
+          p.color = themePalette[Math.floor(Math.random() * themePalette.length)];
+        });
+      });
 
       // Click ripple explosion
       canvas.addEventListener('click', (e) => {
@@ -612,7 +626,7 @@ import Layout from '../layouts/Layout.astro';
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             radius: 2 + Math.random() * 2,
-            color: ['#f2b84b', '#9d8df1', '#ff9a76'][Math.floor(Math.random() * 3)],
+            color: themePalette[Math.floor(Math.random() * themePalette.length)],
             alpha: 1.0,
             decay: 0.025
           });
