@@ -1,0 +1,1000 @@
+---
+// SeasonalAudio.astro - Soft Procedural Web Audio Ambient Chime & Melody Engine for Seasonal Themes
+---
+
+<!-- Ambient Theme Music Floating Control -->
+<div
+  id="seasonal-audio-widget"
+  class="fixed bottom-5 right-5 z-40 flex items-center gap-2"
+>
+  <button
+    id="audio-toggle-btn"
+    type="button"
+    class="group flex items-center gap-2 px-3.5 py-2 rounded-full bg-[var(--color-surface)]/90 hover:bg-[var(--color-surface-2)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[var(--color-brand)] shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand)] cursor-pointer select-none"
+    aria-label="Toggle ambient seasonal music"
+    title="Toggle Theme Ambient Melody"
+  >
+    <!-- Audio Icon / Animated Equalizer Bars -->
+    <div class="relative w-4 h-4 flex items-center justify-center">
+      <!-- Equalizer Bars (When Playing) -->
+      <div id="audio-eq-bars" class="hidden items-end justify-center gap-0.5 w-4 h-3.5">
+        <span class="w-0.5 bg-[var(--color-brand)] rounded-full h-full animate-[eqBounce1_0.8s_ease-in-out_infinite]"></span>
+        <span class="w-0.5 bg-[var(--color-brand)] rounded-full h-2/3 animate-[eqBounce2_0.6s_ease-in-out_infinite]"></span>
+        <span class="w-0.5 bg-[var(--color-brand)] rounded-full h-4/5 animate-[eqBounce3_0.9s_ease-in-out_infinite]"></span>
+        <span class="w-0.5 bg-[var(--color-brand)] rounded-full h-1/2 animate-[eqBounce1_0.7s_ease-in-out_infinite]"></span>
+      </div>
+
+      <!-- Mute Icon (When Off) -->
+      <svg
+        id="audio-mute-icon"
+        class="w-4 h-4 text-[var(--color-muted)] group-hover:text-[var(--color-brand)] transition-colors"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <line x1="23" y1="9" x2="17" y2="15"></line>
+        <line x1="17" y1="9" x2="23" y2="15"></line>
+      </svg>
+    </div>
+
+    <span id="audio-status-label" class="text-xs font-mono font-medium text-[var(--color-muted)] group-hover:text-[var(--color-text)] transition-colors">
+      Music Off
+    </span>
+  </button>
+</div>
+
+<style>
+  @keyframes eqBounce1 {
+    0%, 100% { height: 25%; }
+    50% { height: 100%; }
+  }
+  @keyframes eqBounce2 {
+    0%, 100% { height: 75%; }
+    50% { height: 30%; }
+  }
+  @keyframes eqBounce3 {
+    0%, 100% { height: 40%; }
+    50% { height: 90%; }
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    // ── Super Distinct Seasonal Melodies & Synthesizer Voices ───────────────
+
+    const MELODIES = {
+      // 1. Dec: Holiday Wonderland - "Jingle Bell Rock"
+      holiday: {
+        title: 'Jingle Bell Rock',
+        tempo: 165, // Bouncy rockabilly holiday swing tempo (~120 BPM)
+        synthType: 'jingle_celesta',
+        chordInterval: 8,
+        notes: [
+          // "Jingle bell, jingle bell, jingle bell rock"
+          587.33, 587.33, 587.33, 0, 493.88, 493.88, 493.88, 0,
+          493.88, 587.33, 493.88, 440.00, 0, 0, 0, 0,
+          // "Jingle bells swing and jingle bells ring"
+          440.00, 493.88, 440.00, 369.99, 440.00, 493.88, 440.00, 329.63,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          // "Snowin' and blowin' up bushels of fun"
+          329.63, 369.99, 392.00, 440.00, 493.88, 554.37, 587.33, 0,
+          // "Now the jingle hop has begun"
+          493.88, 440.00, 392.00, 329.63, 293.66, 0, 0, 0
+        ],
+        bass: [
+          // Rockabilly swing walking bass: D -> Bm -> Em -> A7
+          73.42, 110.00, 146.83, 110.00, 61.74, 92.50, 123.47, 92.50, // D -> Bm
+          82.41, 123.47, 164.81, 123.47, 55.00, 82.41, 110.00, 82.41, // Em -> A7
+          82.41, 123.47, 164.81, 123.47, 55.00, 82.41, 110.00, 82.41,
+          73.42, 110.00, 146.83, 110.00, 73.42, 110.00, 146.83, 73.42
+        ],
+        drums: [
+          'kick', 'hihat', 'snare', 'hihat', 'kick', 'hihat', 'snare', 'hihat'
+        ],
+        chords: [
+          [146.83, 185.00, 220.00], // D
+          [123.47, 146.83, 185.00], // Bm
+          [164.81, 196.00, 246.94], // Em
+          [110.00, 138.59, 164.81], // A7
+          [164.81, 196.00, 246.94], // Em
+          [110.00, 138.59, 164.81], // A7
+          [146.83, 185.00, 220.00]  // D
+        ]
+      },
+
+      // 2. Mar: Sakura Bloom - "Suzume (Theme)" (Radwimps / Yash Garg / Koto & Flute)
+      sakura: {
+        title: 'Suzume (Theme)',
+        tempo: 320, // Serene Japanese koto & flute tempo
+        synthType: 'koto',
+        chordInterval: 8,
+        notes: [
+          // Iconic Intro Motif: B4 -> D5 -> E5 -> F#5 -> D5 -> B4 -> A4 -> B4
+          493.88, 0, 587.33, 659.25, 739.99, 0, 587.33, 0,
+          493.88, 440.00, 493.88, 0, 0, 0, 0, 0,
+          // Verse Phrase: F#4 -> B4 -> C#5 -> D5 -> C#5 -> B4 -> A4 -> B4
+          369.99, 493.88, 554.37, 587.33, 554.37, 493.88, 440.00, 493.88,
+          0, 0, 369.99, 493.88, 554.37, 587.33, 659.25, 587.33,
+          // Soaring Chorus Phrase: F#5 -> E5 -> D5 -> C#5 -> B4 -> A4 -> B4
+          739.99, 0, 659.25, 587.33, 554.37, 493.88, 440.00, 493.88,
+          0, 0, 587.33, 659.25, 739.99, 880.00, 739.99, 0
+        ],
+        bass: [
+          // Bm -> G -> D -> A
+          61.74, 92.50, 123.47, 92.50, 49.00, 73.42, 98.00, 73.42,
+          73.42, 110.00, 146.83, 110.00, 55.00, 82.41, 110.00, 82.41,
+          61.74, 92.50, 123.47, 92.50, 49.00, 73.42, 98.00, 73.42,
+          73.42, 110.00, 146.83, 110.00, 55.00, 82.41, 110.00, 82.41,
+          61.74, 92.50, 123.47, 92.50, 49.00, 73.42, 98.00, 73.42,
+          73.42, 110.00, 146.83, 110.00, 61.74, 92.50, 123.47, 61.74
+        ],
+        chords: [
+          [123.47, 146.83, 185.00], // Bm
+          [98.00, 146.83, 196.00],  // G
+          [146.83, 185.00, 220.00], // D
+          [110.00, 164.81, 220.00], // A
+          [123.47, 146.83, 185.00], // Bm
+          [98.00, 146.83, 196.00]   // G
+        ]
+      },
+
+      // 3. Sep: Hogwarts Magic - "Harry's Wondrous World / Hedwig's Theme" (John Williams)
+      hogwarts: {
+        title: "Harry's Wondrous World (Hedwig's Theme)",
+        tempo: 330, // Mystical magical 3/8 waltz tempo
+        synthType: 'jingle_celesta',
+        notes: [
+          // "Hedwig's Theme" - Iconic Opening Celesta Motif
+          493.88, 0, 659.25, 783.99, 739.99, 0,
+          659.25, 0, 987.77, 0, 880.00, 0,
+          739.99, 0, 0, 0,
+          659.25, 783.99, 739.99, 622.25, 698.46, 0,
+          493.88, 0, 0, 0,
+          // Phrase 2
+          493.88, 0, 659.25, 783.99, 739.99, 0,
+          659.25, 0, 987.77, 0, 1174.66, 1108.73,
+          1046.50, 0, 830.61, 0,
+          1046.50, 987.77, 932.33, 493.88, 783.99, 0,
+          659.25, 0, 0, 0
+        ],
+        chords: [
+          [164.81, 196.00, 246.94], // Em
+          [123.47, 164.81, 196.00], // Em/B
+          [110.00, 164.81, 220.00], // Am
+          [123.47, 155.56, 185.00], // B7
+          [164.81, 196.00, 246.94], // Em
+          [130.81, 164.81, 207.65], // C/G#
+          [123.47, 155.56, 185.00], // B7
+          [164.81, 196.00, 246.94]  // Em
+        ]
+      },
+      autumn: {
+        title: "Harry's Wondrous World (Hedwig's Theme)",
+        tempo: 330,
+        synthType: 'jingle_celesta',
+        notes: [
+          493.88, 0, 659.25, 783.99, 739.99, 0,
+          659.25, 0, 987.77, 0, 880.00, 0,
+          739.99, 0, 0, 0,
+          659.25, 783.99, 739.99, 622.25, 698.46, 0,
+          493.88, 0, 0, 0,
+          493.88, 0, 659.25, 783.99, 739.99, 0,
+          659.25, 0, 987.77, 0, 1174.66, 1108.73,
+          1046.50, 0, 830.61, 0,
+          1046.50, 987.77, 932.33, 493.88, 783.99, 0,
+          659.25, 0, 0, 0
+        ],
+        chords: [
+          [164.81, 196.00, 246.94],
+          [123.47, 164.81, 196.00],
+          [110.00, 164.81, 220.00],
+          [123.47, 155.56, 185.00],
+          [164.81, 196.00, 246.94],
+          [130.81, 164.81, 207.65],
+          [123.47, 155.56, 185.00],
+          [164.81, 196.00, 246.94]
+        ]
+      },
+
+      // 4. Oct: Spooky Haunt - "This Is Halloween" (Danny Elfman / The Nightmare Before Christmas)
+      halloween: {
+        title: 'This Is Halloween',
+        tempo: 220, // Classic spooky swinging tempo
+        synthType: 'spooky_celesta',
+        chordInterval: 8,
+        notes: [
+          // Verse 1: "Boys and girls of every age, wouldn't you like to see something strange?"
+          261.63, 261.63, 261.63, 261.63, 293.66, 311.13, 293.66, 261.63,
+          311.13, 311.13, 311.13, 349.23, 392.00, 349.23, 311.13, 0,
+          // "Come with us and you will see, this our town of Halloween!"
+          392.00, 392.00, 392.00, 392.00, 415.30, 466.16, 415.30, 392.00,
+          349.23, 392.00, 415.30, 392.00, 349.23, 311.13, 293.66, 0,
+          // Chorus: "This is Halloween, this is Halloween"
+          261.63, 0, 261.63, 293.66, 311.13, 0, 293.66, 261.63,
+          261.63, 0, 261.63, 293.66, 311.13, 0, 293.66, 261.63,
+          // "Pumpkins scream in the dead of night"
+          311.13, 311.13, 349.23, 392.00, 415.30, 392.00, 349.23, 311.13,
+          293.66, 0, 261.63, 0, 0, 0, 0, 0,
+          // High Hook: "This is Halloween, everybody make a scene"
+          523.25, 0, 523.25, 587.33, 622.25, 0, 587.33, 523.25,
+          523.25, 0, 523.25, 587.33, 622.25, 0, 587.33, 523.25,
+          // "Trick or treat 'til the neighbors gonna die of fright"
+          622.25, 622.25, 698.46, 783.99, 830.61, 783.99, 698.46, 622.25,
+          587.33, 0, 523.25, 493.88, 523.25, 0, 0, 0
+        ],
+        bass: [
+          // Spooky swinging walking bass: Cm -> Eb -> Fm -> G7
+          65.41, 98.00, 130.81, 98.00, 77.78, 116.54, 155.56, 116.54, // Cm -> Eb
+          87.31, 130.81, 174.61, 130.81, 98.00, 146.83, 196.00, 146.83, // Fm -> G7
+          65.41, 98.00, 130.81, 98.00, 65.41, 98.00, 130.81, 98.00, // Cm -> Cm
+          77.78, 116.54, 155.56, 116.54, 98.00, 146.83, 196.00, 65.41, // Eb -> G -> Cm
+          65.41, 98.00, 130.81, 98.00, 65.41, 98.00, 130.81, 98.00,
+          77.78, 116.54, 155.56, 116.54, 98.00, 146.83, 196.00, 65.41
+        ],
+        drums: [
+          'kick', 'hihat', 'snare', 'hihat', 'kick', 'hihat', 'snare', 'hihat'
+        ],
+        chords: [
+          [130.81, 155.56, 196.00], // Cm
+          [155.56, 196.00, 233.08], // Eb
+          [174.61, 207.65, 261.63], // Fm
+          [196.00, 246.94, 293.66], // G7
+          [130.81, 155.56, 196.00], // Cm
+          [130.81, 155.56, 196.00], // Cm
+          [155.56, 196.00, 233.08], // Eb
+          [196.00, 246.94, 293.66], // G7
+          [130.81, 155.56, 196.00], // Cm
+          [130.81, 155.56, 196.00], // Cm
+          [155.56, 196.00, 233.08], // Eb
+          [196.00, 246.94, 293.66]  // G7
+        ]
+      },
+
+      // 5. Jun: Retro Cyberwave - Fast 80s Synthwave Outrun Arp
+      synthwave: {
+        title: 'Retro Outrun',
+        tempo: 160, // Fast 80s synthesizer pulse
+        synthType: 'synthwave_saw',
+        notes: [
+          // Pumping 80s cyberpunk arpeggio
+          220.00, 440.00, 329.63, 440.00,
+          220.00, 523.25, 440.00, 659.25,
+          174.61, 349.23, 261.63, 349.23,
+          174.61, 440.00, 349.23, 523.25,
+          196.00, 392.00, 293.66, 392.00,
+          196.00, 493.88, 392.00, 587.33,
+          164.81, 329.63, 246.94, 329.63,
+          164.81, 392.00, 329.63, 493.88
+        ],
+        chords: [
+          [110.00, 164.81, 220.00], // Am
+          [87.31, 130.81, 174.61],  // F
+          [98.00, 146.83, 196.00],  // G
+          [82.41, 123.47, 164.81]   // Em
+        ]
+      },
+
+      // 6. Jan: Neon Frost - Crystalline High Ice Bell Glissando
+      frost: {
+        title: 'Ice Crystals',
+        tempo: 310,
+        synthType: 'ice_bell',
+        notes: [
+          1046.50, 783.99, 659.25, 523.25,
+          587.33, 783.99, 880.00, 1174.66,
+          1318.51, 987.77, 783.99, 659.25,
+          880.00, 659.25, 523.25, 0
+        ],
+        chords: [
+          [130.81, 196.00, 261.63], // C
+          [146.83, 220.00, 293.66], // Dm
+          [110.00, 164.81, 220.00], // Am
+          [98.00, 146.83, 196.00]   // G
+        ]
+      },
+
+      // 7. Jul: Abyssal Ocean - Deep Aquatic Bubble Marimba & Low Sine Swell
+      abyss: {
+        title: 'Ocean Deep',
+        tempo: 440, // Slow deep underwater cadence
+        synthType: 'abyss_bubble',
+        notes: [
+          196.00, 261.63, 329.63, 392.00,
+          523.25, 392.00, 329.63, 261.63,
+          174.61, 220.00, 261.63, 349.23,
+          440.00, 349.23, 261.63, 0
+        ],
+        chords: [
+          [82.41, 123.47, 164.81],  // Em
+          [73.42, 110.00, 146.83],  // D
+          [65.41, 98.00, 130.81],   // C
+          [61.74, 92.50, 123.47]    // Bm
+        ]
+      },
+
+      // 8. Aug: Perseid Meteor - "Hymn For The Weekend" (Coldplay / Beyoncé)
+      meteor: {
+        title: 'Hymn For The Weekend',
+        tempo: 240, // Groovy melodic pop tempo
+        synthType: 'jingle_celesta',
+        chordInterval: 8,
+        notes: [
+          // Intro Hook: "Ah-oh-ah-oh-ah..."
+          311.13, 0, 349.23, 392.00, 466.16, 0, 392.00, 0,
+          349.23, 311.13, 349.23, 0, 0, 0, 0, 0,
+          // Verse: "Oh, angel sent from up above, you know you make my world light up"
+          392.00, 392.00, 392.00, 392.00, 349.23, 311.13, 349.23, 392.00,
+          0, 349.23, 311.13, 0, 0, 0, 0, 0,
+          392.00, 392.00, 392.00, 392.00, 349.23, 311.13, 349.23, 392.00,
+          0, 466.16, 392.00, 0, 0, 0, 0, 0,
+          // Pre-Chorus: "Drink from me, drink from me..."
+          466.16, 0, 392.00, 0, 349.23, 0, 311.13, 0,
+          349.23, 392.00, 349.23, 311.13, 261.63, 0, 0, 0,
+          // Chorus: "Got me feeling drunk and high, so high, so high..."
+          523.25, 0, 466.16, 0, 392.00, 0, 349.23, 311.13,
+          349.23, 0, 392.00, 0, 0, 0, 0, 0,
+          523.25, 0, 466.16, 0, 392.00, 0, 349.23, 311.13,
+          349.23, 0, 311.13, 0, 261.63, 0, 0, 0,
+          622.25, 0, 587.33, 0, 523.25, 0, 466.16, 0,
+          392.00, 466.16, 523.25, 0, 0, 0, 0, 0
+        ],
+        bass: [
+          // Cm -> Ab -> Eb -> Bb
+          65.41, 98.00, 130.81, 98.00, 51.91, 77.78, 103.83, 77.78,
+          77.78, 116.54, 155.56, 116.54, 58.27, 87.31, 116.54, 87.31,
+          65.41, 98.00, 130.81, 98.00, 51.91, 77.78, 103.83, 77.78,
+          77.78, 116.54, 155.56, 116.54, 58.27, 87.31, 116.54, 87.31,
+          65.41, 98.00, 130.81, 98.00, 51.91, 77.78, 103.83, 77.78,
+          77.78, 116.54, 155.56, 116.54, 58.27, 87.31, 116.54, 87.31,
+          65.41, 98.00, 130.81, 98.00, 77.78, 116.54, 155.56, 65.41
+        ],
+        drums: [
+          'kick', 'hihat', 'snare', 'hihat', 'kick', 'hihat', 'snare', 'hihat'
+        ],
+        chords: [
+          [130.81, 155.56, 196.00], // Cm
+          [103.83, 130.81, 155.56], // Ab
+          [155.56, 196.00, 233.08], // Eb
+          [116.54, 146.83, 174.61], // Bb
+          [130.81, 155.56, 196.00], // Cm
+          [103.83, 130.81, 155.56], // Ab
+          [155.56, 196.00, 233.08], // Eb
+          [116.54, 146.83, 174.61], // Bb
+          [130.81, 155.56, 196.00], // Cm
+          [103.83, 130.81, 155.56], // Ab
+          [155.56, 196.00, 233.08], // Eb
+          [116.54, 146.83, 174.61]  // Bb
+        ]
+      },
+
+      // 9. Feb: Nebula Love - Romantic French Celesta Ballad
+      hearts: {
+        title: 'Cosmic Romance',
+        tempo: 340,
+        synthType: 'jingle_celesta',
+        notes: [
+          659.25, 523.25, 587.33, 659.25, 783.99, 659.25,
+          587.33, 440.00, 493.88, 523.25, 659.25, 523.25,
+          493.88, 392.00, 440.00, 493.88, 587.33, 493.88,
+          440.00, 329.63, 392.00, 440.00, 523.25, 0
+        ],
+        chords: [
+          [164.81, 246.94, 329.63], // Em
+          [174.61, 261.63, 349.23], // F
+          [130.81, 196.00, 261.63], // C
+          [146.83, 220.00, 293.66]  // G
+        ]
+      },
+
+      // 10. Apr: Emerald Awakening - Celtic Woodland Spring Flute & Glockenspiel
+      emerald: {
+        title: 'Woodland Meadow',
+        tempo: 220,
+        synthType: 'flute_glock',
+        notes: [
+          587.33, 739.99, 880.00, 739.99, 880.00, 1174.66,
+          880.00, 739.99, 587.33, 493.88, 440.00, 493.88,
+          587.33, 739.99, 880.00, 739.99, 587.33, 493.88,
+          440.00, 370.00, 440.00, 493.88, 587.33, 0
+        ],
+        chords: [
+          [146.83, 220.00, 293.66], // D
+          [164.81, 246.94, 329.63], // Em
+          [110.00, 164.81, 220.00], // A
+          [123.47, 185.00, 246.94]  // Bm
+        ]
+      },
+
+      // 11. May: Vesak Festival of Lights - "Gilem Obe Guna Moode" (Vesak Flute & Chimes)
+      vesak: {
+        title: 'Gilem Obe Guna Moode',
+        tempo: 320,
+        synthType: 'vesak_flute',
+        notes: [
+          523.25, 587.33, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33,
+          523.25, 659.25, 783.99, 880.00, 1046.50, 880.00, 783.99, 0,
+          659.25, 783.99, 880.00, 783.99, 659.25, 587.33, 523.25, 440.00,
+          392.00, 440.00, 523.25, 587.33, 659.25, 587.33, 523.25, 0
+        ],
+        chords: [
+          [130.81, 196.00, 261.63], // C
+          [174.61, 220.00, 261.63], // F
+          [146.83, 220.00, 293.66], // Dm
+          [196.00, 246.94, 293.66]  // G
+        ]
+      },
+      solar: {
+        title: 'Gilem Obe Guna Moode',
+        tempo: 320,
+        synthType: 'vesak_flute',
+        notes: [
+          523.25, 587.33, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33,
+          523.25, 659.25, 783.99, 880.00, 1046.50, 880.00, 783.99, 0,
+          659.25, 783.99, 880.00, 783.99, 659.25, 587.33, 523.25, 440.00,
+          392.00, 440.00, 523.25, 587.33, 659.25, 587.33, 523.25, 0
+        ],
+        chords: [
+          [130.81, 196.00, 261.63],
+          [174.61, 220.00, 261.63],
+          [146.83, 220.00, 293.66],
+          [196.00, 246.94, 293.66]
+        ]
+      },
+
+      // 12. Nov: Cosmic Harvest - Twilight Golden Star Harp
+      harvest: {
+        title: 'Starry Harp',
+        tempo: 300,
+        synthType: 'kalimba',
+        notes: [
+          440.00, 554.37, 659.25, 880.00, 1108.73, 880.00, 659.25, 554.37,
+          493.88, 587.33, 739.99, 987.77, 1174.66, 987.77, 739.99, 587.33
+        ],
+        chords: [
+          [110.00, 164.81, 220.00], // A
+          [123.47, 185.00, 246.94], // Bm
+          [92.50, 138.59, 185.00],  // F#m
+          [82.41, 123.47, 164.81]   // E
+        ]
+      }
+    };
+
+    // ── Web Audio Synthesizer Engine ──────────────────────────────────────
+    let audioCtx = null;
+    let masterGain = null;
+    let compressor = null;
+    let isPlaying = false;
+    let stepTimer = null;
+    let currentStep = 0;
+    let currentThemeKey = 'dec'; // Will be resolved dynamically on start
+
+    function resolveCurrentTheme() {
+      const container = document.getElementById('seasonal-bg-container');
+      const serverKey = container ? container.getAttribute('data-active-theme') : null;
+      if (serverKey && THEME_MAP[serverKey]) return serverKey;
+
+      const docTheme = document.documentElement.getAttribute('data-season-theme');
+      if (docTheme && THEME_MAP[docTheme]) return docTheme;
+
+      const monthIdx = new Date().getMonth();
+      const monthKey = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][monthIdx];
+      return monthKey || 'sep';
+    }
+
+    const THEME_MAP = {
+      jan: 'frost',
+      feb: 'hearts',
+      mar: 'sakura',
+      apr: 'emerald',
+      may: 'vesak',
+      jun: 'synthwave',
+      jul: 'abyss',
+      aug: 'meteor',
+      sep: 'hogwarts',
+      autumn: 'hogwarts',
+      hogwarts: 'hogwarts',
+      oct: 'halloween',
+      nov: 'harvest',
+      dec: 'holiday'
+    };
+
+    function initAudio() {
+      if (audioCtx) return;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      audioCtx = new AudioContextClass();
+
+      // Dynamics Compressor: gently tames sudden volume spikes and ensures velvety smooth dynamics
+      compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.setValueAtTime(-24, audioCtx.currentTime);
+      compressor.knee.setValueAtTime(25, audioCtx.currentTime);
+      compressor.ratio.setValueAtTime(8, audioCtx.currentTime);
+      compressor.attack.setValueAtTime(0.005, audioCtx.currentTime);
+      compressor.release.setValueAtTime(0.20, audioCtx.currentTime);
+
+      // Master Limiter / Gain Node (Pleasant, soft ambient level)
+      masterGain = audioCtx.createGain();
+      masterGain.gain.setValueAtTime(0.11, audioCtx.currentTime);
+
+      compressor.connect(masterGain);
+      masterGain.connect(audioCtx.destination);
+    }
+
+    // Play a single procedural instrument note (soft & warm)
+    function playNote(freq, type, duration = 1.2, volume = 0.105) {
+      if (!audioCtx || !masterGain || freq <= 0) return;
+      const targetNode = compressor || masterGain;
+      const now = audioCtx.currentTime;
+
+      // Equal-loudness contour compensation: soften higher frequencies (>600Hz) so they never feel piercing
+      let freqScale = 1.0;
+      if (freq > 600) {
+        freqScale = Math.max(0.60, 1.0 - ((freq - 600) / 1600) * 0.40);
+      }
+      const noteVol = volume * freqScale;
+
+      // Primary Tone Oscillator
+      const osc = audioCtx.createOscillator();
+      const oscGain = audioCtx.createGain();
+
+      // Harmonic Overtone Oscillator
+      const overtone = audioCtx.createOscillator();
+      const overtoneGain = audioCtx.createGain();
+
+      // Low-pass Filter for warmth
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+
+      if (type === 'jingle_celesta') {
+        // Soft ringing Christmas / Hogwarts music box celesta
+        osc.type = 'sine';
+        overtone.type = 'sine';
+        overtone.frequency.setValueAtTime(freq * 2.0, now);
+        filter.frequency.setValueAtTime(Math.min(freq * 2.6, 4500), now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.85, now + 0.02);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.20, now + 0.015);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.5);
+      } else if (type === 'koto') {
+        // Japanese Koto string pluck: Warm gentle wooden body
+        osc.type = 'sawtooth';
+        overtone.type = 'sine';
+        overtone.frequency.setValueAtTime(freq * 2.0, now);
+        filter.frequency.setValueAtTime(freq * 2.0, now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.75, now + 0.01);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.65);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.18, now + 0.01);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.35);
+      } else if (type === 'synthwave_saw') {
+        // Soft 80s Cyberwave saw synthesizer lead with mellow filter
+        osc.type = 'sawtooth';
+        overtone.type = 'triangle';
+        overtone.frequency.setValueAtTime(freq * 1.004, now);
+        filter.frequency.setValueAtTime(Math.min(freq * 2.2, 3200), now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.70, now + 0.02);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.55);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.18, now + 0.02);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.55);
+      } else if (type === 'kalimba') {
+        // Warm resonant lo-fi kalimba tine
+        osc.type = 'triangle';
+        overtone.type = 'sine';
+        overtone.frequency.setValueAtTime(freq * 3.0, now);
+        filter.frequency.setValueAtTime(freq * 2.0, now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.75, now + 0.015);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.70);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.18, now + 0.015);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.30);
+      } else if (type === 'spooky_celesta') {
+        // Eerie Gothic Music Box / Celesta for "This Is Halloween"
+        osc.type = 'triangle';
+        overtone.type = 'sine';
+        overtone.frequency.setValueAtTime(freq * 2.0, now);
+        filter.frequency.setValueAtTime(Math.min(freq * 2.6, 3800), now);
+        filter.Q.setValueAtTime(1.1, now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.78, now + 0.012);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.70);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.18, now + 0.01);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.40);
+      } else if (type === 'zombie_rave_lead' || type === 'scooby_mystery' || type === 'bloody_synth') {
+        // Smooth mellow spooky lead with warm lowpass filter
+        osc.type = 'sawtooth';
+        overtone.type = 'triangle';
+        overtone.frequency.setValueAtTime(freq * 1.003, now);
+        filter.frequency.setValueAtTime(Math.min(freq * 2.0, 2800), now);
+        filter.Q.setValueAtTime(1.0, now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.65, now + 0.02);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.60);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.16, now + 0.02);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.40);
+      } else if (type === 'abyss_bubble') {
+        // Aquatic bubbly marimba with pitch envelope
+        osc.type = 'sine';
+        overtone.type = 'triangle';
+        osc.frequency.setValueAtTime(freq * 1.08, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.04);
+        filter.frequency.setValueAtTime(freq * 1.8, now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.75, now + 0.01);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.55);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.15, now + 0.01);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.25);
+      } else if (type === 'vesak_flute') {
+        // Serene Eastern Bamboo Flute & Meditation Bells
+        osc.type = 'sine';
+        overtone.type = 'triangle';
+        overtone.frequency.setValueAtTime(freq * 2.0, now);
+        filter.frequency.setValueAtTime(freq * 2.2, now);
+        filter.Q.setValueAtTime(0.8, now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.75, now + 0.04);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.85);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.18, now + 0.03);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.50);
+      } else if (type === 'flute_glock') {
+        // Celtic flute / glockenspiel
+        osc.type = 'triangle';
+        overtone.type = 'sine';
+        overtone.frequency.setValueAtTime(freq * 2.0, now);
+        filter.frequency.setValueAtTime(freq * 2.2, now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.70, now + 0.02);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.75);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.16, now + 0.015);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.35);
+      } else {
+        // Default ice bell / marimba
+        osc.type = 'sine';
+        overtone.type = 'sine';
+        overtone.frequency.setValueAtTime(freq * 2.76, now);
+        filter.frequency.setValueAtTime(Math.min(freq * 2.4, 4200), now);
+
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(noteVol * 0.75, now + 0.015);
+        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        overtoneGain.gain.setValueAtTime(0.0001, now);
+        overtoneGain.gain.linearRampToValueAtTime(noteVol * 0.18, now + 0.01);
+        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.45);
+      }
+
+      osc.frequency.setValueAtTime(freq, now);
+
+      osc.connect(oscGain);
+      overtone.connect(overtoneGain);
+
+      oscGain.connect(filter);
+      overtoneGain.connect(filter);
+
+      filter.connect(targetNode);
+
+      osc.start(now);
+      overtone.start(now);
+
+      osc.stop(now + duration + 0.1);
+      overtone.stop(now + duration + 0.1);
+    }
+
+    // Play synthesized bassline (gentle warm acoustic tone)
+    function playBass(freq, duration = 0.22, volume = 0.055) {
+      if (!audioCtx || !masterGain || freq <= 0) return;
+      const targetNode = compressor || masterGain;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      const ftr = audioCtx.createBiquadFilter();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      ftr.type = 'lowpass';
+      ftr.frequency.setValueAtTime(Math.min(freq * 2.0, 350), now);
+      ftr.frequency.exponentialRampToValueAtTime(Math.min(freq * 1.1, 200), now + duration);
+
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(volume, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(ftr);
+      ftr.connect(g);
+      g.connect(targetNode);
+
+      osc.start(now);
+      osc.stop(now + duration + 0.05);
+    }
+
+    // Play synthesized percussive drum hit (soft gentle acoustic taps)
+    function playDrum(type, volume = 0.045) {
+      if (!audioCtx || !masterGain) return;
+      const targetNode = compressor || masterGain;
+      const now = audioCtx.currentTime;
+
+      if (type === 'kick') {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(80, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.07);
+
+        g.gain.setValueAtTime(volume * 0.9, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.10);
+
+        osc.connect(g);
+        g.connect(targetNode);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else if (type === 'snare' || type === 'clap') {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
+
+        g.gain.setValueAtTime(volume * 0.5, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+        osc.connect(g);
+        g.connect(targetNode);
+        osc.start(now);
+        osc.stop(now + 0.09);
+      } else if (type === 'hihat') {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        const ftr = audioCtx.createBiquadFilter();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(4500, now);
+
+        ftr.type = 'bandpass';
+        ftr.frequency.setValueAtTime(4000, now);
+
+        g.gain.setValueAtTime(volume * 0.25, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+        osc.connect(ftr);
+        ftr.connect(g);
+        g.connect(targetNode);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    }
+
+    // Play subtle background chord pad
+    function playChord(chordNotes, duration = 3.2) {
+      if (!chordNotes || chordNotes.length === 0) return;
+      const targetNode = compressor || masterGain;
+      chordNotes.forEach(f => {
+        if (!audioCtx || !masterGain || f <= 0) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        const ftr = audioCtx.createBiquadFilter();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now);
+
+        ftr.type = 'lowpass';
+        ftr.frequency.setValueAtTime(f * 1.5, now);
+
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.linearRampToValueAtTime(0.016, now + 0.20);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(g);
+        g.connect(ftr);
+        ftr.connect(targetNode);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.1);
+      });
+    }
+
+    // Step Sequencer Loop
+    function tick() {
+      if (!isPlaying) return;
+
+      const visualTheme = THEME_MAP[currentThemeKey] || 'holiday';
+      const preset = MELODIES[visualTheme] || MELODIES['holiday'];
+
+      // 1. Lead Melody Note
+      const notes = preset.notes;
+      const noteFreq = notes[currentStep % notes.length];
+      const synthType = preset.synthType;
+
+      if (noteFreq > 0) {
+        playNote(noteFreq, synthType, 1.4, 0.105);
+      }
+
+      // 2. Bassline Track (if defined)
+      if (preset.bass && preset.bass.length > 0) {
+        const bassFreq = preset.bass[currentStep % preset.bass.length];
+        if (bassFreq > 0) {
+          playBass(bassFreq, (preset.tempo * 1.2) / 1000, 0.055);
+        }
+      }
+
+      // 3. Drum Track (if defined)
+      if (preset.drums && preset.drums.length > 0) {
+        const drumHit = preset.drums[currentStep % preset.drums.length];
+        if (drumHit) {
+          playDrum(drumHit, 0.045);
+        }
+      }
+
+      // 4. Chord backing (default every 8 steps, or custom chordInterval per preset)
+      const interval = preset.chordInterval || 8;
+      if (currentStep % interval === 0 && preset.chords) {
+        const chordIdx = Math.floor(currentStep / interval) % preset.chords.length;
+        playChord(preset.chords[chordIdx], (preset.tempo * interval) / 1000);
+      }
+
+      currentStep++;
+      stepTimer = setTimeout(tick, preset.tempo);
+    }
+
+    // ── Start / Stop Functions ───────────────────────────────────────────
+    let activeAudioEl = null;
+
+    function stopProceduralSynth() {
+      clearTimeout(stepTimer);
+      stepTimer = null;
+      if (masterGain && audioCtx) {
+        try {
+          masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          masterGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        } catch(e) {}
+      }
+    }
+
+    function startProceduralSynth() {
+      initAudio();
+      if (!audioCtx) return;
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      if (masterGain) {
+        masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+        masterGain.gain.setValueAtTime(0.005, audioCtx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0.11, audioCtx.currentTime + 0.35);
+      }
+
+      currentStep = 0;
+      clearTimeout(stepTimer);
+      tick();
+    }
+
+    function startAudio() {
+      currentThemeKey = resolveCurrentTheme();
+      stopProceduralSynth();
+
+      isPlaying = true;
+      updateUI();
+      startProceduralSynth();
+    }
+
+    function stopAudio() {
+      stopProceduralSynth();
+      isPlaying = false;
+      updateUI();
+    }
+
+    function toggleAudio() {
+      if (isPlaying) {
+        stopAudio();
+        try { localStorage.setItem('arcadelab_ambient_audio', 'off'); } catch(e) {}
+      } else {
+        startAudio();
+        try { localStorage.setItem('arcadelab_ambient_audio', 'on'); } catch(e) {}
+      }
+    }
+
+    function updateUI() {
+      const btn = document.getElementById('audio-toggle-btn');
+      const eq = document.getElementById('audio-eq-bars');
+      const mute = document.getElementById('audio-mute-icon');
+      const label = document.getElementById('audio-status-label');
+
+      const visualTheme = THEME_MAP[currentThemeKey] || 'holiday';
+      const preset = MELODIES[visualTheme] || MELODIES['holiday'];
+
+      if (isPlaying) {
+        if (eq) { eq.classList.remove('hidden'); eq.classList.add('flex'); }
+        if (mute) mute.classList.add('hidden');
+        if (label) label.textContent = preset.title || 'Music On';
+        if (btn) btn.classList.add('border-[var(--color-brand)]');
+      } else {
+        if (eq) { eq.classList.add('hidden'); eq.classList.remove('flex'); }
+        if (mute) mute.classList.remove('hidden');
+        if (label) label.textContent = 'Music Off';
+        if (btn) btn.classList.remove('border-[var(--color-brand)]');
+      }
+    }
+
+    // ── Setup Listeners ──────────────────────────────────────────────────
+    function setupAudioWidget() {
+      const btn = document.getElementById('audio-toggle-btn');
+      if (btn && !btn._bound) {
+        btn._bound = true;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleAudio();
+        });
+      }
+
+      currentThemeKey = resolveCurrentTheme();
+      updateUI();
+
+      // Auto-resume if user left it on
+      try {
+        const pref = localStorage.getItem('arcadelab_ambient_audio');
+        if (pref === 'on') {
+          const unlockHandler = () => {
+            if (!isPlaying) startAudio();
+            window.removeEventListener('click', unlockHandler);
+            window.removeEventListener('keydown', unlockHandler);
+          };
+          window.addEventListener('click', unlockHandler, { once: true });
+          window.addEventListener('keydown', unlockHandler, { once: true });
+        }
+      } catch(e) {}
+
+      // Listen for seasonal theme changes
+      window.addEventListener('arcadelab-theme-change', (e) => {
+        const newKey = e.detail && e.detail.themeKey;
+        if (newKey && newKey !== currentThemeKey) {
+          currentThemeKey = newKey;
+          if (isPlaying) {
+            startAudio();
+          } else {
+            updateUI();
+          }
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupAudioWidget);
+    } else {
+      setupAudioWidget();
+    }
+  })();
+</script>

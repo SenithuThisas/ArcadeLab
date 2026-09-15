@@ -1,0 +1,241 @@
+---
+// ThemeSelector.astro - Live Interactive Seasonal & Festival Theme Switcher
+import { SEASONAL_THEMES, MONTH_KEYS, getCurrentTheme, getCurrentMonthKey } from '../lib/seasonalThemes';
+
+const themesList = MONTH_KEYS.map((k) => SEASONAL_THEMES[k]);
+const currentTheme = getCurrentTheme();
+---
+
+<div class="relative" id="theme-selector-container">
+  <!-- Trigger Button -->
+  <button
+    id="theme-selector-btn"
+    type="button"
+    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-medium
+           bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text)]
+           hover:border-[var(--color-brand)] hover:shadow-[0_0_12px_rgba(242,184,75,0.15)]
+           transition-all duration-200 cursor-pointer select-none"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-label="Select Seasonal & Festival Theme"
+  >
+    <span id="theme-active-icon" class="text-sm">{currentTheme.icon}</span>
+    <span id="theme-active-label" class="hidden sm:inline">{currentTheme.name}</span>
+    <svg
+      id="theme-chevron"
+      class="w-3.5 h-3.5 text-[var(--color-muted)] transition-transform duration-200"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+
+  <!-- Dropdown Menu / Modal -->
+  <div
+    id="theme-dropdown"
+    class="hidden absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl p-4
+           bg-[var(--color-surface)]/95 backdrop-blur-xl border border-[var(--color-border)]
+           shadow-2xl shadow-black/60 z-50 transition-all duration-200 transform origin-top-right"
+    role="menu"
+    aria-orientation="vertical"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-3 mb-3 border-b border-[var(--color-border)]">
+      <div>
+        <div class="text-xs font-bold text-[var(--color-text)] font-heading">
+          Seasonal & Festival Themes
+        </div>
+        <div class="text-[10px] font-mono text-[var(--color-muted)]">
+          Auto-updates monthly or preview any season
+        </div>
+      </div>
+
+      <button
+        id="theme-reset-auto"
+        class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-brand)] hover:border-[var(--color-brand)] transition-colors flex items-center gap-1 cursor-pointer"
+        title="Reset to real-world calendar month"
+      >
+        <span>🔄 Auto</span>
+      </button>
+    </div>
+
+    <!-- Theme Grid -->
+    <div class="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1 custom-scroll">
+      {themesList.map((t) => (
+        <button
+          type="button"
+          data-theme-key={t.id}
+          class="theme-option-btn group relative flex items-center gap-2.5 p-2 rounded-xl text-left
+                 border border-[var(--color-border)] bg-[var(--color-base)]/60
+                 hover:bg-[var(--color-surface-2)] hover:border-[var(--color-brand)]/50
+                 transition-all duration-150 cursor-pointer"
+        >
+          <!-- Icon & Color Dots -->
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-base" style={`background: ${t.colors.glowStart}; border: 1px solid ${t.colors.brand}40;`}>
+            {t.icon}
+          </div>
+
+          <!-- Label & Month -->
+          <div class="min-w-0 flex-1">
+            <div class="text-[11px] font-bold text-[var(--color-text)] group-hover:text-[var(--color-brand)] truncate transition-colors">
+              {t.name}
+            </div>
+            <div class="text-[9px] font-mono text-[var(--color-muted)] flex items-center gap-1">
+              <span>{t.id.toUpperCase()}</span>
+              <span>·</span>
+              <span class="truncate">{t.particleType}</span>
+            </div>
+          </div>
+
+          <!-- Active Indicator Pill -->
+          <span class="active-check hidden w-1.5 h-1.5 rounded-full bg-[var(--color-brand)] absolute top-2 right-2 shadow-[0_0_6px_var(--color-brand)]"></span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Footer Note -->
+    <div class="pt-3 mt-3 border-t border-[var(--color-border)] text-[10px] font-mono text-[var(--color-muted)] flex items-center justify-between">
+      <span>✨ 60 FPS Particle Canvas</span>
+      <span class="text-[var(--color-brand)]">Click anywhere to burst</span>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    const THEMES = {
+      jan: { id: 'jan', name: 'Neon Frost', icon: '❄️' },
+      feb: { id: 'feb', name: 'Nebula Love', icon: '💖' },
+      mar: { id: 'mar', name: 'Sakura Bloom', icon: '🌸' },
+      apr: { id: 'apr', name: 'Emerald Spring', icon: '🌱' },
+      may: { id: 'may', name: 'Vesak Festival', icon: '🪔' },
+      jun: { id: 'jun', name: 'Cyberwave', icon: '🌴' },
+      jul: { id: 'jul', name: 'Abyssal Ocean', icon: '🌊' },
+      aug: { id: 'aug', name: 'Perseid Meteor', icon: '🌠' },
+      sep: { id: 'sep', name: 'Autumn Equinox', icon: '🍂' },
+      oct: { id: 'oct', name: 'Spooky Haunt', icon: '🎃' },
+      nov: { id: 'nov', name: 'Cosmic Harvest', icon: '✨' },
+      dec: { id: 'dec', name: 'Holiday Wonderland', icon: '🎄' }
+    };
+
+    const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
+    function getAutoMonthKey() {
+      return 'jan';
+    }
+
+    const btn = document.getElementById('theme-selector-btn');
+    const dropdown = document.getElementById('theme-dropdown');
+    const chevron = document.getElementById('theme-chevron');
+    const activeIcon = document.getElementById('theme-active-icon');
+    const activeLabel = document.getElementById('theme-active-label');
+    const resetBtn = document.getElementById('theme-reset-auto');
+    const optionBtns = document.querySelectorAll('.theme-option-btn');
+
+    let currentActive = 'jan';
+
+    function updateActiveUI(key, isAuto = false) {
+      currentActive = key;
+      const theme = THEMES[key] || THEMES['sep'];
+      if (activeIcon) activeIcon.textContent = theme.icon;
+      if (activeLabel) activeLabel.textContent = isAuto ? `${theme.name} (Auto)` : theme.name;
+
+      optionBtns.forEach(b => {
+        const k = b.getAttribute('data-theme-key');
+        const check = b.querySelector('.active-check');
+        if (k === key) {
+          b.classList.add('border-[var(--color-brand)]', 'bg-[var(--color-surface-2)]');
+          if (check) check.classList.remove('hidden');
+        } else {
+          b.classList.remove('border-[var(--color-brand)]', 'bg-[var(--color-surface-2)]');
+          if (check) check.classList.add('hidden');
+        }
+      });
+    }
+
+    // Initialize from storage or calendar
+    const saved = localStorage.getItem('arcadelab_seasonal_theme');
+    if (saved && THEMES[saved]) {
+      updateActiveUI(saved, false);
+    } else {
+      updateActiveUI(getAutoMonthKey(), true);
+    }
+
+    // Toggle Dropdown
+    function toggleDropdown() {
+      const isHidden = dropdown.classList.contains('hidden');
+      if (isHidden) {
+        dropdown.classList.remove('hidden');
+        if (chevron) chevron.classList.add('rotate-180');
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        dropdown.classList.add('hidden');
+        if (chevron) chevron.classList.remove('rotate-180');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown();
+      });
+    }
+
+    // Select Theme
+    optionBtns.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const key = option.getAttribute('data-theme-key');
+        if (key && THEMES[key]) {
+          updateActiveUI(key, false);
+          try {
+            localStorage.setItem('arcadelab_seasonal_theme', key);
+          } catch(err) {}
+          window.dispatchEvent(new CustomEvent('arcadelab-theme-change', {
+            detail: { themeKey: key, isAuto: false }
+          }));
+          toggleDropdown();
+        }
+      });
+    });
+
+    // Reset Auto
+    if (resetBtn) {
+      resetBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const autoKey = getAutoMonthKey();
+        try {
+          localStorage.removeItem('arcadelab_seasonal_theme');
+        } catch(err) {}
+        updateActiveUI(autoKey, true);
+        window.dispatchEvent(new CustomEvent('arcadelab-theme-change', {
+          detail: { themeKey: autoKey, isAuto: true }
+        }));
+        toggleDropdown();
+      });
+    }
+
+    // Close on click outside or Escape
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        if (chevron) chevron.classList.remove('rotate-180');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+        if (chevron) chevron.classList.remove('rotate-180');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+</script>
