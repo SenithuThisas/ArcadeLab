@@ -38,12 +38,20 @@ body {
 }
 
 /* ── Typography helpers ────────────────────────────────────────────────────── */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 700;
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading) !important;
+  font-weight: 650;
   letter-spacing: -0.02em;
   line-height: 1.15;
   margin: 0;
+}
+
+.theme-headline-gradient {
+  background-image: var(--headline-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 6px 20px rgba(0, 0, 0, 0.85));
 }
 
 /* ── Scrollbar styling ─────────────────────────────────────────────────────── */

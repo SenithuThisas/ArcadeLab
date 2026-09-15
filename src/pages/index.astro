@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCurrentTheme } from '../lib/seasonalThemes';
+
+const currentTheme = getCurrentTheme();
 ---
 
 <Layout
@@ -19,34 +22,38 @@ import Layout from '../layouts/Layout.astro';
 
       <div class="space-y-6 text-center max-w-3xl mx-auto">
         
-        <!-- Live Badge -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md border border-[var(--color-border)] shadow-sm hover:border-[var(--color-brand)]/40 transition-colors max-w-full">
-          <span class="relative flex h-2 w-2 flex-shrink-0">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-          </span>
-          <span class="text-[11px] sm:text-xs font-mono font-medium tracking-wide text-[var(--color-text)] flex items-center gap-1.5">
-            <span>Phase 1</span>
-            <span class="text-[var(--color-muted)] opacity-60">·</span>
+        <!-- Live Seasonal & Status Badge -->
+        <div class="inline-flex flex-wrap items-center justify-center gap-2 max-w-full">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)]/85 backdrop-blur-md border border-[var(--color-border)] shadow-sm hover:border-[var(--color-brand)]/50 transition-colors">
+            <span class="relative flex h-2 w-2 flex-shrink-0">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-brand)] opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-brand)]"></span>
+            </span>
+            <span class="seasonal-badge-text text-[11px] sm:text-xs font-mono font-semibold tracking-wide text-[var(--color-brand)]">
+              {currentTheme.badge}
+            </span>
+          </div>
+
+          <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-surface-2)]/60 backdrop-blur-md border border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
             <span>3 Playable Games</span>
-            <span class="text-[var(--color-muted)] opacity-60">·</span>
+            <span class="text-[var(--color-muted)] opacity-50">·</span>
             <span class="inline-flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
               <span id="online-count">--</span> online
             </span>
-          </span>
+          </div>
         </div>
 
         <!-- Catchy Main Heading -->
-        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-text)] leading-[1.15] font-heading">
+        <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-[1.1] font-heading drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
           Hand-crafted games.<br />
-          <span class="text-[var(--color-brand)]" style="background: linear-gradient(90deg, #f2b84b, #ff8c42, #ff7597); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          <span class="theme-headline-gradient">
             Instant adrenaline<span class="sm:hidden"><br /></span> in your browser.
           </span>
         </h1>
 
         <!-- Subtitle -->
-        <p class="text-[var(--color-muted)] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
+        <p class="text-white text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed px-2 sm:px-0 drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)] font-normal">
           No heavy engines or bloated setups. Just pure HTML5 canvas physics, responsive controls, and silky smooth 60 FPS gameplay.
         </p>
 
@@ -584,7 +591,8 @@ import Layout from '../layouts/Layout.astro';
         mouse.isOver = false;
       });
 
-      // Sparks & Particles
+      // Sparks & Particles with Dynamic Theme Palette
+      let themePalette = ['#f2b84b', '#ff8c42', '#38dbf5', '#9d8df1', '#80ffdb'];
       const particles = [];
       for (let i = 0; i < 60; i++) {
         particles.push({
@@ -593,10 +601,19 @@ import Layout from '../layouts/Layout.astro';
           vx: (Math.random() - 0.5) * 0.8,
           vy: (Math.random() - 0.5) * 0.8,
           radius: 1 + Math.random() * 2.5,
-          color: ['#9d8df1', '#f2b84b', '#ff7597', '#38dbf5', '#80ffdb'][Math.floor(Math.random() * 5)],
+          color: themePalette[Math.floor(Math.random() * themePalette.length)],
           alpha: 0.2 + Math.random() * 0.6
         });
       }
+
+      window.addEventListener('arcadelab-theme-change', () => {
+        const brand = getComputedStyle(document.documentElement).getPropertyValue('--color-brand').trim();
+        const accent = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim();
+        if (brand) themePalette = [brand, accent, '#ffffff', brand + 'cc', accent + 'cc'];
+        particles.forEach(p => {
+          p.color = themePalette[Math.floor(Math.random() * themePalette.length)];
+        });
+      });
 
       // Click ripple explosion
       canvas.addEventListener('click', (e) => {
@@ -612,7 +629,7 @@ import Layout from '../layouts/Layout.astro';
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             radius: 2 + Math.random() * 2,
-            color: ['#f2b84b', '#9d8df1', '#ff9a76'][Math.floor(Math.random() * 3)],
+            color: themePalette[Math.floor(Math.random() * themePalette.length)],
             alpha: 1.0,
             decay: 0.025
           });
