@@ -61,10 +61,11 @@ h5,
 h6,
 .font-heading {
   font-family: var(--font-heading) !important;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
   margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 24px rgba(0, 0, 0, 0.8);
 }
 
 .theme-headline-gradient {
@@ -72,7 +73,7 @@ h6,
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 6px 20px rgba(0, 0, 0, 0.85));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 1)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95));
 }
 
 /* ── Scrollbar styling ─────────────────────────────────────────────────────── */
