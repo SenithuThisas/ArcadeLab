@@ -10,31 +10,27 @@ const currentTheme = getCurrentTheme();
   description="Instant, zero-install indie browser games crafted in pure JavaScript & HTML5 Canvas. Fast, beautiful, and ad-free."
 >
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-20">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-12 sm:space-y-20">
 
     <!-- ══════════════════════════════════════════════════════
          HERO SECTION: High-Energy, Interactive, Live Showcase
     ══════════════════════════════════════════════════════ -->
-    <section aria-label="Arcade Hero Showcase" class="relative">
-
-      <!-- Ambient Glow Blobs -->
-      <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-gradient-to-r from-[#9d8df1]/15 via-[#f2b84b]/15 to-[#38dbf5]/15 blur-3xl pointer-events-none -z-10"></div>
-
-      <div class="space-y-6 text-center max-w-3xl mx-auto">
+    <section aria-label="Arcade Hero Showcase" class="relative pt-2 sm:pt-6 pb-2">
+      <div class="relative space-y-4 sm:space-y-6 text-center max-w-3xl mx-auto px-4 py-6 sm:py-8 sm:px-1">
         
         <!-- Live Seasonal & Status Badge -->
         <div class="inline-flex flex-wrap items-center justify-center gap-2 max-w-full">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-surface)]/85 backdrop-blur-md border border-[var(--color-border)] shadow-sm hover:border-[var(--color-brand)]/50 transition-colors">
+          <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-[var(--color-surface)]/95 backdrop-blur-md border border-[var(--color-border)] shadow-md hover:border-[var(--color-brand)]/50 transition-colors">
             <span class="relative flex h-2 w-2 flex-shrink-0">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-brand)] opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-brand)]"></span>
             </span>
-            <span class="seasonal-badge-text text-[11px] sm:text-xs font-mono font-semibold tracking-wide text-[var(--color-brand)]">
+            <span class="seasonal-badge-text text-[10px] sm:text-xs font-mono font-semibold tracking-wide text-[var(--color-brand)]">
               {currentTheme.badge}
             </span>
           </div>
 
-          <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-surface-2)]/60 backdrop-blur-md border border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
+          <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--color-surface-2)]/80 backdrop-blur-md border border-[var(--color-border)] text-[11px] font-mono text-[var(--color-muted)]">
             <span>3 Handcrafted Games</span>
             <span class="text-[var(--color-muted)] opacity-50">·</span>
             <span>60 FPS Native</span>
@@ -42,7 +38,7 @@ const currentTheme = getCurrentTheme();
         </div>
 
         <!-- Catchy Main Heading -->
-        <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-[1.1] font-heading drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+        <h1 class="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.2] sm:leading-[1.1] font-heading">
           Hand-crafted games.<br />
           <span class="theme-headline-gradient">
             Instant adrenaline in your browser.
@@ -50,52 +46,91 @@ const currentTheme = getCurrentTheme();
         </h1>
 
         <!-- Subtitle -->
-        <p class="text-white text-base sm:text-lg max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)] font-normal">
+        <p class="text-zinc-200 text-xs sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed font-normal px-2">
           No heavy engines or bloated setups. Just pure HTML5 canvas physics, responsive controls, and silky smooth 60 FPS gameplay.
         </p>
 
         <!-- Quick CTAs -->
-        <div class="flex flex-wrap items-center justify-center gap-3.5 pt-2">
-          <a
-            href="/games/space-dodge"
-            id="hero-cta-featured"
-            class="px-6 py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/25 hover:shadow-xl hover:shadow-[#38dbf5]/40 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
-          >
-            <span>🚀 Play Space Dodge</span>
-            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 font-bold">Featured</span>
-          </a>
+        <div class="pt-1 sm:pt-2 w-full">
 
-          <a
-            href="/games/chroma-bloom"
-            class="px-5 py-3 rounded-full font-semibold text-sm bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[#9d8df1] text-[var(--color-text)] hover:text-[#9d8df1] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
-          >
-            <span>🌸 Chroma Bloom</span>
-            <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold">New</span>
-          </a>
+          <!-- ─── MOBILE LAYOUT (<640px) ─── -->
+          <div class="flex flex-col items-center gap-2 w-full max-w-xs xs:max-w-sm mx-auto sm:hidden">
+            <!-- Primary Action: Full-width vibrant pill with clear CTA -->
+            <a
+              href="/games/space-dodge"
+              id="hero-cta-featured-mobile"
+              class="w-full py-2.5 px-4 rounded-full font-bold text-xs xs:text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <span>🚀 Play Space Dodge</span>
+              <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 font-bold">Featured</span>
+            </a>
 
-          <button
-            id="btn-random-game"
-            class="px-4 py-3 rounded-full font-semibold text-sm bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-brand)] text-[var(--color-text)] hover:text-[var(--color-brand)] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-            </svg>
-            <span>Surprise Me</span>
-          </button>
+            <!-- Secondary Actions: Balanced 2-column tactile buttons -->
+            <div class="grid grid-cols-2 gap-2 w-full">
+              <a
+                href="/games/chroma-bloom"
+                class="flex items-center justify-center gap-1 py-2 px-2.5 rounded-full bg-[var(--color-surface)]/95 border border-[var(--color-border)] active:border-[#9d8df1]/60 text-[11px] xs:text-xs font-semibold text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap shadow-sm"
+              >
+                <span>🌸 Chroma Bloom</span>
+                <span class="text-[8px] uppercase font-mono px-1 py-0.5 rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold">New</span>
+              </a>
+
+              <button
+                id="btn-random-game-mobile"
+                class="flex items-center justify-center gap-1 py-2 px-2.5 rounded-full bg-[var(--color-surface)]/95 border border-[var(--color-border)] active:border-[var(--color-brand)]/60 text-[11px] xs:text-xs font-semibold text-[var(--color-text)] active:scale-[0.98] transition-all whitespace-nowrap shadow-sm"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+                <span>Surprise Me</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── DESKTOP / TABLET LAYOUT (≥640px) ─── -->
+          <div class="hidden sm:flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/games/space-dodge"
+              id="hero-cta-featured"
+              class="px-6 py-3 rounded-full font-semibold text-sm bg-gradient-to-r from-[#38dbf5] to-[#f2b84b] text-[#05070f] shadow-lg shadow-[#38dbf5]/25 hover:shadow-xl hover:shadow-[#38dbf5]/40 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
+            >
+              <span>🚀 Play Space Dodge</span>
+              <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 font-bold">Featured</span>
+            </a>
+
+            <a
+              href="/games/chroma-bloom"
+              class="px-5 py-3 rounded-full font-semibold text-sm bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[#9d8df1] text-[var(--color-text)] hover:text-[#9d8df1] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
+            >
+              <span>🌸 Chroma Bloom</span>
+              <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-[#9d8df1]/20 text-[#9d8df1] font-bold">New</span>
+            </a>
+
+            <button
+              id="btn-random-game"
+              class="px-4 py-3 rounded-full font-semibold text-sm bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-brand)] text-[var(--color-text)] hover:text-[var(--color-brand)] hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 inline-flex items-center gap-2"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Surprise Me</span>
+            </button>
+          </div>
+
         </div>
 
-        <!-- Trust Badges -->
-        <div class="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs font-mono text-[var(--color-muted)]">
-          <div class="inline-flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>60 FPS Native Canvas</span>
+        <!-- Trust Badges: single compact row -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-6 pt-1 text-[10px] sm:text-xs font-mono text-zinc-300 sm:text-[var(--color-muted)]">
+          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--color-surface)]/70 sm:bg-transparent border border-[var(--color-border)]/40 sm:border-transparent">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>60 FPS Native</span>
           </div>
-          <div class="inline-flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#48eed6" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--color-surface)]/70 sm:bg-transparent border border-[var(--color-border)]/40 sm:border-transparent">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#48eed6" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
             <span>Pure Vanilla JS</span>
           </div>
-          <div class="inline-flex items-center gap-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff7597" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--color-surface)]/70 sm:bg-transparent border border-[var(--color-border)]/40 sm:border-transparent">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff7597" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span>Instant Load (&lt;1s)</span>
           </div>
         </div>
@@ -124,7 +159,7 @@ const currentTheme = getCurrentTheme();
 
       <ul
         id="game-grid"
-        class="grid grid-cols-1 md:grid-cols-3 gap-6 list-none m-0 p-0"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 list-none m-0 p-0"
         role="list"
       >
         <!-- ── CARD 1: Space Dodge (Retro High-Speed Arcade) ─────────── -->
@@ -401,7 +436,7 @@ const currentTheme = getCurrentTheme();
           </div>
         </div>
 
-        <div class="flex items-center gap-2 font-mono text-xs text-[var(--color-brand)] shrink-0 self-end sm:self-center bg-[var(--color-surface-2)]/80 px-3.5 py-1.5 rounded-full border border-[var(--color-border)]">
+        <div class="flex items-center gap-2 font-mono text-xs text-[var(--color-brand)] self-start sm:self-center sm:shrink-0 bg-[var(--color-surface-2)]/80 px-3.5 py-1.5 rounded-full border border-[var(--color-border)]">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-brand)] opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-brand)]"></span>
@@ -446,41 +481,42 @@ const currentTheme = getCurrentTheme();
     <!-- ══════════════════════════════════════════════════════
          INTERACTIVE ARCADE PLAYGROUND SHOWCASE (Bottom Section)
     ══════════════════════════════════════════════════════ -->
-    <section aria-label="Interactive arcade playground" class="space-y-4 pt-4">
+    <section aria-label="Interactive arcade playground" class="space-y-3 pt-4">
       <div class="flex items-center justify-between">
         <div>
           <div class="text-xs font-mono text-[var(--color-brand)] uppercase tracking-wider">Canvas Engine Lab</div>
-          <h3 class="text-xl font-heading font-bold text-[var(--color-text)]">Interactive Particle Cosmos</h3>
+          <h3 class="text-lg sm:text-xl font-heading font-bold text-[var(--color-text)]">Interactive Particle Cosmos</h3>
         </div>
-        <div class="text-[11px] font-mono text-[var(--color-muted)] hidden sm:block">
-          💡 Click or drag cursor to spawn starbursts
+        <div class="text-[11px] font-mono text-[var(--color-muted)]">
+          <span class="hidden sm:inline">💡 Click or drag cursor to spawn starbursts</span>
+          <span class="sm:hidden">👆 Tap to interact</span>
         </div>
       </div>
 
       <div class="relative rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-2xl bg-[var(--color-surface)] group">
-        <div class="relative w-full aspect-[16/9] sm:aspect-[21/9] min-h-[260px] overflow-hidden">
-          <canvas id="heroCanvas" class="absolute inset-0 w-full h-full block cursor-pointer"></canvas>
+        <div class="relative w-full aspect-[2/1] sm:aspect-[16/9] lg:aspect-[21/9] min-h-[180px] sm:min-h-[260px] overflow-hidden">
+          <canvas id="heroCanvas" class="absolute inset-0 w-full h-full block cursor-pointer" style="touch-action: none;"></canvas>
 
           <!-- Floating Overlaid Game Showcase Pill -->
-          <div class="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto flex flex-wrap items-center gap-3 p-3 rounded-xl bg-[var(--color-base)]/85 backdrop-blur-md border border-[var(--color-border)] text-left shadow-lg">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#38dbf5] to-[#f2b84b] flex items-center justify-center text-lg">
+          <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-6 sm:right-auto flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-[var(--color-base)]/90 backdrop-blur-md border border-[var(--color-border)] text-left shadow-lg">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-tr from-[#38dbf5] to-[#f2b84b] flex items-center justify-center text-base sm:text-lg flex-shrink-0">
               🚀
             </div>
-            <div>
-              <div class="text-xs font-mono text-[var(--color-muted)] flex items-center gap-2">
-                <span>FEATURED GAME</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <div class="min-w-0 flex-1">
+              <div class="text-[10px] sm:text-xs font-mono text-[var(--color-muted)] flex items-center gap-1.5">
+                <span>FEATURED</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
               </div>
-              <div class="text-sm font-bold text-[var(--color-text)] font-heading" id="hero-game-title">
+              <div class="text-xs sm:text-sm font-bold text-[var(--color-text)] font-heading truncate" id="hero-game-title">
                 Space Dodge: Starfighter Odyssey
               </div>
             </div>
             <a
               id="hero-spotlight-btn"
               href="/games/space-dodge"
-              class="ml-auto px-4 py-1.5 rounded-lg text-xs font-bold bg-[var(--color-brand)] text-[#0b0e1b] hover:opacity-90 transition-opacity"
+              class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--color-brand)] text-[#0b0e1b] hover:opacity-90 transition-opacity"
             >
-              Play Now →
+              Play →
             </a>
           </div>
         </div>
@@ -497,14 +533,27 @@ const currentTheme = getCurrentTheme();
       // 1. Random Game Button
       const games = ['/games/chroma-bloom', '/games/shadow-protocol', '/games/space-dodge'];
       const btnRandom = document.getElementById('btn-random-game');
-      if (btnRandom) {
-        btnRandom.addEventListener('click', () => {
-          const target = games[Math.floor(Math.random() * games.length)];
-          window.location.href = target;
-        });
+      const btnRandomMobile = document.getElementById('btn-random-game-mobile');
+      function goRandomGame() {
+        const target = games[Math.floor(Math.random() * games.length)];
+        window.location.href = target;
+      }
+      if (btnRandom) btnRandom.addEventListener('click', goRandomGame);
+      if (btnRandomMobile) btnRandomMobile.addEventListener('click', goRandomGame);
+
+      // 2. Simulated Live Online Counter
+      const onlineEl = document.getElementById('online-count');
+      if (onlineEl) {
+        let base = 38 + Math.floor(Math.random() * 75); // realistic 38–113 range
+        onlineEl.textContent = base;
+        setInterval(() => {
+          base += Math.floor(Math.random() * 9) - 4; // drift ±4
+          base = Math.max(18, Math.min(210, base));
+          onlineEl.textContent = base;
+        }, 5000);
       }
 
-      // 2. Interactive Hero Canvas Particle & Simulation Loop
+      // 3. Interactive Hero Canvas Particle & Simulation Loop
       const canvas = document.getElementById('heroCanvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');

@@ -2,23 +2,27 @@
 
 /* ── Design-system tokens ──────────────────────────────────────────────────── */
 :root {
-  --color-base:        #0d0f14;
-  --color-surface:     #171a21;
-  --color-surface-2:   #1e222c;
-  --color-text:        #eef1f5;
-  --color-muted:       #8b93a1;
-  --color-brand:       #f2b84b;   /* header / nav accent */
-  --color-accent:      #ff8c42;   /* arcade accent (hover / focus) */
-  --color-border:      #2a2f3d;
+  --color-base: #0d0f14;
+  --color-surface: #171a21;
+  --color-surface-2: #1e222c;
+  --color-text: #eef1f5;
+  --color-muted: #8b93a1;
+  --color-brand: #f2b84b;
+  /* header / nav accent */
+  --color-accent: #ff8c42;
+  /* arcade accent (hover / focus) */
+  --color-border: #2a2f3d;
 
   /* Typography */
   --font-heading: 'Space Grotesk', system-ui, sans-serif;
-  --font-body:    'Inter', system-ui, sans-serif;
-  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
 /* ── Base resets ───────────────────────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -37,10 +41,27 @@ body {
   line-height: 1.6;
 }
 
+#seasonal-bg-container {
+  z-index: 0;
+}
+
+body > header,
+body > main,
+body > footer {
+  position: relative;
+  z-index: 1;
+}
+
 /* ── Typography helpers ────────────────────────────────────────────────────── */
-h1, h2, h3, h4, h5, h6, .font-heading {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
   font-family: var(--font-heading) !important;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
   margin: 0;
@@ -51,14 +72,28 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 6px 20px rgba(0, 0, 0, 0.85));
+  color: transparent;
+  display: inline-block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
 }
 
 /* ── Scrollbar styling ─────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-base); }
-::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
 
 /* ── Focus ring ────────────────────────────────────────────────────────────── */
 :focus-visible {
@@ -91,4 +126,15 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   width: 100%;
   height: auto;
   image-rendering: pixelated;
+}
+
+/* Keep seasonal scenery atmospheric without competing with text on phones. */
+@media (max-width: 1023px) {
+  #seasonal-glow-underlay {
+    opacity: 0.2;
+  }
+
+  #seasonalCanvas {
+    opacity: 0.25;
+  }
 }
