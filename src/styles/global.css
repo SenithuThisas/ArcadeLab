@@ -45,9 +45,9 @@ body {
   z-index: 0;
 }
 
-body > header,
-body > main,
-body > footer {
+body>header,
+body>main,
+body>footer {
   position: relative;
   z-index: 1;
 }
@@ -61,7 +61,7 @@ h5,
 h6,
 .font-heading {
   font-family: var(--font-heading) !important;
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.02em;
   line-height: 1.15;
   margin: 0;

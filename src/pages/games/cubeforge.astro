@@ -1,0 +1,1158 @@
+---
+const title = 'CubeForge';
+const description = 'A Minecraft-style 3D voxel world. Build, mine, and explore a procedurally generated world with multiple block types, day/night cycle, and first-person exploration.';
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>{title} | arcadelab.</title>
+  <meta name="description" content={description} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-base:     #0a0c10;
+      --color-surface:  #12151f;
+      --color-surface2: #1c2030;
+      --color-text:     #eef1f5;
+      --color-muted:    #7a8499;
+      --color-brand:    #f5a623;
+      --color-accent:   #5bc8f5;
+      --color-green:    #4ade80;
+      --color-red:      #f87171;
+      --color-border:   rgba(255,255,255,0.1);
+      --nav-h: 52px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--color-base);
+      color: var(--color-text);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .game-nav {
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(5,8,15,0.9);
+      backdrop-filter: blur(20px);
+      flex-shrink: 0;
+      z-index: 40;
+      gap: 12px;
+    }
+    .game-nav-left { display: flex; align-items: center; gap: 10px; }
+    .back-pill-btn {
+      color: var(--color-text);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: all 0.22s;
+      white-space: nowrap;
+    }
+    .back-pill-btn:hover { background: rgba(255,255,255,0.12); transform: translateX(-2px); }
+    .nav-badge {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(245,166,35,0.12);
+      border: 1px solid rgba(245,166,35,0.3);
+      padding: 5px 14px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      box-shadow: 0 0 12px rgba(245,166,35,0.2);
+    }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--color-text);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 5px;
+      transition: all 0.2s;
+      height: 32px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+    .nav-btn.active { background: rgba(91,200,245,0.15); border-color: rgba(91,200,245,0.4); color: var(--color-accent); }
+
+    #game-shell {
+      height: calc(100dvh - var(--nav-h));
+      position: relative;
+      overflow: hidden;
+    }
+
+    #three-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      outline: none;
+      cursor: crosshair;
+    }
+
+    #crosshair {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+    }
+    #crosshair .ch-h, #crosshair .ch-v {
+      position: absolute;
+      background: rgba(255,255,255,0.9);
+      border-radius: 1px;
+    }
+    #crosshair .ch-h { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    #crosshair .ch-v { width: 2px; height: 18px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+    #hud {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      pointer-events: none;
+      z-index: 20;
+      padding: 12px 18px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: linear-gradient(180deg, rgba(5,8,15,0.85) 0%, transparent 100%);
+    }
+    .hud-stat { display: flex; flex-direction: column; gap: 4px; }
+    .hud-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--color-muted);
+      text-transform: uppercase;
+    }
+    .hud-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .hud-value.accent { color: var(--color-accent); text-shadow: 0 0 8px rgba(91,200,245,0.5); }
+    .hud-value.gold { color: var(--color-brand); text-shadow: 0 0 8px rgba(245,166,35,0.4); }
+    .hud-center { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .day-badge {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--color-brand);
+      background: rgba(245,166,35,0.12);
+      border: 1px solid rgba(245,166,35,0.25);
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+    #time-of-day {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--color-muted);
+    }
+
+    .health-bar-wrap { display: flex; flex-direction: column; gap: 3px; }
+    .health-bar-bg {
+      width: 80px; height: 6px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 3px; overflow: hidden;
+    }
+    #health-fill {
+      height: 100%; width: 100%;
+      background: linear-gradient(90deg, #ef4444, #f87171);
+      box-shadow: 0 0 8px rgba(239,68,68,0.6);
+      transition: width 0.2s;
+    }
+
+    #hotbar {
+      position: absolute;
+      bottom: 40px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      background: rgba(5,8,15,0.85);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 6px;
+      backdrop-filter: blur(12px);
+      z-index: 20;
+      pointer-events: auto;
+    }
+    .hotbar-slot {
+      width: 48px; height: 52px;
+      border-radius: 6px;
+      border: 2px solid rgba(255,255,255,0.1);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s;
+      overflow: hidden;
+    }
+    .hotbar-slot:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
+    .hotbar-slot.active {
+      border-color: var(--color-brand);
+      box-shadow: 0 0 16px rgba(245,166,35,0.4), inset 0 0 8px rgba(245,166,35,0.08);
+      transform: translateY(-3px);
+    }
+    .hotbar-slot .slot-color {
+      width: 28px; height: 24px;
+      border-radius: 3px;
+    }
+    .hotbar-slot .slot-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 6.5px;
+      color: var(--color-muted);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .slot-key {
+      position: absolute;
+      top: 2px; left: 4px;
+      font-family: 'Orbitron', monospace;
+      font-size: 7px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 700;
+    }
+
+    #lock-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5,8,15,0.9);
+      backdrop-filter: blur(20px);
+      z-index: 50;
+      gap: 18px;
+      transition: opacity 0.4s;
+    }
+    #lock-overlay.hidden { opacity: 0; pointer-events: none; }
+    .lock-icon { font-size: 60px; filter: drop-shadow(0 0 24px rgba(245,166,35,0.7)); animation: floatIcon 3s ease-in-out infinite; }
+    @keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    .lock-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(26px, 5vw, 42px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #f5a623, #ff8844, #ffe87a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.08em;
+      text-shadow: none;
+    }
+    .lock-sub {
+      font-size: 13px;
+      color: var(--color-muted);
+      text-align: center;
+      max-width: 360px;
+      line-height: 1.6;
+    }
+    .lock-btn {
+      padding: 14px 40px;
+      background: linear-gradient(135deg, #f5a623, #e8880e);
+      color: #0a0c10;
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      box-shadow: 0 0 32px rgba(245,166,35,0.45), 0 8px 24px rgba(0,0,0,0.5);
+      transition: all 0.2s;
+    }
+    .lock-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 0 48px rgba(245,166,35,0.65), 0 14px 32px rgba(0,0,0,0.6); }
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      max-width: 360px;
+    }
+    .ctrl-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+    kbd {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--color-accent);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .ctrl-desc { font-size: 11px; color: var(--color-muted); }
+
+    #toast {
+      position: absolute;
+      top: 70px;
+      right: 16px;
+      background: linear-gradient(135deg, rgba(14,20,36,0.96), rgba(8,12,24,0.96));
+      border: 1px solid var(--color-brand);
+      box-shadow: 0 0 20px rgba(245,166,35,0.3), 0 8px 24px rgba(0,0,0,0.8);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      z-index: 60;
+      transform: translateX(120%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+      max-width: 280px;
+    }
+    #toast.show { transform: translateX(0); }
+    #toast-icon { font-size: 22px; }
+    #toast-msg { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--color-text); }
+
+    #hints-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 5px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--color-muted);
+      background: rgba(5,8,15,0.8);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      z-index: 20;
+      pointer-events: none;
+      flex-wrap: wrap;
+    }
+    .hint-item { display: flex; align-items: center; gap: 5px; }
+
+    #pause-menu {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(5,8,15,0.9);
+      backdrop-filter: blur(16px);
+      z-index: 50;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    #pause-menu.active { display: flex; }
+    .pause-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--color-brand);
+      text-shadow: 0 0 30px rgba(245,166,35,0.5);
+      margin-bottom: 8px;
+    }
+    .pause-btn {
+      width: 220px;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--color-text);
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .pause-btn:hover { background: rgba(245,166,35,0.12); border-color: rgba(245,166,35,0.4); color: var(--color-brand); transform: translateY(-1px); }
+    .pause-btn.primary { background: linear-gradient(135deg,#f5a623,#e8880e); color:#0a0c10; border:none; box-shadow: 0 0 20px rgba(245,166,35,0.4); }
+    .pause-btn.primary:hover { filter: brightness(1.1); }
+
+    #pos-display {
+      position: absolute;
+      bottom: 36px;
+      left: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      pointer-events: none;
+      z-index: 20;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="game-nav">
+  <div class="game-nav-left">
+    <a href="/" class="back-pill-btn" id="back-btn">← arcadelab.</a>
+    <span class="nav-badge">⚒ CubeForge</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn" id="btn-wireframe">⬡ Wire</button>
+    <button class="nav-btn" id="btn-pause">⏸ Pause</button>
+  </div>
+</nav>
+
+<div id="game-shell">
+  <canvas id="three-canvas"></canvas>
+
+  <div id="crosshair" style="display:none">
+    <div class="ch-h"></div>
+    <div class="ch-v"></div>
+  </div>
+
+  <div id="hud">
+    <div class="hud-stat health-bar-wrap">
+      <span class="hud-label">❤ Health</span>
+      <div class="health-bar-bg"><div id="health-fill"></div></div>
+      <span class="hud-value accent" id="hud-health">100</span>
+    </div>
+    <div class="hud-stat hud-center">
+      <div class="day-badge" id="day-night-badge">☀ DAY</div>
+      <span id="time-of-day">06:00</span>
+    </div>
+    <div class="hud-stat" style="align-items:flex-end">
+      <span class="hud-label">⛏ Mined</span>
+      <span class="hud-value gold" id="hud-mined">0</span>
+      <span class="hud-label" style="margin-top:4px">📦 Placed</span>
+      <span class="hud-value accent" id="hud-placed">0</span>
+    </div>
+  </div>
+
+  <div id="hotbar"></div>
+  <div id="pos-display"></div>
+
+  <div id="lock-overlay">
+    <div class="lock-icon">⚒️</div>
+    <div class="lock-title">CUBEFORGE</div>
+    <div class="lock-sub">A Minecraft-style 3D voxel world — forge, mine and explore a procedurally generated landscape with multiple biomes, block types, and a dynamic day/night cycle.</div>
+    <button class="lock-btn" id="start-btn">▶ ENTER WORLD</button>
+    <div class="controls-grid">
+      <div class="ctrl-item"><kbd>WASD</kbd><span class="ctrl-desc">Move</span></div>
+      <div class="ctrl-item"><kbd>Mouse</kbd><span class="ctrl-desc">Look around</span></div>
+      <div class="ctrl-item"><kbd>Space</kbd><span class="ctrl-desc">Jump</span></div>
+      <div class="ctrl-item"><kbd>1–9</kbd><span class="ctrl-desc">Select block</span></div>
+      <div class="ctrl-item"><kbd>LMB</kbd><span class="ctrl-desc">Mine block</span></div>
+      <div class="ctrl-item"><kbd>RMB</kbd><span class="ctrl-desc">Place block</span></div>
+      <div class="ctrl-item"><kbd>Scroll</kbd><span class="ctrl-desc">Cycle hotbar</span></div>
+      <div class="ctrl-item"><kbd>ESC</kbd><span class="ctrl-desc">Pause</span></div>
+    </div>
+  </div>
+
+  <div id="toast"><span id="toast-icon">⚒</span><span id="toast-msg">Block mined!</span></div>
+
+  <div id="pause-menu">
+    <div class="pause-title">⏸ PAUSED</div>
+    <button class="pause-btn primary" id="resume-btn">▶ Resume Game</button>
+    <button class="pause-btn" id="new-world-btn">🌍 New World</button>
+    <button class="pause-btn" id="back-home-btn">← Back to ArcadeLab</button>
+  </div>
+
+  <div id="hints-bar">
+    <div class="hint-item"><kbd>LMB</kbd><span>Mine</span></div>
+    <div class="hint-item"><kbd>RMB</kbd><span>Place</span></div>
+    <div class="hint-item"><kbd>WASD</kbd><span>Move</span></div>
+    <div class="hint-item"><kbd>Space</kbd><span>Jump</span></div>
+    <div class="hint-item"><kbd>Scroll</kbd><span>Block</span></div>
+    <div class="hint-item"><kbd>ESC</kbd><span>Pause</span></div>
+  </div>
+</div>
+
+<script>
+(function() {
+'use strict';
+
+// ── Block Types ──────────────────────────────────────
+const BLOCK = { AIR:0, GRASS:1, DIRT:2, STONE:3, SAND:4, WOOD:5, LEAVES:6, WATER:7, SNOW:8, GRAVEL:9 };
+
+const BLOCK_DEFS = [
+  null,
+  { name:'Grass',  top:'#4a8c3f', side:'#6b7c45', bottom:'#8b6340', emoji:'🌿' },
+  { name:'Dirt',   top:'#8b6340', side:'#7a5830', bottom:'#6b4820', emoji:'🟤' },
+  { name:'Stone',  top:'#888888', side:'#777777', bottom:'#666666', emoji:'🪨' },
+  { name:'Sand',   top:'#d4c07a', side:'#c4b06a', bottom:'#b4a05a', emoji:'🏜️' },
+  { name:'Wood',   top:'#5c4a2a', side:'#6b5a35', bottom:'#5c4a2a', emoji:'🪵' },
+  { name:'Leaves', top:'#2d7a2d', side:'#2d6a2d', bottom:'#256025', emoji:'🍃', transparent:true },
+  { name:'Water',  top:'#2266dd', side:'#1a55bb', bottom:'#1244aa', emoji:'💧', transparent:true },
+  { name:'Snow',   top:'#f4f8ff', side:'#d8e0f0', bottom:'#c0ccdf', emoji:'❄️' },
+  { name:'Gravel', top:'#9a9a8a', side:'#8a8a7a', bottom:'#7a7a6a', emoji:'⬛' },
+];
+
+const HOTBAR_BLOCKS = [BLOCK.GRASS,BLOCK.DIRT,BLOCK.STONE,BLOCK.SAND,BLOCK.WOOD,BLOCK.LEAVES,BLOCK.SNOW,BLOCK.GRAVEL,BLOCK.WATER];
+
+// ── State ─────────────────────────────────────────────
+let scene, camera, renderer, clock;
+let isPointerLocked = false;
+let isPaused = false;
+let isWireframe = false;
+let gameStarted = false;
+
+const CHUNK_SIZE  = 16;
+const WORLD_H     = 50;
+const RENDER_DIST = 3;
+
+const blocks = new Map();
+const chunkMeshes = new Map();
+const generatedChunks = new Set();
+
+const player = {
+  pos: new THREE.Vector3(8, WORLD_H + 4, 8),
+  vel: new THREE.Vector3(),
+  onGround: false,
+  health: 100,
+  yaw: 0,
+  pitch: 0,
+};
+
+const PLAYER_HALF = 0.3;
+const PLAYER_H    = 1.75;
+const GRAVITY     = -24;
+const JUMP_VEL    = 9;
+const MOVE_SPD    = 6;
+
+const keys = {};
+let mdx = 0, mdy = 0;
+let blocksMined = 0, blocksPlaced = 0;
+let selectedSlot = 0;
+let dayCycle = 0.25;
+
+// ── Noise ─────────────────────────────────────────────
+function hash2(x, z) {
+  let n = (x * 1619 + z * 31337) | 0;
+  n = n ^ (n >> 13);
+  n = (n * (n * n * 15731 + 789221) + 1376312589) | 0;
+  return (n & 0x7fffffff) / 0x7fffffff;
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function fade(t) { return t * t * (3 - 2 * t); }
+
+function vnoise(x, z, scale) {
+  const sx = x / scale, sz = z / scale;
+  const xi = Math.floor(sx), zi = Math.floor(sz);
+  const xf = sx - xi, zf = sz - zi;
+  return lerp(
+    lerp(hash2(xi,zi), hash2(xi+1,zi), fade(xf)),
+    lerp(hash2(xi,zi+1), hash2(xi+1,zi+1), fade(xf)),
+    fade(zf)
+  );
+}
+
+function getTerrainHeight(wx, wz) {
+  let h = 0;
+  h += vnoise(wx, wz, 60) * 22;
+  h += vnoise(wx, wz, 22) * 9;
+  h += vnoise(wx, wz, 8)  * 3.5;
+  h += vnoise(wx, wz, 3)  * 1.2;
+  return Math.round(h + 10);
+}
+
+// ── World ─────────────────────────────────────────────
+function bkey(x,y,z) { return `${x|0},${y|0},${z|0}`; }
+function setB(x,y,z,t) { blocks.set(bkey(x,y,z), t); }
+function getB(x,y,z) { return blocks.get(bkey(x,y,z)) ?? BLOCK.AIR; }
+
+const WATER_LEVEL = 13;
+
+function genChunk(cx, cz) {
+  const key = `${cx},${cz}`;
+  if (generatedChunks.has(key)) return;
+  generatedChunks.add(key);
+
+  const ox = cx*CHUNK_SIZE, oz = cz*CHUNK_SIZE;
+  for (let lx=0; lx<CHUNK_SIZE; lx++) {
+    for (let lz=0; lz<CHUNK_SIZE; lz++) {
+      const wx=ox+lx, wz=oz+lz;
+      const h = getTerrainHeight(wx, wz);
+
+      for (let y=0; y<=h; y++) {
+        let t;
+        if (y===h) {
+          if (h > 34) t = BLOCK.SNOW;
+          else if (h <= WATER_LEVEL+1) t = BLOCK.SAND;
+          else t = BLOCK.GRASS;
+        } else if (y >= h-3) {
+          t = BLOCK.DIRT;
+        } else if (y >= h-8) {
+          t = BLOCK.STONE;
+        } else {
+          t = hash2(wx*7+y, wz*3+y) < 0.06 ? BLOCK.GRAVEL : BLOCK.STONE;
+        }
+        setB(wx,y,wz,t);
+      }
+
+      // Water fill
+      for (let y=h+1; y<=WATER_LEVEL; y++) setB(wx,y,wz,BLOCK.WATER);
+
+      // Trees
+      if (h > WATER_LEVEL+1 && h < 28 && hash2(wx*13, wz*17) < 0.038) {
+        const th = 4 + Math.floor(hash2(wx,wz)*3);
+        for (let ty=1; ty<=th; ty++) setB(wx, h+ty, wz, BLOCK.WOOD);
+        for (let ly=th-2; ly<=th+1; ly++) {
+          const r = ly < th ? 2 : 1;
+          for (let dx=-r; dx<=r; dx++) for (let dz=-r; dz<=r; dz++) {
+            if (Math.abs(dx)===r && Math.abs(dz)===r && ly>=th) continue;
+            if (getB(wx+dx,h+ly,wz+dz)===BLOCK.AIR) setB(wx+dx,h+ly,wz+dz,BLOCK.LEAVES);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ── Mesh Building ──────────────────────────────────────
+const DIRS = [
+  {d:[0,1,0],  face:'top'},
+  {d:[0,-1,0], face:'bot'},
+  {d:[0,0,1],  face:'fr'},
+  {d:[0,0,-1], face:'bk'},
+  {d:[1,0,0],  face:'rt'},
+  {d:[-1,0,0], face:'lt'},
+];
+const DARK = {top:0, bot:0.35, fr:0.15, bk:0.2, rt:0.18, lt:0.22};
+
+function faceColor(def, face) {
+  let base;
+  if (face==='top') base=def.top;
+  else if (face==='bot') base=def.bottom;
+  else base=def.side;
+  if (!base) base=def.top;
+  const c=new THREE.Color(base);
+  const d=DARK[face]||0;
+  return c.multiplyScalar(1-d).getHexString();
+}
+
+const FACE_VERTS = {
+  top: (x,y,z)=>[x,y+1,z, x+1,y+1,z, x+1,y+1,z+1, x,y+1,z, x+1,y+1,z+1, x,y+1,z+1],
+  bot: (x,y,z)=>[x,y,z+1, x+1,y,z+1, x+1,y,z, x,y,z+1, x+1,y,z, x,y,z],
+  fr:  (x,y,z)=>[x,y,z+1, x+1,y,z+1, x+1,y+1,z+1, x,y,z+1, x+1,y+1,z+1, x,y+1,z+1],
+  bk:  (x,y,z)=>[x+1,y,z, x,y,z, x,y+1,z, x+1,y,z, x,y+1,z, x+1,y+1,z],
+  rt:  (x,y,z)=>[x+1,y,z+1, x+1,y,z, x+1,y+1,z, x+1,y,z+1, x+1,y+1,z, x+1,y+1,z+1],
+  lt:  (x,y,z)=>[x,y,z, x,y,z+1, x,y+1,z+1, x,y,z, x,y+1,z+1, x,y+1,z],
+};
+const FACE_NORMS = {
+  top:[0,1,0], bot:[0,-1,0], fr:[0,0,1], bk:[0,0,-1], rt:[1,0,0], lt:[-1,0,0]
+};
+
+function buildChunk(cx, cz) {
+  const ck = `${cx},${cz}`;
+  if (chunkMeshes.has(ck)) { chunkMeshes.get(ck).forEach(m=>scene.remove(m)); chunkMeshes.delete(ck); }
+
+  const ox=cx*CHUNK_SIZE, oz=cz*CHUNK_SIZE;
+  const groups = new Map(); // hexColor+tr => {verts, norms, uvs, transparent}
+
+  for (let lx=0; lx<CHUNK_SIZE; lx++) {
+    for (let lz=0; lz<CHUNK_SIZE; lz++) {
+      const wx=ox+lx, wz=oz+lz;
+      for (let y=0; y<WORLD_H; y++) {
+        const t=getB(wx,y,wz);
+        if (!t) continue;
+        const def=BLOCK_DEFS[t];
+        const tr=!!def.transparent;
+        for (const {d,face} of DIRS) {
+          const nb=getB(wx+d[0],y+d[1],wz+d[2]);
+          if (nb!==BLOCK.AIR && !BLOCK_DEFS[nb]?.transparent && !tr) continue;
+          if (nb===t && tr) continue;
+          const hex=faceColor(def,face);
+          const gk=hex+(tr?'T':'');
+          if (!groups.has(gk)) groups.set(gk,{hex,tr,verts:[],norms:[],uvs:[]});
+          const g=groups.get(gk);
+          const vf=FACE_VERTS[face](wx,y,wz);
+          const nm=FACE_NORMS[face];
+          g.verts.push(...vf);
+          for(let i=0;i<6;i++) g.norms.push(...nm);
+          g.uvs.push(0,0,1,0,1,1,0,0,1,1,0,1);
+        }
+      }
+    }
+  }
+
+  const meshes=[];
+  for (const [,g] of groups) {
+    if (!g.verts.length) continue;
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(g.verts,3));
+    geo.setAttribute('normal',  new THREE.Float32BufferAttribute(g.norms,3));
+    geo.setAttribute('uv',      new THREE.Float32BufferAttribute(g.uvs,2));
+    const mat=new THREE.MeshLambertMaterial({
+      color:new THREE.Color('#'+g.hex),
+      transparent:g.tr, opacity:g.tr?0.58:1,
+      wireframe:isWireframe,
+    });
+    const m=new THREE.Mesh(geo,mat);
+    scene.add(m);
+    meshes.push(m);
+  }
+  chunkMeshes.set(ck,meshes);
+}
+
+function rebuildAround(wx,wz) {
+  const cx=Math.floor(wx/CHUNK_SIZE), cz=Math.floor(wz/CHUNK_SIZE);
+  for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++) buildChunk(cx+dx,cz+dz);
+}
+
+// ── Three.js Init ──────────────────────────────────────
+let sunLight, ambLight, skySphere, skyMat, starMat, sunMesh, sunMat;
+
+function initThree() {
+  const canvas=document.getElementById('three-canvas');
+  const shell=document.getElementById('game-shell');
+  const W=shell.clientWidth, H=shell.clientHeight-30;
+
+  renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+  renderer.setSize(W,H);
+  renderer.setClearColor(0x87ceeb);
+
+  scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0x87ceeb,50,110);
+
+  camera=new THREE.PerspectiveCamera(72,W/H,0.05,180);
+  clock=new THREE.Clock();
+
+  ambLight=new THREE.AmbientLight(0xffffff,0.55);
+  scene.add(ambLight);
+  sunLight=new THREE.DirectionalLight(0xfffce0,1.2);
+  sunLight.position.set(60,100,60);
+  scene.add(sunLight);
+
+  // Sky
+  const skyGeo=new THREE.SphereGeometry(160,16,8);
+  skyMat=new THREE.MeshBasicMaterial({color:0x87ceeb,side:THREE.BackSide});
+  skySphere=new THREE.Mesh(skyGeo,skyMat);
+  scene.add(skySphere);
+
+  // Stars
+  const sPos=[];
+  for(let i=0;i<1000;i++){
+    const t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1), r=155;
+    sPos.push(r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t));
+  }
+  const sGeo=new THREE.BufferGeometry();
+  sGeo.setAttribute('position',new THREE.Float32BufferAttribute(sPos,3));
+  starMat=new THREE.PointsMaterial({color:0xffffff,size:0.55,transparent:true,opacity:0});
+  scene.add(new THREE.Points(sGeo,starMat));
+
+  // Sun/moon disc
+  sunMat=new THREE.MeshBasicMaterial({color:0xffe87a,side:THREE.DoubleSide});
+  sunMesh=new THREE.Mesh(new THREE.CircleGeometry(6,12),sunMat);
+  scene.add(sunMesh);
+
+  window.addEventListener('resize',()=>{
+    const W2=shell.clientWidth,H2=shell.clientHeight-30;
+    renderer.setSize(W2,H2);
+    camera.aspect=W2/H2;
+    camera.updateProjectionMatrix();
+  });
+}
+
+// ── World Init ─────────────────────────────────────────
+function initWorld() {
+  blocks.clear(); generatedChunks.clear();
+  chunkMeshes.forEach(ms=>ms.forEach(m=>scene.remove(m)));
+  chunkMeshes.clear();
+
+  for(let dx=-RENDER_DIST;dx<=RENDER_DIST;dx++)
+    for(let dz=-RENDER_DIST;dz<=RENDER_DIST;dz++) genChunk(dx,dz);
+  for(let dx=-RENDER_DIST;dx<=RENDER_DIST;dx++)
+    for(let dz=-RENDER_DIST;dz<=RENDER_DIST;dz++) buildChunk(dx,dz);
+
+  const sh=getTerrainHeight(8,8);
+  player.pos.set(8.5,sh+3,8.5);
+  player.vel.set(0,0,0);
+  player.yaw=0; player.pitch=0; player.health=100;
+  blocksMined=0; blocksPlaced=0; dayCycle=0.25;
+  updateHUD();
+}
+
+// ── Dynamic Chunk Loading ──────────────────────────────
+let lastCX=null,lastCZ=null;
+function updateChunks() {
+  const cx=Math.floor(player.pos.x/CHUNK_SIZE), cz=Math.floor(player.pos.z/CHUNK_SIZE);
+  if(cx===lastCX&&cz===lastCZ) return;
+  lastCX=cx; lastCZ=cz;
+  for(let dx=-RENDER_DIST;dx<=RENDER_DIST;dx++) for(let dz=-RENDER_DIST;dz<=RENDER_DIST;dz++) {
+    const ncx=cx+dx,ncz=cz+dz;
+    const k=`${ncx},${ncz}`;
+    if(!generatedChunks.has(k)) { genChunk(ncx,ncz); buildChunk(ncx,ncz); }
+    else if(!chunkMeshes.has(k)) buildChunk(ncx,ncz);
+  }
+}
+
+// ── Collision ──────────────────────────────────────────
+function isSolid(x,y,z) {
+  const b=getB(Math.floor(x),Math.floor(y),Math.floor(z));
+  return b!==BLOCK.AIR && b!==BLOCK.WATER;
+}
+
+function sweepAABB(pos, vel, dt) {
+  const hw=PLAYER_HALF, ph=PLAYER_H;
+  let nx=pos.x+vel.x*dt, ny=pos.y+vel.y*dt, nz=pos.z+vel.z*dt;
+  let vely=vel.y, onGround=false;
+
+  // X
+  let blocked=false;
+  for(let ox=-1;ox<=1;ox+=2) {
+    for(let y2=Math.floor(pos.y);y2<=Math.floor(pos.y+ph-0.01);y2++) {
+      if(isSolid(nx+ox*hw,y2,pos.z)) { blocked=true; break; }
+    }
+    if(blocked) break;
+  }
+  if(blocked) nx=pos.x;
+
+  // Z
+  blocked=false;
+  for(let oz=-1;oz<=1;oz+=2) {
+    for(let y2=Math.floor(pos.y);y2<=Math.floor(pos.y+ph-0.01);y2++) {
+      if(isSolid(nx,y2,nz+oz*hw)) { blocked=true; break; }
+    }
+    if(blocked) break;
+  }
+  if(blocked) nz=pos.z;
+
+  // Y
+  if(vely<0) {
+    if(isSolid(nx-hw,ny,nz-hw)||isSolid(nx+hw,ny,nz-hw)||
+       isSolid(nx-hw,ny,nz+hw)||isSolid(nx+hw,ny,nz+hw)) {
+      ny=Math.floor(ny)+1; vely=0; onGround=true;
+    }
+  } else if(vely>0) {
+    if(isSolid(nx-hw,ny+ph,nz-hw)||isSolid(nx+hw,ny+ph,nz-hw)||
+       isSolid(nx-hw,ny+ph,nz+hw)||isSolid(nx+hw,ny+ph,nz+hw)) {
+      ny=Math.ceil(ny+ph)-ph-0.001; vely=0;
+    }
+  }
+
+  return {nx,ny,nz,vely,onGround};
+}
+
+// ── Player Movement ────────────────────────────────────
+function movePlayer(dt) {
+  const fwd=new THREE.Vector3(-Math.sin(player.yaw),0,-Math.cos(player.yaw));
+  const rgt=new THREE.Vector3( Math.cos(player.yaw),0,-Math.sin(player.yaw));
+  const move=new THREE.Vector3();
+  if(keys['KeyW']||keys['ArrowUp'])    move.add(fwd);
+  if(keys['KeyS']||keys['ArrowDown'])  move.sub(fwd);
+  if(keys['KeyD']||keys['ArrowRight']) move.add(rgt);
+  if(keys['KeyA']||keys['ArrowLeft'])  move.sub(rgt);
+  const spd=keys['ShiftLeft']?2.5:MOVE_SPD;
+  if(move.lengthSq()>0) move.normalize().multiplyScalar(spd);
+
+  player.vel.x=move.x; player.vel.z=move.z;
+
+  // Water
+  const fy=getB(Math.floor(player.pos.x),Math.floor(player.pos.y),Math.floor(player.pos.z));
+  const inWater=fy===BLOCK.WATER;
+  if(inWater) { player.vel.y*=0.75; if(keys['Space']) player.vel.y=Math.max(player.vel.y,2.5); }
+  else {
+    player.vel.y+=GRAVITY*dt;
+    if(keys['Space']&&player.onGround) { player.vel.y=JUMP_VEL; player.onGround=false; }
+  }
+
+  const {nx,ny,nz,vely,onGround}=sweepAABB(player.pos,player.vel,dt);
+  player.pos.set(nx,ny,nz);
+  player.vel.y=vely;
+  player.onGround=onGround;
+
+  // Void fall reset
+  if(player.pos.y<-30) {
+    const sh=getTerrainHeight(8,8);
+    player.pos.set(8.5,sh+3,8.5);
+    player.vel.set(0,0,0);
+    player.health=Math.max(0,player.health-20);
+    showToast('💀','Fell into the void! -20 HP');
+    updateHUD();
+  }
+}
+
+// ── Mouse Look ─────────────────────────────────────────
+function applyLook() {
+  if(mdx===0&&mdy===0) return;
+  player.yaw  -=mdx*0.002;
+  player.pitch-=mdy*0.002;
+  player.pitch=Math.max(-1.55,Math.min(1.55,player.pitch));
+  mdx=0; mdy=0;
+}
+
+function updateCamera() {
+  camera.position.copy(player.pos).add(new THREE.Vector3(0,PLAYER_H-0.15,0));
+  camera.rotation.order='YXZ';
+  camera.rotation.y=player.yaw;
+  camera.rotation.x=player.pitch;
+  skySphere.position.copy(camera.position);
+}
+
+// ── Raycast ─────────────────────────────────────────────
+function raycast() {
+  const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
+  let px=camera.position.x,py=camera.position.y,pz=camera.position.z;
+  let lbx=null,lby=null,lbz=null;
+  const STEPS=80,MAX=6;
+  for(let i=1;i<=STEPS;i++){
+    const t=(i/STEPS)*MAX;
+    const bx=Math.floor(px+dir.x*t),by=Math.floor(py+dir.y*t),bz=Math.floor(pz+dir.z*t);
+    if(lbx!==bx||lby!==by||lbz!==bz){
+      const b=getB(bx,by,bz);
+      if(b!==BLOCK.AIR&&b!==BLOCK.WATER)
+        return{hit:true,bx,by,bz,pbx:lbx,pby:lby,pbz:lbz};
+      lbx=bx;lby=by;lbz=bz;
+    }
+  }
+  return{hit:false};
+}
+
+// Block highlight wire box
+let hlMesh=null;
+function updateHL(rc){
+  if(hlMesh){scene.remove(hlMesh);hlMesh=null;}
+  if(!rc.hit)return;
+  hlMesh=new THREE.Mesh(
+    new THREE.BoxGeometry(1.02,1.02,1.02),
+    new THREE.MeshBasicMaterial({color:0x000000,wireframe:true,transparent:true,opacity:0.45})
+  );
+  hlMesh.position.set(rc.bx+0.5,rc.by+0.5,rc.bz+0.5);
+  scene.add(hlMesh);
+}
+
+// ── Day/Night ──────────────────────────────────────────
+function updateDayNight(dt) {
+  dayCycle=(dayCycle+dt/140)%1;
+  const a=dayCycle*Math.PI*2;
+  const sx=Math.cos(a)*140,sy=Math.sin(a)*130;
+  sunMesh.position.set(camera.position.x+sx,camera.position.y+sy,camera.position.z-60);
+  sunMesh.lookAt(camera.position);
+
+  const isDay=dayCycle>0.2&&dayCycle<0.8;
+  const isDawn=dayCycle>0.18&&dayCycle<0.3;
+  const isDusk=dayCycle>0.7&&dayCycle<0.82;
+  const isNight=!isDay;
+
+  let sky,fog,amb,sun;
+  if(isDay&&!isDawn&&!isDusk){
+    const t=Math.sin(dayCycle*Math.PI*2);
+    sky=new THREE.Color().setHSL(0.58,0.65,0.52+t*0.1);
+    fog=sky.clone();
+    amb=0.55+t*0.25; sun=1.0+t*0.3;
+    sunMat.color.setHex(0xffe87a);
+  } else if(isDawn){
+    sky=new THREE.Color(0xff9966); fog=new THREE.Color(0xffb08a);
+    amb=0.35; sun=0.7; sunMat.color.setHex(0xffaa55);
+  } else if(isDusk){
+    sky=new THREE.Color(0xff6644); fog=new THREE.Color(0xff8866);
+    amb=0.3; sun=0.6; sunMat.color.setHex(0xff8844);
+  } else {
+    sky=new THREE.Color(0x020c1a); fog=new THREE.Color(0x050e22);
+    amb=0.1; sun=0; sunMat.color.setHex(0xddddee);
+  }
+
+  skyMat.color.copy(sky);
+  renderer.setClearColor(sky);
+  scene.fog.color.copy(fog);
+  ambLight.intensity=amb;
+  sunLight.intensity=sun;
+  sunLight.position.set(camera.position.x+sx,camera.position.y+sy,camera.position.z);
+
+  const nightFactor=isDay?0:isDusk?(dayCycle-0.75)*8:isDawn?(0.25-dayCycle)*8:1;
+  starMat.opacity=Math.max(0,Math.min(1,nightFactor));
+
+  const hh=Math.floor(dayCycle*24), mm=Math.floor((dayCycle*24-hh)*60);
+  document.getElementById('time-of-day').textContent=`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+  const badge=document.getElementById('day-night-badge');
+  if(isDay&&!isDawn&&!isDusk){badge.textContent='☀ DAY';badge.style.color='#f5a623';}
+  else if(isDawn){badge.textContent='🌅 DAWN';badge.style.color='#ff9944';}
+  else if(isDusk){badge.textContent='🌇 DUSK';badge.style.color='#ff6644';}
+  else{badge.textContent='🌙 NIGHT';badge.style.color='#88aadd';}
+}
+
+// ── HUD ────────────────────────────────────────────────
+function updateHUD() {
+  document.getElementById('hud-mined').textContent=blocksMined;
+  document.getElementById('hud-placed').textContent=blocksPlaced;
+  document.getElementById('hud-health').textContent=player.health;
+  document.getElementById('health-fill').style.width=(player.health)+'%';
+}
+
+// ── Toast ───────────────────────────────────────────────
+let _toastT=null;
+function showToast(icon,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-icon').textContent=icon;
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ── Hotbar ─────────────────────────────────────────────
+function buildHotbar() {
+  const hb=document.getElementById('hotbar');
+  hb.innerHTML='';
+  HOTBAR_BLOCKS.forEach((bt,i)=>{
+    const def=BLOCK_DEFS[bt];
+    const el=document.createElement('div');
+    el.className='hotbar-slot'+(i===selectedSlot?' active':'');
+    el.id=`hs-${i}`;
+    el.innerHTML=`<div class="slot-key">${i+1}</div>
+      <div class="slot-color" style="background:#${new THREE.Color(def.top).getHexString()};border-radius:3px;"></div>
+      <div class="slot-label">${def.emoji} ${def.name}</div>`;
+    el.onclick=()=>selectSlot(i);
+    hb.appendChild(el);
+  });
+}
+
+function selectSlot(i){
+  if(i<0||i>=HOTBAR_BLOCKS.length) return;
+  document.getElementById(`hs-${selectedSlot}`)?.classList.remove('active');
+  selectedSlot=i;
+  document.getElementById(`hs-${i}`)?.classList.add('active');
+}
+
+// ── Input ───────────────────────────────────────────────
+function setupInput(){
+  window.addEventListener('keydown',e=>{
+    keys[e.code]=true;
+    if(e.code==='Escape'&&gameStarted) togglePause();
+    if(e.code.startsWith('Digit')) selectSlot(parseInt(e.key)-1);
+    if(e.code==='KeyQ') selectSlot((selectedSlot-1+HOTBAR_BLOCKS.length)%HOTBAR_BLOCKS.length);
+    if(e.code==='KeyE') selectSlot((selectedSlot+1)%HOTBAR_BLOCKS.length);
+  });
+  window.addEventListener('keyup',e=>{ keys[e.code]=false; });
+  window.addEventListener('mousemove',e=>{ if(isPointerLocked){mdx+=e.movementX;mdy+=e.movementY;} });
+
+  document.addEventListener('pointerlockchange',()=>{
+    isPointerLocked=document.pointerLockElement===renderer.domElement;
+    document.getElementById('crosshair').style.display=isPointerLocked?'block':'none';
+  });
+
+  renderer.domElement.addEventListener('mousedown',e=>{
+    if(!isPointerLocked){ renderer.domElement.requestPointerLock(); return; }
+    if(isPaused) return;
+    const rc=raycast();
+    if(e.button===0&&rc.hit){
+      const old=getB(rc.bx,rc.by,rc.bz);
+      setB(rc.bx,rc.by,rc.bz,BLOCK.AIR);
+      blocksMined++;
+      rebuildAround(rc.bx,rc.bz);
+      showToast(BLOCK_DEFS[old].emoji,`Mined ${BLOCK_DEFS[old].name}`);
+      updateHUD();
+    } else if(e.button===2&&rc.hit&&rc.pbx!==null){
+      const pt=HOTBAR_BLOCKS[selectedSlot];
+      const px=Math.floor(player.pos.x),pz2=Math.floor(player.pos.z);
+      const py0=Math.floor(player.pos.y),py1=Math.floor(player.pos.y+PLAYER_H-0.1);
+      if(rc.pbx===px&&rc.pbz===pz2&&(rc.pby===py0||rc.pby===py1)){
+        showToast('⚠️','Cannot place block there!'); return;
+      }
+      setB(rc.pbx,rc.pby,rc.pbz,pt);
+      blocksPlaced++;
+      rebuildAround(rc.pbx,rc.pbz);
+      showToast(BLOCK_DEFS[pt].emoji,`Placed ${BLOCK_DEFS[pt].name}`);
+      updateHUD();
+    }
+  });
+
+  renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+  renderer.domElement.addEventListener('wheel',e=>{
+    if(!isPointerLocked) return;
+    e.preventDefault();
+    selectSlot(e.deltaY>0?(selectedSlot+1)%HOTBAR_BLOCKS.length:(selectedSlot-1+HOTBAR_BLOCKS.length)%HOTBAR_BLOCKS.length);
+  },{passive:false});
+}
+
+// ── Pause ──────────────────────────────────────────────
+function togglePause(){
+  isPaused=!isPaused;
+  document.getElementById('pause-menu').classList.toggle('active',isPaused);
+  document.getElementById('btn-pause').classList.toggle('active',isPaused);
+  document.getElementById('btn-pause').textContent=isPaused?'▶ Resume':'⏸ Pause';
+  if(!isPaused) renderer.domElement.requestPointerLock();
+  else if(isPointerLocked) document.exitPointerLock();
+}
+
+// ── Wireframe ──────────────────────────────────────────
+function toggleWireframe(){
+  isWireframe=!isWireframe;
+  chunkMeshes.forEach(ms=>ms.forEach(m=>{ if(m.material) m.material.wireframe=isWireframe; }));
+  document.getElementById('btn-wireframe').classList.toggle('active',isWireframe);
+}
+
+// ── Main Loop ──────────────────────────────────────────
+function loop(){
+  requestAnimationFrame(loop);
+  if(!gameStarted||isPaused) return;
+  const dt=Math.min(clock.getDelta(),0.05);
+  applyLook();
+  movePlayer(dt);
+  updateCamera();
+  updateDayNight(dt);
+  updateChunks();
+  const rc=raycast();
+  updateHL(rc);
+  // Pos display
+  const p=player.pos;
+  document.getElementById('pos-display').textContent=`X:${p.x.toFixed(1)} Y:${p.y.toFixed(1)} Z:${p.z.toFixed(1)}`;
+  renderer.render(scene,camera);
+}
+
+// ── Boot ───────────────────────────────────────────────
+function boot(){
+  initThree();
+  initWorld();
+  buildHotbar();
+  setupInput();
+
+  document.getElementById('start-btn').onclick=()=>{
+    document.getElementById('lock-overlay').classList.add('hidden');
+    gameStarted=true;
+    renderer.domElement.requestPointerLock();
+  };
+  document.getElementById('resume-btn').onclick=()=>{ if(isPaused) togglePause(); };
+  document.getElementById('btn-pause').onclick=()=>{ if(gameStarted) togglePause(); };
+  document.getElementById('new-world-btn').onclick=()=>{
+    if(isPaused) togglePause();
+    initWorld(); buildHotbar();
+    lastCX=null;lastCZ=null;
+    renderer.domElement.requestPointerLock();
+  };
+  document.getElementById('btn-wireframe').onclick=toggleWireframe;
+  document.getElementById('back-home-btn').onclick=()=>window.location='/';
+
+  loop();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
+})();
+</script>
+</body>
+</html>
