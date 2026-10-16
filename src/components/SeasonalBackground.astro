@@ -12,13 +12,6 @@ const activeKey = getCurrentMonthKey();
   aria-hidden="true"
   data-active-theme={activeKey}
 >
-  <!-- Dynamic Ambient Glow Radial Underlays -->
-  <div id="seasonal-glow-underlay" class="absolute inset-0 transition-opacity duration-1000 opacity-85">
-    <div id="seasonal-glow-blob-1" class="absolute -top-32 left-1/4 w-[45rem] h-[30rem] rounded-full blur-3xl opacity-30 transition-all duration-700"></div>
-    <div id="seasonal-glow-blob-2" class="absolute top-1/3 -right-24 w-[35rem] h-[35rem] rounded-full blur-3xl opacity-20 transition-all duration-700"></div>
-    <div id="seasonal-glow-blob-3" class="absolute bottom-10 left-1/3 w-[40rem] h-[25rem] rounded-full blur-3xl opacity-25 transition-all duration-700"></div>
-  </div>
-
   <!-- Atmospheric Background Canvas -->
   <canvas id="seasonalCanvas" class="absolute inset-0 w-full h-full block"></canvas>
 </div>
@@ -84,16 +77,16 @@ const activeKey = getCurrentMonthKey();
       },
       sep: {
         id: 'sep', name: 'Autumn Equinox', badge: '🍂 Hogwarts & Autumn Harvest Edition',
-        fontHeading: "'Cinzel', 'Space Grotesk', serif",
-        headlineGradient: 'linear-gradient(135deg, #ffffff 0%, #fde68a 30%, #f2b84b 60%, #ff8c42 85%, #ef4444 100%)',
-        colors: { brand: '#f2b84b', accent: '#ff8c42', glowStart: 'rgba(242, 184, 75, 0.28)', glowMid: 'rgba(255, 140, 66, 0.20)', glowEnd: 'rgba(239, 68, 68, 0.12)', surfaceTint: 'rgba(28, 18, 12, 0.65)', particlePalette: ['#f2b84b', '#ff8c42', '#ef4444', '#d97706', '#fde68a'] },
+        fontHeading: "'Space Grotesk', 'Outfit', sans-serif",
+        headlineGradient: 'linear-gradient(135deg, #ffffff 0%, #fef08a 35%, #fbbf24 70%, #f59e0b 100%)',
+        colors: { brand: '#f59e0b', accent: '#f97316', glowStart: 'rgba(245, 158, 11, 0.25)', glowMid: 'rgba(251, 191, 36, 0.18)', glowEnd: 'rgba(249, 115, 22, 0.12)', surfaceTint: 'rgba(28, 18, 12, 0.65)', particlePalette: ['#ffffff', '#fef08a', '#fbbf24', '#f59e0b', '#ea580c'] },
         visualTheme: 'autumn'
       },
       oct: {
         id: 'oct', name: 'Spooky Haunt', badge: '🎃 Halloween Haunt Edition',
-        fontHeading: "'Cinzel', 'Space Grotesk', serif",
-        headlineGradient: 'linear-gradient(135deg, #ffffff 0%, #fb923c 30%, #f97316 60%, #c084fc 85%, #a855f7 100%)',
-        colors: { brand: '#f97316', accent: '#a855f7', glowStart: 'rgba(249, 115, 22, 0.32)', glowMid: 'rgba(168, 85, 247, 0.24)', glowEnd: 'rgba(132, 204, 22, 0.16)', surfaceTint: 'rgba(24, 10, 34, 0.70)', particlePalette: ['#f97316', '#fb923c', '#c084fc', '#a855f7', '#a3e635'] },
+        fontHeading: "'Space Grotesk', 'Outfit', sans-serif",
+        headlineGradient: 'linear-gradient(135deg, #ffffff 0%, #fed7aa 35%, #fb923c 70%, #c084fc 100%)',
+        colors: { brand: '#fb923c', accent: '#c084fc', glowStart: 'rgba(251, 146, 60, 0.30)', glowMid: 'rgba(168, 85, 247, 0.22)', glowEnd: 'rgba(132, 204, 22, 0.14)', surfaceTint: 'rgba(24, 10, 34, 0.70)', particlePalette: ['#ffffff', '#fed7aa', '#fb923c', '#c084fc', '#a855f7'] },
         visualTheme: 'halloween'
       },
       nov: {
@@ -105,19 +98,21 @@ const activeKey = getCurrentMonthKey();
       },
       dec: {
         id: 'dec', name: 'Holiday Wonderland', badge: '🎄 Winter Holiday Edition',
-        fontHeading: "'Cinzel', 'Space Grotesk', serif",
-        headlineGradient: 'linear-gradient(135deg, #ffffff 0%, #fecdd3 30%, #f43f5e 60%, #fbbf24 85%, #10b981 100%)',
-        colors: { brand: '#f43f5e', accent: '#10b981', glowStart: 'rgba(244, 63, 94, 0.28)', glowMid: 'rgba(16, 185, 129, 0.20)', glowEnd: 'rgba(251, 191, 36, 0.14)', surfaceTint: 'rgba(24, 14, 18, 0.65)', particlePalette: ['#ffffff', '#f43f5e', '#10b981', '#fbbf24', '#fecdd3'] },
+        fontHeading: "'Space Grotesk', 'Outfit', sans-serif",
+        headlineGradient: 'linear-gradient(135deg, #ffffff 0%, #fecdd3 35%, #fb7185 70%, #38dbf5 100%)',
+        colors: { brand: '#fb7185', accent: '#38dbf5', glowStart: 'rgba(251, 113, 133, 0.25)', glowMid: 'rgba(56, 219, 245, 0.18)', glowEnd: 'rgba(254, 205, 211, 0.12)', surfaceTint: 'rgba(24, 14, 18, 0.65)', particlePalette: ['#ffffff', '#fb7185', '#38dbf5', '#fbbf24', '#fecdd3'] },
         visualTheme: 'holiday'
       }
     };
 
-    const container = document.getElementById('seasonal-bg-container');
-    const serverKey = container ? container.getAttribute('data-active-theme') : null;
     const currentMonthIdx = new Date().getMonth();
     const liveMonthKey = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][currentMonthIdx];
+    let savedTheme = null;
+    try {
+      savedTheme = localStorage.getItem('arcadelab_seasonal_theme');
+    } catch(err) {}
 
-    let currentThemeKey = (serverKey && THEMES[serverKey]) ? serverKey : (liveMonthKey || 'sep');
+    let currentThemeKey = (savedTheme && THEMES[savedTheme]) ? savedTheme : (liveMonthKey || 'sep');
     let currentTheme = THEMES[currentThemeKey] || THEMES['sep'];
 
     // DOM Glow Elements
@@ -287,8 +282,14 @@ const activeKey = getCurrentMonthKey();
 
     function initParticles() {
       particles = [];
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(createParticle(currentTheme));
+      const count = width < 640 ? 8 : 28;
+      for (let i = 0; i < count; i++) {
+        const p = createParticle(currentTheme);
+        if (width < 640) {
+          p.alpha *= 0.65;
+          p.size *= 0.85;
+        }
+        particles.push(p);
       }
     }
 
@@ -297,15 +298,18 @@ const activeKey = getCurrentMonthKey();
       sceneryProps = [];
       ambientEntities = [];
       const theme = currentTheme.visualTheme;
+      const isMobile = width < 640;
 
       if (theme === 'jan' || theme === 'frost') {
         // Jan: Bioluminescent Neon Spirit Forest with Ancient Glowing Tree, Overhanging Boughs & Spirit Moths
-        sceneryProps.push({ type: 'neon_forest_vista', alpha: 0.92 });
-        const spiritTreeHeight = Math.min(height * 0.78, 520);
-        sceneryProps.push({ type: 'neon_spirit_tree', x: 0, y: height, size: spiritTreeHeight, alpha: 0.95 });
-        sceneryProps.push({ type: 'neon_overhanging_canopy', alpha: 0.94 });
+        sceneryProps.push({ type: 'neon_forest_vista', alpha: isMobile ? 0.45 : 0.92 });
+        const spiritTreeHeight = Math.min(height * 0.78, isMobile ? 380 : 520);
+        sceneryProps.push({ type: 'neon_spirit_tree', x: isMobile ? -60 : 0, y: height, size: spiritTreeHeight, alpha: isMobile ? 0.65 : 0.95 });
+        if (!isMobile) {
+          sceneryProps.push({ type: 'neon_overhanging_canopy', alpha: 0.94 });
+        }
 
-        for (let b = 0; b < 3; b++) {
+        for (let b = 0; b < (isMobile ? 1 : 3); b++) {
           ambientEntities.push({
             type: 'neon_butterfly',
             x: Math.random() * width,
@@ -316,34 +320,75 @@ const activeKey = getCurrentMonthKey();
             wing: Math.random() * Math.PI * 2,
             wingSpeed: 0.12 + Math.random() * 0.06,
             color: Math.random() > 0.5 ? '#38dbf5' : '#c084fc',
-            alpha: 0.85
+            alpha: isMobile ? 0.5 : 0.85
           });
         }
       } else if (theme === 'dec' || theme === 'holiday') {
         // Dec: Magical Christmas Village with Tree, Snowman, Vintage Streetlamp, Cottage, Gingerbread Man & Santa's Sleigh
-        sceneryProps.push({ type: 'xmas_tree', x: width * 0.08, y: height - 10, size: 68, alpha: 0.92 });
-        sceneryProps.push({ type: 'snowman', x: width * 0.19, y: height - 12, size: 24, alpha: 0.88 });
-        sceneryProps.push({ type: 'street_lamp', x: width * 0.28, y: height - 10, size: 75, alpha: 0.88 });
-        sceneryProps.push({ type: 'cottage', x: width * 0.80, y: height - 12, size: 55, alpha: 0.85 });
-        sceneryProps.push({ type: 'xmas_tree', x: width * 0.92, y: height - 10, size: 60, alpha: 0.88 });
-        sceneryProps.push({ type: 'gingerbread', x: width * 0.70, y: height - 10, size: 22, alpha: 0.85 });
-        sceneryProps.push({ type: 'christmas_lights' });
+        sceneryProps.push({ type: 'xmas_tree', x: width * 0.08, y: height - 10, size: isMobile ? 45 : 68, alpha: isMobile ? 0.75 : 0.92 });
+        sceneryProps.push({ type: 'snowman', x: width * 0.19, y: height - 12, size: isMobile ? 18 : 24, alpha: isMobile ? 0.75 : 0.88 });
+        sceneryProps.push({ type: 'street_lamp', x: width * 0.28, y: height - 10, size: isMobile ? 55 : 75, alpha: isMobile ? 0.75 : 0.88 });
+        sceneryProps.push({ type: 'cottage', x: width * 0.80, y: height - 12, size: isMobile ? 40 : 55, alpha: isMobile ? 0.75 : 0.85 });
+        sceneryProps.push({ type: 'xmas_tree', x: width * 0.92, y: height - 10, size: isMobile ? 45 : 60, alpha: isMobile ? 0.75 : 0.88 });
+        sceneryProps.push({ type: 'gingerbread', x: width * 0.70, y: height - 10, size: isMobile ? 16 : 22, alpha: isMobile ? 0.75 : 0.85 });
+        if (!isMobile) {
+          sceneryProps.push({ type: 'christmas_lights' });
+        }
 
         ambientEntities.push({ type: 'santas_sleigh', x: -50, y: height * 0.20, vx: 0.75, size: 28, hover: 0 });
       } else if (theme === 'mar' || theme === 'sakura') {
         // Mar: Grand Anime Sakura Scene with Left Tree + Top-Right Overhanging Canopy + Vista Horizon
-        const treeHeight = Math.min(height * 0.96, 680);
-        sceneryProps.push({ type: 'sakura_vista_horizon' });
-        sceneryProps.push({ type: 'tall_sakura_tree', x: 0, y: height, size: treeHeight, alpha: 0.95 });
-        sceneryProps.push({ type: 'overhanging_sakura' });
+        const treeHeight = Math.min(height * 0.96, isMobile ? 380 : 680);
+        sceneryProps.push({ type: 'sakura_vista_horizon', alpha: isMobile ? 0.45 : 0.95 });
+        sceneryProps.push({ type: 'tall_sakura_tree', x: isMobile ? -60 : 0, y: height, size: treeHeight, alpha: isMobile ? 0.7 : 0.95 });
+        if (!isMobile) {
+          sceneryProps.push({ type: 'overhanging_sakura' });
+        }
       } else if (theme === 'oct' || theme === 'halloween') {
         // Oct: Spooky Gothic Haunt with Blood Harvest Moon, Haunted Castle, Cemetery Hill & Flying Witch
-        sceneryProps.push({ type: 'spooky_moon_horizon', alpha: 0.94 });
+        sceneryProps.push({ type: 'spooky_moon_horizon', alpha: isMobile ? 0.45 : 0.94 });
 
-        const leftHillSize = Math.min(Math.max(height * 0.28, 120), 180);
-        const rightHillSize = Math.min(Math.max(height * 0.25, 110), 160);
-        sceneryProps.push({ type: 'spooky_graveyard_hill', x: 0, y: height, size: leftHillSize, alpha: 0.95, flip: false });
-        sceneryProps.push({ type: 'spooky_graveyard_hill', x: width, y: height, size: rightHillSize, alpha: 0.92, flip: true });
+        const leftHillSize = Math.min(Math.max(height * 0.28, 120), isMobile ? 120 : 180);
+        const rightHillSize = Math.min(Math.max(height * 0.25, 110), isMobile ? 110 : 160);
+        sceneryProps.push({ type: 'spooky_graveyard_hill', x: isMobile ? -20 : 0, y: height, size: leftHillSize, alpha: isMobile ? 0.65 : 0.95, flip: false });
+        sceneryProps.push({ type: 'spooky_graveyard_hill', x: isMobile ? width + 20 : width, y: height, size: rightHillSize, alpha: isMobile ? 0.65 : 0.92, flip: true });
+
+        // === PUMPKINS scattered along the bottom ===
+        const pumpkinPositions = isMobile
+          ? [{ x: width * 0.12, s: 13 }, { x: width * 0.88, s: 11 }]
+          : [
+              { x: width * 0.08,  s: 18 }, { x: width * 0.16, s: 13 },
+              { x: width * 0.28,  s: 16 }, { x: width * 0.42, s: 12 },
+              { x: width * 0.58,  s: 15 }, { x: width * 0.72, s: 11 },
+              { x: width * 0.84,  s: 17 }, { x: width * 0.93, s: 13 }
+            ];
+        pumpkinPositions.forEach(p => {
+          sceneryProps.push({
+            type: 'pumpkin',
+            x: p.x,
+            y: height - 6,
+            size: p.s,
+            glow: 0
+          });
+        });
+
+        // === GRAVESTONES in the foreground centre ===
+        if (!isMobile) {
+          const graveData = [
+            { x: width * 0.35, w: 22, h: 36 },
+            { x: width * 0.50, w: 18, h: 30 },
+            { x: width * 0.65, w: 24, h: 40 },
+          ];
+          graveData.forEach(g => {
+            sceneryProps.push({ type: 'grave', x: g.x, y: height - 4, width: g.w, height: g.h, alpha: 0.88 });
+          });
+        }
+
+        // === COBWEBS in top corners ===
+        if (!isMobile) {
+          sceneryProps.push({ type: 'cobweb', corner: 'top-left',  size: 130, alpha: 0.55 });
+          sceneryProps.push({ type: 'cobweb', corner: 'top-right', size: 110, alpha: 0.50 });
+        }
 
         ambientEntities.push({
           type: 'witch_flight',
@@ -354,10 +399,10 @@ const activeKey = getCurrentMonthKey();
           hover: 0
         });
 
-        ambientEntities.push({ type: 'spooky_ghost', x: width * 0.22, y: height * 0.52, vx: 0.35, size: 22, hover: 0, alpha: 0.85 });
-        ambientEntities.push({ type: 'spooky_ghost', x: width * 0.78, y: height * 0.42, vx: -0.3, size: 19, hover: Math.PI, alpha: 0.80 });
+        ambientEntities.push({ type: 'spooky_ghost', x: width * 0.22, y: height * 0.52, vx: 0.35, size: 22, hover: 0, alpha: isMobile ? 0.5 : 0.85 });
+        ambientEntities.push({ type: 'spooky_ghost', x: width * 0.78, y: height * 0.42, vx: -0.3, size: 19, hover: Math.PI, alpha: isMobile ? 0.5 : 0.80 });
 
-        for (let b = 0; b < 4; b++) {
+        for (let b = 0; b < (isMobile ? 2 : 4); b++) {
           ambientEntities.push({
             type: 'spooky_bat',
             x: Math.random() * width,
@@ -367,49 +412,55 @@ const activeKey = getCurrentMonthKey();
             size: 9 + Math.random() * 4,
             wing: Math.random() * Math.PI * 2,
             wingSpeed: 0.18 + Math.random() * 0.08,
-            alpha: 0.75 + Math.random() * 0.2
+            alpha: isMobile ? 0.5 : (0.75 + Math.random() * 0.2)
           });
         }
       } else if (theme === 'jun' || theme === 'synthwave') {
         // Jun: Retro Cyberwave with Segmented Neon Sun, Perspective Wireframe Grid, Cyber Skyline & Outrun Palms
-        sceneryProps.push({ type: 'synthwave_sun_and_grid', alpha: 0.92 });
-        sceneryProps.push({ type: 'cyberpunk_skyline', alpha: 0.90 });
-        const leftPalmHeight = Math.min(Math.max(height * 0.45, 200), 320);
-        const rightPalmHeight = Math.min(Math.max(height * 0.38, 180), 280);
-        sceneryProps.push({ type: 'outrun_palm', x: width * 0.06, y: height, size: leftPalmHeight, alpha: 0.95, flip: false });
-        sceneryProps.push({ type: 'outrun_palm', x: width * 0.94, y: height, size: rightPalmHeight, alpha: 0.92, flip: true });
+        sceneryProps.push({ type: 'synthwave_sun_and_grid', alpha: isMobile ? 0.45 : 0.92 });
+        sceneryProps.push({ type: 'cyberpunk_skyline', alpha: isMobile ? 0.5 : 0.90 });
+        const leftPalmHeight = Math.min(Math.max(height * 0.45, 160), isMobile ? 220 : 320);
+        const rightPalmHeight = Math.min(Math.max(height * 0.38, 140), isMobile ? 190 : 280);
+        sceneryProps.push({ type: 'outrun_palm', x: isMobile ? -20 : width * 0.06, y: height, size: leftPalmHeight, alpha: isMobile ? 0.7 : 0.95, flip: false });
+        sceneryProps.push({ type: 'outrun_palm', x: isMobile ? width + 20 : width * 0.94, y: height, size: rightPalmHeight, alpha: isMobile ? 0.7 : 0.92, flip: true });
 
         ambientEntities.push({ type: 'cyber_spinner', x: -60, y: height * 0.32, vx: 1.1, size: 22 });
       } else if (theme === 'jul' || theme === 'abyss') {
         // Jul: Deep Abyssal Ocean with Surface Caustics, Seafloor Coral Reef, Bioluminescent Jellyfish & Majestic Whale
-        sceneryProps.push({ type: 'ocean_caustics_surface', alpha: 0.90 });
-        sceneryProps.push({ type: 'bioluminescent_reef', alpha: 0.92 });
-        sceneryProps.push({ type: 'majestic_whale_diver', alpha: 0.94 });
+        sceneryProps.push({ type: 'ocean_caustics_surface', alpha: isMobile ? 0.45 : 0.90 });
+        sceneryProps.push({ type: 'bioluminescent_reef', alpha: isMobile ? 0.6 : 0.92 });
+        sceneryProps.push({ type: 'majestic_whale_diver', alpha: isMobile ? 0.6 : 0.94 });
 
-        ambientEntities.push({ type: 'jellyfish_abyss', x: width * 0.18, y: height * 0.55, vy: -0.28, size: 24, pulse: 0, alpha: 0.85 });
-        ambientEntities.push({ type: 'jellyfish_abyss', x: width * 0.82, y: height * 0.40, vy: -0.22, size: 20, pulse: 1.8, alpha: 0.80 });
-        ambientEntities.push({ type: 'jellyfish_abyss', x: width * 0.52, y: height * 0.65, vy: -0.32, size: 16, pulse: 3.2, alpha: 0.75 });
+        ambientEntities.push({ type: 'jellyfish_abyss', x: width * 0.18, y: height * 0.55, vy: -0.28, size: 24, pulse: 0, alpha: isMobile ? 0.5 : 0.85 });
+        ambientEntities.push({ type: 'jellyfish_abyss', x: width * 0.82, y: height * 0.40, vy: -0.22, size: 20, pulse: 1.8, alpha: isMobile ? 0.5 : 0.80 });
+        ambientEntities.push({ type: 'jellyfish_abyss', x: width * 0.52, y: height * 0.65, vy: -0.32, size: 16, pulse: 3.2, alpha: isMobile ? 0.5 : 0.75 });
       } else if (theme === 'sep' || theme === 'autumn' || theme === 'hogwarts') {
         // Sep: Autumn Maple Promenade + Hogwarts Castle Silhouette on Horizon
-        const leftTreeHeight = Math.min(height * 0.96, 680);
-        const rightTreeHeight = Math.min(height * 0.92, 640);
+        const leftTreeHeight = Math.min(height * 0.96, isMobile ? 380 : 680);
+        const rightTreeHeight = Math.min(height * 0.92, isMobile ? 360 : 640);
 
         // 1. Distant Hogwarts Castle Silhouette in the background between trees
-        sceneryProps.push({ type: 'hogwarts_castle_silhouette', alpha: 0.92 });
+        sceneryProps.push({ type: 'hogwarts_castle_silhouette', alpha: isMobile ? 0.35 : 0.92 });
 
         // 2. Perspective Promenade Walkway & Park Benches in Lower Ground Zone
         sceneryProps.push({ type: 'autumn_park_avenue' });
 
-        // 3. Middle-Ground Trees on Far Margins
-        sceneryProps.push({ type: 'autumn_tree', x: width * 0.08, y: height * 0.96, size: leftTreeHeight * 0.85, alpha: 0.90, flip: false, isBg: true });
-        sceneryProps.push({ type: 'autumn_tree', x: width * 0.92, y: height * 0.96, size: rightTreeHeight * 0.85, alpha: 0.90, flip: true, isBg: true });
+        // 3. Middle-Ground Trees on Far Margins (desktop/tablet only to keep mobile center clean)
+        if (!isMobile) {
+          sceneryProps.push({ type: 'autumn_tree', x: width * 0.08, y: height * 0.96, size: leftTreeHeight * 0.85, alpha: 0.90, flip: false, isBg: true });
+          sceneryProps.push({ type: 'autumn_tree', x: width * 0.92, y: height * 0.96, size: rightTreeHeight * 0.85, alpha: 0.90, flip: true, isBg: true });
+        }
 
-        // 4. Foreground Grand Maple Trees on Outer Edges
-        sceneryProps.push({ type: 'autumn_tree', x: 0, y: height, size: leftTreeHeight, alpha: 0.98, flip: false, isBg: false });
-        sceneryProps.push({ type: 'autumn_tree', x: width, y: height, size: rightTreeHeight, alpha: 0.98, flip: true, isBg: false });
+        // 4. Foreground Grand Maple Trees on Outer Edges (Framed gently on side margins)
+        const leftOffset = isMobile ? -50 : 0;
+        const rightOffset = isMobile ? width + 50 : width;
+        sceneryProps.push({ type: 'autumn_tree', x: leftOffset, y: height, size: leftTreeHeight, alpha: isMobile ? 0.65 : 0.98, flip: false, isBg: false });
+        sceneryProps.push({ type: 'autumn_tree', x: rightOffset, y: height, size: rightTreeHeight, alpha: isMobile ? 0.65 : 0.98, flip: true, isBg: false });
 
         // 5. Overarching High Top-Edge Canopy Arch & Ground Fallen Leaves
-        sceneryProps.push({ type: 'autumn_canopy_tunnel' });
+        if (!isMobile) {
+          sceneryProps.push({ type: 'autumn_canopy_tunnel' });
+        }
         sceneryProps.push({ type: 'fallen_leaves_carpet' });
       } else if (theme === 'apr' || theme === 'emerald') {
         // Apr: Ghibli Emerald Spring with Lush Mountains, Reflective Lake, Overgrown Ivy Stone Arch & Forest Ferns
@@ -1279,22 +1330,6 @@ const activeKey = getCurrentMonthKey();
       ctx.save();
       ctx.globalAlpha = alpha;
 
-      // 1. Distant Warm Forest Backdrop
-      const bgGrad = ctx.createLinearGradient(0, height - 160, 0, height);
-      bgGrad.addColorStop(0, 'rgba(64, 40, 16, 0.45)');
-      bgGrad.addColorStop(0.5, 'rgba(45, 30, 12, 0.70)');
-      bgGrad.addColorStop(1, 'rgba(28, 18, 8, 0.90)');
-      ctx.fillStyle = bgGrad;
-
-      ctx.beginPath();
-      ctx.moveTo(0, height);
-      ctx.lineTo(0, height - 100);
-      ctx.quadraticCurveTo(width * 0.25, height - 140, width * 0.50, height - 120);
-      ctx.quadraticCurveTo(width * 0.75, height - 150, width, height - 95);
-      ctx.lineTo(width, height);
-      ctx.closePath();
-      ctx.fill();
-
       // Distant green/amber shrubbery layer at path horizon
       const shrubY = height - 75;
       const shrubGrad = ctx.createLinearGradient(0, shrubY - 40, 0, shrubY + 10);
@@ -2139,6 +2174,91 @@ const activeKey = getCurrentMonthKey();
       ctx.restore();
     }
 
+    // Cobweb drawn from a corner
+    function drawCobweb(ctx, corner, size, alpha, now) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      const isRight = corner === 'top-right';
+      const sx = isRight ? width : 0;
+      const sy = 0;
+      const sway = Math.sin(now * 0.0008) * 0.03;
+
+      ctx.save();
+      ctx.translate(sx, sy);
+      if (isRight) ctx.scale(-1, 1);
+      ctx.rotate(sway);
+
+      // Spider silk threads radiating from corner
+      const threads = 6;
+      const angles = [0, 0.18, 0.35, 0.55, 0.75, 0.95]; // radians from edge
+      ctx.strokeStyle = 'rgba(200,190,220,0.7)';
+      ctx.lineWidth = 0.7;
+      angles.forEach(a => {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        const ex = Math.cos(a) * size;
+        const ey = Math.sin(a) * size;
+        ctx.lineTo(ex, ey);
+        ctx.stroke();
+      });
+
+      // Concentric arc strands
+      const arcLevels = [0.22, 0.42, 0.62, 0.82, 1.0];
+      arcLevels.forEach(frac => {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(200,190,220,${0.55 * (1 - frac * 0.3)})`;
+        ctx.lineWidth = 0.6;
+        for (let i = 0; i < angles.length - 1; i++) {
+          const a1 = angles[i],   r1 = frac * size;
+          const a2 = angles[i+1], r2 = frac * size;
+          const x1 = Math.cos(a1) * r1, y1 = Math.sin(a1) * r1;
+          const x2 = Math.cos(a2) * r2, y2 = Math.sin(a2) * r2;
+          const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+          const bulge = frac * 14;
+          ctx.moveTo(x1, y1);
+          ctx.quadraticCurveTo(mx + Math.sin(a1) * bulge, my - Math.cos(a1) * bulge, x2, y2);
+        }
+        ctx.stroke();
+      });
+
+      // Dangling spider on a thread
+      const spiderAngle = angles[2];
+      const spiderR = size * 0.55;
+      const spiderX = Math.cos(spiderAngle) * spiderR;
+      const spiderY = Math.sin(spiderAngle) * spiderR;
+      const dropLen = 18 + 6 * Math.sin(now * 0.001);
+      ctx.strokeStyle = 'rgba(200,190,220,0.6)';
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(spiderX, spiderY);
+      ctx.lineTo(spiderX, spiderY + dropLen);
+      ctx.stroke();
+      // Spider body
+      ctx.fillStyle = '#1a0a22';
+      ctx.beginPath();
+      ctx.ellipse(spiderX, spiderY + dropLen + 5, 4, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(spiderX, spiderY + dropLen + 2, 3, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Spider legs
+      ctx.strokeStyle = '#1a0a22';
+      ctx.lineWidth = 0.8;
+      for (let l = 0; l < 4; l++) {
+        const la = -0.6 + l * 0.4;
+        ctx.beginPath(); ctx.moveTo(spiderX, spiderY + dropLen + 4);
+        ctx.lineTo(spiderX - 8 * Math.cos(la), spiderY + dropLen + 4 + 6 * Math.sin(la + 0.3));
+        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(spiderX, spiderY + dropLen + 4);
+        ctx.lineTo(spiderX + 8 * Math.cos(la), spiderY + dropLen + 4 + 6 * Math.sin(la + 0.3));
+        ctx.stroke();
+      }
+
+      ctx.restore();
+      ctx.restore();
+    }
+
     // 10. Cosmic 4-Point Diamond Cross Star (Feb & Nov)
     function drawCrossStar(ctx, x, y, size, coreColor, outerColor, alpha = 1.0) {
       ctx.save();
@@ -2224,6 +2344,328 @@ const activeKey = getCurrentMonthKey();
         const pulse = 0.55 + Math.sin(now * 0.003 + st.p) * 0.45;
         drawCrossStar(ctx, st.x, st.y, st.s * (0.8 + pulse * 0.3), '#ffffff', '#ff94b8', pulse * 0.9);
       });
+
+      ctx.restore();
+    }
+
+    // 12a. Giant Harvest Blood Moon & Gothic Horizon (Oct)
+    function drawSpookyMoonAndHorizon(ctx, width, height, alpha, now) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      const horizY = height * 0.72;
+
+      // 1. Spooky Night Sky Backdrop Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, 'rgba(10, 4, 20, 0.50)');
+      skyGrad.addColorStop(0.5, 'rgba(31, 13, 56, 0.40)');
+      skyGrad.addColorStop(0.85, 'rgba(56, 14, 40, 0.45)');
+      skyGrad.addColorStop(1, 'rgba(15, 6, 26, 0.85)');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Giant Glowing Harvest Blood Moon (Positioned on the upper right clear of hero text)
+      const moonX = Math.min(width * 0.86, width - 90);
+      const moonY = Math.max(height * 0.22, 110);
+      const moonR = Math.min(Math.max(width * 0.085, 48), 85);
+
+      const moonAura = ctx.createRadialGradient(moonX, moonY, moonR * 0.5, moonX, moonY, moonR * 1.8);
+      moonAura.addColorStop(0, 'rgba(251, 146, 60, 0.45)');
+      moonAura.addColorStop(0.4, 'rgba(168, 85, 247, 0.22)');
+      moonAura.addColorStop(0.8, 'rgba(249, 115, 22, 0.08)');
+      moonAura.addColorStop(1, 'transparent');
+      ctx.fillStyle = moonAura;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonR * 1.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      const moonGrad = ctx.createRadialGradient(moonX - moonR * 0.25, moonY - moonR * 0.25, 2, moonX, moonY, moonR);
+      moonGrad.addColorStop(0, '#fef08a');
+      moonGrad.addColorStop(0.4, '#fde047');
+      moonGrad.addColorStop(0.75, '#fb923c');
+      moonGrad.addColorStop(1, '#ea580c');
+      ctx.fillStyle = moonGrad;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+      ctx.clip();
+
+      ctx.fillStyle = 'rgba(154, 52, 18, 0.25)';
+      const craters = [
+        { cx: moonX - moonR * 0.35, cy: moonY - moonR * 0.2, r: moonR * 0.22 },
+        { cx: moonX + moonR * 0.25, cy: moonY - moonR * 0.35, r: moonR * 0.18 },
+        { cx: moonX - moonR * 0.15, cy: moonY + moonR * 0.35, r: moonR * 0.28 },
+        { cx: moonX + moonR * 0.38, cy: moonY + moonR * 0.25, r: moonR * 0.20 },
+        { cx: moonX + moonR * 0.05, cy: moonY - moonR * 0.05, r: moonR * 0.14 }
+      ];
+      craters.forEach(cr => {
+        ctx.beginPath();
+        ctx.arc(cr.cx, cr.cy, cr.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+
+      // 3. Gothic Haunted Castle on Horizon
+      const cX = width * 0.44;
+      const cY = horizY;
+      const cW = 85;
+      const cH = 90;
+
+      ctx.fillStyle = '#0c0517';
+      ctx.fillRect(cX - cW * 0.35, cY - cH * 0.65, cW * 0.7, cH * 0.65);
+      ctx.fillRect(cX - cW * 0.48, cY - cH * 0.85, cW * 0.25, cH * 0.85);
+      ctx.beginPath();
+      ctx.moveTo(cX - cW * 0.52, cY - cH * 0.85);
+      ctx.lineTo(cX - cW * 0.35, cY - cH * 1.15);
+      ctx.lineTo(cX - cW * 0.20, cY - cH * 0.85);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(cX - cW * 0.18, cY - cH * 0.65);
+      ctx.lineTo(cX, cY - cH * 1.05);
+      ctx.lineTo(cX + cW * 0.18, cY - cH * 0.65);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillRect(cX + cW * 0.24, cY - cH * 0.75, cW * 0.24, cH * 0.75);
+      ctx.beginPath();
+      ctx.moveTo(cX + cW * 0.20, cY - cH * 0.75);
+      ctx.lineTo(cX + cW * 0.36, cY - cH * 1.0);
+      ctx.lineTo(cX + cW * 0.52, cY - cH * 0.75);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fef08a';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 6;
+      ctx.fillRect(cX - cW * 0.40, cY - cH * 0.65, 4, 8);
+      ctx.fillRect(cX - cW * 0.08, cY - cH * 0.48, 5, 9);
+      ctx.fillRect(cX + cW * 0.30, cY - cH * 0.55, 4, 8);
+      ctx.shadowBlur = 0;
+
+      // 4. Gnarled Bare Spooky Trees
+      const deadTrees = [
+        { tx: width * 0.22, ty: horizY, h: 70, w: 45 },
+        { tx: width * 0.75, ty: horizY, h: 80, w: 50 }
+      ];
+
+      deadTrees.forEach(dt => {
+        ctx.strokeStyle = '#0a0314';
+        ctx.lineWidth = 4.0;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(dt.tx, dt.ty);
+        ctx.quadraticCurveTo(dt.tx - 6, dt.ty - dt.h * 0.5, dt.tx, dt.ty - dt.h);
+        ctx.stroke();
+
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.moveTo(dt.tx - 3, dt.ty - dt.h * 0.55);
+        ctx.quadraticCurveTo(dt.tx - dt.w * 0.6, dt.ty - dt.h * 0.75, dt.tx - dt.w * 0.8, dt.ty - dt.h * 0.95);
+        ctx.moveTo(dt.tx + 2, dt.ty - dt.h * 0.65);
+        ctx.quadraticCurveTo(dt.tx + dt.w * 0.5, dt.ty - dt.h * 0.85, dt.tx + dt.w * 0.75, dt.ty - dt.h * 1.05);
+        ctx.moveTo(dt.tx, dt.ty - dt.h);
+        ctx.lineTo(dt.tx - 12, dt.ty - dt.h - 15);
+        ctx.moveTo(dt.tx, dt.ty - dt.h);
+        ctx.lineTo(dt.tx + 10, dt.ty - dt.h - 18);
+        ctx.stroke();
+      });
+
+      // 5. Spooky Horizon Hill & Wrought-Iron Spiked Fence
+      ctx.fillStyle = '#080210';
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.lineTo(0, horizY);
+      ctx.quadraticCurveTo(width * 0.35, horizY - 25, width * 0.65, horizY - 10);
+      ctx.quadraticCurveTo(width * 0.85, horizY - 30, width, horizY - 15);
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = '#1e112e';
+      ctx.lineWidth = 1.2;
+      const numPickets = Math.ceil(width / 22);
+      for (let p = 0; p <= numPickets; p++) {
+        const px = p * 22;
+        const py = horizY - 12 + Math.sin(p * 0.4) * 4;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px, py - 18);
+        ctx.stroke();
+
+        ctx.fillStyle = '#1e112e';
+        ctx.beginPath();
+        ctx.moveTo(px - 2.5, py - 16);
+        ctx.lineTo(px, py - 21);
+        ctx.lineTo(px + 2.5, py - 16);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(0, horizY - 20);
+      ctx.lineTo(width, horizY - 20);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // 12b. Gothic Graveyard Hill with Weathered Cross, Cauldron & Blinking Eyes (Oct)
+    function drawSpookyGraveyardHill(ctx, x, y, size, alpha, now, flip) {
+      ctx.save();
+      ctx.translate(x, y);
+      if (flip) ctx.scale(-1, 1);
+      ctx.globalAlpha = alpha;
+
+      const w = size * 2.2;
+      const h = size;
+
+      // 1. Grassy Cemetery Mound
+      ctx.fillStyle = '#090314';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-w, 0);
+      ctx.quadraticCurveTo(-w * 0.5, -h * 0.55, 0, -h * 0.35);
+      ctx.closePath();
+      ctx.fill();
+
+      // 2. Weathered Stone Celtic Cross Tombstone
+      const crossX = -w * 0.35;
+      const crossY = -h * 0.38;
+      const crossH = h * 0.55;
+
+      ctx.fillStyle = '#1e162a';
+      ctx.strokeStyle = '#38264e';
+      ctx.lineWidth = 1.0;
+      ctx.fillRect(crossX - 4, crossY - crossH, 8, crossH);
+      ctx.strokeRect(crossX - 4, crossY - crossH, 8, crossH);
+      ctx.fillRect(crossX - 14, crossY - crossH * 0.72, 28, 7);
+      ctx.strokeRect(crossX - 14, crossY - crossH * 0.72, 28, 7);
+      ctx.beginPath();
+      ctx.arc(crossX, crossY - crossH * 0.68, 10, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 3. Rounded R.I.P. Tombstone
+      const ripX = -w * 0.65;
+      const ripY = -h * 0.28;
+      ctx.fillStyle = '#181024';
+      ctx.strokeStyle = '#2d1c44';
+      ctx.beginPath();
+      ctx.moveTo(ripX - 12, ripY);
+      ctx.lineTo(ripX - 12, ripY - 26);
+      ctx.quadraticCurveTo(ripX, ripY - 36, ripX + 12, ripY - 26);
+      ctx.lineTo(ripX + 12, ripY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#a855f7';
+      ctx.font = 'bold 7px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('R.I.P', ripX, ripY - 14);
+
+      // 4. Carved Jack-o'-Lantern with Glowing Fiery Face
+      const pX = -w * 0.16;
+      const pY = -h * 0.32;
+      const pSize = h * 0.22;
+
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.ellipse(pX, pY, pSize * 0.95, pSize * 0.75, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#15803d';
+      ctx.beginPath();
+      ctx.moveTo(pX - 2, pY - pSize * 0.75);
+      ctx.quadraticCurveTo(pX + 4, pY - pSize * 1.15, pX + 8, pY - pSize * 1.05);
+      ctx.lineTo(pX + 2, pY - pSize * 0.75);
+      ctx.closePath();
+      ctx.fill();
+
+      const pGlow = 0.8 + Math.sin(now * 0.008) * 0.2;
+      ctx.fillStyle = '#fef08a';
+      ctx.shadowColor = '#f97316';
+      ctx.shadowBlur = 8 * pGlow;
+
+      ctx.beginPath();
+      ctx.moveTo(pX - pSize * 0.45, pY - pSize * 0.15);
+      ctx.lineTo(pX - pSize * 0.15, pY - pSize * 0.15);
+      ctx.lineTo(pX - pSize * 0.3, pY - pSize * 0.45);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(pX + pSize * 0.15, pY - pSize * 0.15);
+      ctx.lineTo(pX + pSize * 0.45, pY - pSize * 0.15);
+      ctx.lineTo(pX + pSize * 0.3, pY - pSize * 0.45);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(pX - pSize * 0.55, pY + pSize * 0.15);
+      ctx.lineTo(pX - pSize * 0.25, pY + pSize * 0.38);
+      ctx.lineTo(pX, pY + pSize * 0.18);
+      ctx.lineTo(pX + pSize * 0.25, pY + pSize * 0.38);
+      ctx.lineTo(pX + pSize * 0.55, pY + pSize * 0.15);
+      ctx.lineTo(pX, pY + pSize * 0.55);
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // 5. Bubbling Witch's Cauldron
+      const cauldX = -w * 0.82;
+      const cauldY = -h * 0.18;
+      const cauldR = h * 0.20;
+
+      ctx.fillStyle = '#0f051a';
+      ctx.strokeStyle = '#2d1348';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cauldX, cauldY, cauldR, 0.2, Math.PI - 0.2);
+      ctx.lineTo(cauldX - cauldR * 1.1, cauldY - 4);
+      ctx.lineTo(cauldX + cauldR * 1.1, cauldY - 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#a3e635';
+      ctx.shadowColor = '#4ade80';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.ellipse(cauldX, cauldY - 4, cauldR * 0.95, 4.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      for (let b = 1; b <= 3; b++) {
+        const bubProg = ((now * 0.0015 + b * 0.35) % 1);
+        const bubY = (cauldY - 6) - (bubProg * 24);
+        const bubX = cauldX + Math.sin(now * 0.004 + b) * 8;
+        const bubAlpha = (1 - bubProg) * 0.75;
+        ctx.fillStyle = 'rgba(163, 230, 53, ' + bubAlpha + ')';
+        ctx.beginPath();
+        ctx.arc(bubX, bubY, 2.2 * (1 - bubProg * 0.5), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 6. Sinister Glowing Eyes in Dark Cave Hollow (blinking)
+      const eyeBlink = Math.sin(now * 0.002) > 0.9 ? 0 : 1;
+      if (eyeBlink > 0) {
+        const eyeX = -w * 0.48;
+        const eyeY = -h * 0.15;
+        ctx.fillStyle = '#ef4444';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.ellipse(eyeX - 4, eyeY, 2.5, 1.4, -0.2, 0, Math.PI * 2);
+        ctx.ellipse(eyeX + 4, eyeY, 2.5, 1.4, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
 
       ctx.restore();
     }
@@ -4786,50 +5228,7 @@ const activeKey = getCurrentMonthKey();
       ctx.arc(moonX - moonR * 0.1, moonY + moonR * 0.35, moonR * 0.25, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. Distant Highland Mountain Ridge Layers
-      const mtnBaseY = height * 0.78;
-
-      // Far Mountain Ridge (Deep Twilight Slate/Purple)
-      ctx.fillStyle = 'rgba(24, 12, 34, 0.75)';
-      ctx.beginPath();
-      ctx.moveTo(0, mtnBaseY);
-      ctx.lineTo(0, height * 0.50);
-      ctx.lineTo(width * 0.18, height * 0.44);
-      ctx.lineTo(width * 0.35, height * 0.48);
-      ctx.lineTo(width * 0.52, height * 0.40);
-      ctx.lineTo(width * 0.70, height * 0.44);
-      ctx.lineTo(width * 0.88, height * 0.38);
-      ctx.lineTo(width, height * 0.46);
-      ctx.lineTo(width, height);
-      ctx.lineTo(0, height);
-      ctx.closePath();
-      ctx.fill();
-
-      // Mid Mountain Ridge (Darker Indigo Silhouette)
-      ctx.fillStyle = 'rgba(16, 8, 24, 0.88)';
-      ctx.beginPath();
-      ctx.moveTo(0, mtnBaseY);
-      ctx.lineTo(0, height * 0.56);
-      ctx.lineTo(width * 0.22, height * 0.50);
-      ctx.lineTo(width * 0.42, height * 0.54);
-      ctx.lineTo(width * 0.62, height * 0.46);
-      ctx.lineTo(width * 0.82, height * 0.50);
-      ctx.lineTo(width, height * 0.48);
-      ctx.lineTo(width, height);
-      ctx.lineTo(0, height);
-      ctx.closePath();
-      ctx.fill();
-
-      // 3. Atmospheric Mountain Base Mist
-      const mistGrad = ctx.createLinearGradient(0, height * 0.48, 0, height * 0.75);
-      mistGrad.addColorStop(0, 'transparent');
-      mistGrad.addColorStop(0.5, 'rgba(254, 240, 138, 0.08)');
-      mistGrad.addColorStop(0.8, 'rgba(245, 158, 11, 0.05)');
-      mistGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = mistGrad;
-      ctx.fillRect(0, height * 0.48, width, height * 0.27);
-
-      // 4. Castle Scale & Positioning
+      // 2. Castle Scale & Positioning
       const cBaseX = width * 0.54;
       const cBaseY = height * 0.68;
       const cW = Math.min(Math.max(width * 0.44, 400), 580);
@@ -5223,8 +5622,12 @@ const activeKey = getCurrentMonthKey();
         else if (p.type === 'palm_tree') drawPalmTree(ctx, p.x, p.y, p.size, p.alpha);
         else if (p.type === 'coral') drawCoral(ctx, p.x, p.y, p.size, p.alpha);
         else if (p.type === 'mushroom') drawMushroom(ctx, p.x, p.y, p.size, p.alpha);
-        else if (p.type === 'pumpkin') drawJackOLantern(ctx, p.x, p.y, p.size, p.glow);
+        else if (p.type === 'pumpkin') {
+          const glow = 0.7 + 0.3 * Math.sin(now * 0.0025 + p.x);
+          drawJackOLantern(ctx, p.x, p.y, p.size, glow);
+        }
         else if (p.type === 'grave') drawGrave(ctx, p.x, p.y, p.width, p.height, p.alpha);
+        else if (p.type === 'cobweb') drawCobweb(ctx, p.corner, p.size, p.alpha, now);
         else if (p.type === 'glacier') {
           ctx.save();
           ctx.fillStyle = `rgba(56, 219, 245, ${p.alpha * 0.4})`;
@@ -5601,6 +6004,183 @@ const activeKey = getCurrentMonthKey();
           ctx.arc(8, 0, 2.0, 0, Math.PI * 2);
           ctx.fill();
           ctx.shadowBlur = 0;
+
+          ctx.restore();
+        } else if (e.type === 'witch_flight') {
+          e.x += e.vx;
+          e.hover = (e.hover || 0) + 0.025;
+          if (e.x > width + 80) e.x = -80;
+          ctx.save();
+          const wy = e.y + Math.sin(e.hover) * 6;
+          ctx.translate(e.x, wy);
+          ctx.globalAlpha = 0.92;
+
+          // 1. Magical Purple / Gold Star Sparkle Trail
+          const trailGrad = ctx.createLinearGradient(-45, 0, 0, 0);
+          trailGrad.addColorStop(0, 'transparent');
+          trailGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.35)');
+          trailGrad.addColorStop(1, 'rgba(254, 240, 138, 0.85)');
+          ctx.strokeStyle = trailGrad;
+          ctx.lineWidth = 2.0;
+          ctx.beginPath();
+          ctx.moveTo(-45, 3);
+          ctx.quadraticCurveTo(-20, 1, 0, 0);
+          ctx.stroke();
+
+          // 2. Wooden Flying Broomstick
+          ctx.strokeStyle = '#78350f';
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(-22, 6);
+          ctx.lineTo(16, -4);
+          ctx.stroke();
+
+          // Broom Bristle Straw Tail
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.moveTo(-22, 6);
+          ctx.lineTo(-32, 2);
+          ctx.lineTo(-34, 11);
+          ctx.closePath();
+          ctx.fill();
+
+          // 3. Cute Anime Witch Silhouette
+          ctx.fillStyle = '#1c0d2e';
+          ctx.beginPath();
+          ctx.moveTo(2, -2);
+          ctx.lineTo(-8, 6);
+          ctx.lineTo(6, 6);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#581c87';
+          ctx.beginPath();
+          ctx.moveTo(-2, -6);
+          ctx.quadraticCurveTo(-14, -2, -18, 5);
+          ctx.lineTo(-4, 4);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#1c0d2e';
+          ctx.beginPath();
+          ctx.arc(2, -8, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#3b0764';
+          ctx.beginPath();
+          ctx.ellipse(2, -9, 10, 2.5, -0.15, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(-4, -9);
+          ctx.quadraticCurveTo(0, -18, -2, -24);
+          ctx.lineTo(6, -9);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#f97316';
+          ctx.fillRect(-2, -12, 6, 2);
+
+          // 4. Familiar Black Cat sitting on broom
+          ctx.fillStyle = '#090214';
+          ctx.beginPath();
+          ctx.ellipse(-14, 2, 3.5, 2.5, -0.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(-16, -1, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(-18, -3); ctx.lineTo(-17, -5); ctx.lineTo(-16, -3);
+          ctx.moveTo(-16, -3); ctx.lineTo(-15, -5); ctx.lineTo(-14, -3);
+          ctx.fill();
+          ctx.fillStyle = '#10b981';
+          ctx.shadowColor = '#10b981';
+          ctx.shadowBlur = 4;
+          ctx.fillRect(-17.5, -1.8, 1, 1);
+          ctx.shadowBlur = 0;
+
+          ctx.restore();
+        } else if (e.type === 'spooky_ghost' || e.type === 'ghost') {
+          e.x += e.vx;
+          e.hover = (e.hover || 0) + 0.03;
+          if (e.x > width + 40) e.x = -40;
+          if (e.x < -40) e.x = width + 40;
+          ctx.save();
+          ctx.translate(e.x, e.y + Math.sin(e.hover) * 8);
+          ctx.globalAlpha = e.alpha;
+
+          const gR = e.size * 0.6;
+
+          const gAura = ctx.createRadialGradient(0, 0, 2, 0, 0, gR * 1.5);
+          gAura.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+          gAura.addColorStop(0.5, 'rgba(192, 132, 252, 0.45)');
+          gAura.addColorStop(1, 'transparent');
+          ctx.fillStyle = gAura;
+          ctx.beginPath();
+          ctx.arc(0, 0, gR * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(0, -gR * 0.2, gR, Math.PI, 0);
+          ctx.lineTo(gR, gR * 1.1);
+
+          const folds = 4;
+          for (let f = folds; f >= 0; f--) {
+            const fx = ((f / folds) * 2 - 1) * gR;
+            const fy = gR * 1.1 + Math.sin(e.hover * 2 + f * 1.5) * 3.5;
+            ctx.lineTo(fx, fy);
+          }
+          ctx.lineTo(-gR, gR * 1.1);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#0f041c';
+          ctx.beginPath();
+          ctx.ellipse(-gR * 0.32, -gR * 0.25, 2.4, 3.8, -0.1, 0, Math.PI * 2);
+          ctx.ellipse(gR * 0.32, -gR * 0.25, 2.4, 3.8, 0.1, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.ellipse(0, gR * 0.2, 2.0, 3.2, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+        } else if (e.type === 'spooky_bat' || e.type === 'bat') {
+          e.x += e.vx;
+          e.wing = (e.wing || 0) + (e.wingSpeed || 0.2);
+          if (e.x > width + 40) e.x = -40;
+          ctx.save();
+          ctx.translate(e.x, e.y + Math.sin(now * 0.003 + e.x) * 6);
+          ctx.globalAlpha = e.alpha;
+
+          const flap = Math.sin(e.wing);
+          const bS = e.size;
+
+          ctx.fillStyle = '#12071f';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, bS * 0.3, bS * 0.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(-bS * 0.2, -bS * 0.1);
+          ctx.quadraticCurveTo(-bS * 0.7, -bS * (0.8 + flap * 0.5), -bS * 1.4, -bS * (0.2 + flap * 0.8));
+          ctx.quadraticCurveTo(-bS * 0.9, bS * (0.2 - flap * 0.4), -bS * 0.5, bS * 0.2);
+          ctx.quadraticCurveTo(-bS * 0.3, bS * 0.4, -bS * 0.1, bS * 0.3);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(bS * 0.2, -bS * 0.1);
+          ctx.quadraticCurveTo(bS * 0.7, -bS * (0.8 + flap * 0.5), bS * 1.4, -bS * (0.2 + flap * 0.8));
+          ctx.quadraticCurveTo(bS * 0.9, bS * (0.2 - flap * 0.4), bS * 0.5, bS * 0.2);
+          ctx.quadraticCurveTo(bS * 0.3, bS * 0.4, bS * 0.1, bS * 0.3);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(-1.5, -bS * 0.3, 0.9, 0.9);
+          ctx.fillRect(0.6, -bS * 0.3, 0.9, 0.9);
 
           ctx.restore();
         } else if (e.type === 'jellyfish_abyss') {
