@@ -126,7 +126,8 @@ const currentTheme = getCurrentTheme();
     const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
     function getAutoMonthKey() {
-      return 'jan';
+      const monthIdx = new Date().getMonth();
+      return MONTH_KEYS[monthIdx] || 'sep';
     }
 
     const btn = document.getElementById('theme-selector-btn');
@@ -137,7 +138,7 @@ const currentTheme = getCurrentTheme();
     const resetBtn = document.getElementById('theme-reset-auto');
     const optionBtns = document.querySelectorAll('.theme-option-btn');
 
-    let currentActive = 'jan';
+    let currentActive = getAutoMonthKey();
 
     function updateActiveUI(key, isAuto = false) {
       currentActive = key;
