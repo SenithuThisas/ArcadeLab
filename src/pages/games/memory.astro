@@ -1,0 +1,75 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MemoryGame from '../../components/games/MemoryGame.astro';
+
+const title = 'Memory Match: Cyber Recall';
+const description = 'Test your cognitive recall in this handcrafted 3D card flipping memory puzzle. Multiple difficulty tiers, real-time moves and timer, and local best score tracking.';
+---
+
+<Layout title={title} description={description}>
+  <main class="max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-3 space-y-2 sm:space-y-3">
+    
+    <!-- ── Compact Header: Back Link + Game Title on one line ────────────── -->
+    <header class="flex items-center justify-between gap-2 px-1">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 text-xs font-mono text-[var(--color-muted)] hover:text-[var(--color-brand)] transition-colors group shrink-0"
+      >
+        <span class="group-hover:-translate-x-1 transition-transform">←</span>
+        <span>Back to Arcade Vault</span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <h1 class="text-sm sm:text-base font-heading font-bold text-[var(--color-text)] tracking-tight">
+          Memory Match: <span class="theme-headline-gradient">Cyber Recall</span>
+        </h1>
+      </div>
+    </header>
+
+    <!-- ── Interactive Memory Game Component ───────────────────────────── -->
+    <section aria-label="Interactive Memory Game Board" class="w-full">
+      <MemoryGame />
+    </section>
+
+    <!-- ── Collapsible Info & Guide (Does not push game down) ──────────── -->
+    <details class="how-to-play-details group pt-1 pb-4">
+      <summary class="flex items-center justify-center gap-2 cursor-pointer text-xs font-mono text-[var(--color-muted)] hover:text-[var(--color-brand)] transition-colors select-none py-1">
+        <span>📖 How to play, keyboard controls & records</span>
+        <span class="transition-transform group-open:rotate-180 text-[10px]">▼</span>
+      </summary>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-[var(--color-border)]/50">
+        <div class="p-3.5 rounded-xl bg-[var(--color-surface)]/80 border border-[var(--color-border)] space-y-1.5">
+          <div class="flex items-center gap-2 text-[var(--color-brand)] font-heading font-bold text-xs sm:text-sm">
+            <span>🧠</span>
+            <h3 class="text-xs sm:text-sm">Rules & Matching</h3>
+          </div>
+          <p class="text-[11px] sm:text-xs text-[var(--color-muted)] leading-relaxed">
+            Select two cards per turn. If symbols match, they stay face-up in emerald glow. If they don't match, they shake and flip back after 800ms.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-[var(--color-surface)]/80 border border-[var(--color-border)] space-y-1.5">
+          <div class="flex items-center gap-2 text-[var(--color-brand)] font-heading font-bold text-xs sm:text-sm">
+            <span>⌨️</span>
+            <h3 class="text-xs sm:text-sm">Keyboard Controls</h3>
+          </div>
+          <p class="text-[11px] sm:text-xs text-[var(--color-muted)] leading-relaxed">
+            Fully accessible without a mouse. Navigate through cards using <kbd class="px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)] font-mono text-[10px]">Tab</kbd>, and flip with <kbd class="px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)] font-mono text-[10px]">Space</kbd> or <kbd class="px-1.5 py-0.5 rounded bg-[var(--color-surface-2)] border border-[var(--color-border)] font-mono text-[10px]">Enter</kbd>.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-[var(--color-surface)]/80 border border-[var(--color-border)] space-y-1.5">
+          <div class="flex items-center gap-2 text-[var(--color-brand)] font-heading font-bold text-xs sm:text-sm">
+            <span>💾</span>
+            <h3 class="text-xs sm:text-sm">Records & Tiers</h3>
+          </div>
+          <p class="text-[11px] sm:text-xs text-[var(--color-muted)] leading-relaxed">
+            Choose from Easy 3×4 (6 pairs), Medium 4×4 (8 pairs), or Hard 6×6 (18 pairs). Best moves and elapsed times persist in your browser's offline storage.
+          </p>
+        </div>
+      </div>
+    </details>
+
+  </main>
+</Layout>
