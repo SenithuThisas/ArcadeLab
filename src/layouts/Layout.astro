@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import SeasonalBackground from '../components/SeasonalBackground.astro';
 import SeasonalAudio from '../components/SeasonalAudio.astro';
+import { getCurrentMonthKey } from '../lib/seasonalThemes';
 
 interface Props {
   title: string;
@@ -16,10 +17,11 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadelab.vercel.app');
+const activeSeason = getCurrentMonthKey();
 ---
 
 <!doctype html>
-<html lang="en" class="antialiased">
+<html lang="en" class="antialiased" data-season-theme={activeSeason}>
   <head>
     <!-- ── Core meta ── -->
     <meta charset="UTF-8" />
@@ -192,6 +194,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://arcadela
         >
           <span>🌸</span>
           Chroma Bloom
+        </a>
+        <a
+          href="/games/memory"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--color-muted)]
+                 hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)]
+                 transition-colors duration-150"
+        >
+          <span>🃏</span>
+          Memory Match
         </a>
       </div>
     </header>

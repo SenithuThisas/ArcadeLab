@@ -1,0 +1,1136 @@
+---
+// MemoryGame.astro - Pure Vanilla JS Interactive Memory Match Game
+---
+
+<div
+  id="memory-game-card"
+  class="memory-game-card relative w-full max-w-[800px] mx-auto rounded-[22px] border border-[rgba(245,158,11,0.2)] bg-[rgba(15,10,28,0.88)] backdrop-blur-md p-2.5 sm:p-4 shadow-[0_16px_40px_-8px_rgba(0,0,0,0.65),0_0_28px_0_rgba(245,158,11,0.12)] space-y-2.5 sm:space-y-3 z-10 overflow-hidden"
+>
+  <!-- ── Accessibility Live Region ─────────────────────────────────────── -->
+  <div
+    id="memory-announcer"
+    class="sr-only"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+  <!-- ── Top Row: Difficulty Selector (Left) & Controls (Right) ────────── -->
+  <div class="flex items-center justify-between gap-2">
+    <!-- Difficulty Selector -->
+    <div
+      class="flex items-center gap-1 p-0.5 sm:p-1 rounded-xl bg-[var(--color-base)]/85 border border-[var(--color-border)]"
+      role="group"
+      aria-label="Select Game Difficulty"
+    >
+      <button
+        type="button"
+        data-difficulty-btn="easy"
+        class="diff-btn px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-all duration-150 cursor-pointer"
+        aria-pressed="false"
+      >
+        Easy <span class="hidden xs:inline text-[10px] opacity-75">3×4</span>
+      </button>
+
+      <button
+        type="button"
+        data-difficulty-btn="medium"
+        class="diff-btn px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-all duration-150 cursor-pointer"
+        aria-pressed="true"
+      >
+        Medium <span class="hidden xs:inline text-[10px] opacity-75">4×4</span>
+      </button>
+
+      <button
+        type="button"
+        data-difficulty-btn="hard"
+        class="diff-btn px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-all duration-150 cursor-pointer"
+        aria-pressed="false"
+      >
+        Hard <span class="hidden xs:inline text-[10px] opacity-75">6×6</span>
+      </button>
+    </div>
+
+    <!-- Actions: Sound Toggle & Restart Button -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <!-- Mute / Unmute Button -->
+      <button
+        id="memory-sound-btn"
+        type="button"
+        class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-[var(--color-muted)] hover:text-[var(--color-brand)] bg-[var(--color-surface-2)]/80 border border-[var(--color-border)] hover:border-[var(--color-brand)]/40 transition-all cursor-pointer"
+        aria-label="Toggle sound effects"
+        aria-pressed="false"
+        title="Toggle audio"
+      >
+        <!-- Unmuted Icon -->
+        <svg id="sound-icon-on" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <!-- Muted Icon -->
+        <svg id="sound-icon-off" class="w-4 h-4 hidden text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </button>
+
+      <!-- Restart Button -->
+      <button
+        id="memory-restart-btn"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold tracking-wide
+               bg-[var(--color-surface-2)]/80 hover:bg-[var(--color-brand)] text-[var(--color-text)] hover:text-[#0b0e1b]
+               border border-[var(--color-border)] hover:border-[var(--color-brand)]
+               active:scale-95 transition-all duration-150 shadow-sm cursor-pointer"
+        aria-label="Restart current game"
+      >
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+        <span>Restart</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Main Area: Left-Side Moves & Scoreboard + Right-Side Card Grid ── -->
+  <div class="game-main-area flex flex-row items-stretch justify-center gap-2 sm:gap-4 w-full">
+    
+    <!-- ── Left Side Moves & Scoreboard Panel ──────────────────────────── -->
+    <aside
+      class="scoreboard-sidebar flex flex-col justify-between w-[76px] xs:w-24 sm:w-44 shrink-0 p-1.5 sm:p-3 rounded-2xl bg-[var(--color-surface-2)]/40 border border-[var(--color-border)]/80 select-none space-y-1.5 sm:space-y-2"
+      aria-label="Game Statistics"
+    >
+      <!-- Moves -->
+      <div class="stat-card p-1.5 sm:p-2.5 rounded-xl bg-[var(--color-base)]/70 border border-[var(--color-border)]/60 flex flex-col items-center sm:items-start text-center sm:text-left transition-all">
+        <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-[var(--color-muted)]">Moves</span>
+        <span id="stat-moves" class="text-sm sm:text-2xl font-mono font-bold text-[var(--color-brand)] leading-tight mt-0.5">0</span>
+      </div>
+
+      <!-- Elapsed Time -->
+      <div class="stat-card p-1.5 sm:p-2.5 rounded-xl bg-[var(--color-base)]/70 border border-[var(--color-border)]/60 flex flex-col items-center sm:items-start text-center sm:text-left transition-all">
+        <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-[var(--color-muted)]">Time</span>
+        <span id="stat-time" class="text-sm sm:text-2xl font-mono font-bold text-[var(--color-text)] leading-tight mt-0.5">0:00</span>
+      </div>
+
+      <!-- Matches -->
+      <div class="stat-card p-1.5 sm:p-2.5 rounded-xl bg-[var(--color-base)]/70 border border-[var(--color-border)]/60 flex flex-col items-center sm:items-start text-center sm:text-left transition-all">
+        <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-[var(--color-muted)]">Matches</span>
+        <span id="stat-matches" class="text-sm sm:text-2xl font-mono font-bold text-emerald-400 leading-tight mt-0.5">0 / 8</span>
+      </div>
+
+      <!-- Best Record -->
+      <div class="stat-card p-1.5 sm:p-2.5 rounded-xl bg-[var(--color-base)]/70 border border-[var(--color-border)]/60 flex flex-col items-center sm:items-start text-center sm:text-left truncate max-w-full transition-all">
+        <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-[var(--color-muted)]">Best</span>
+        <span id="stat-best" class="text-[10px] sm:text-xs font-mono font-semibold text-amber-300 leading-tight mt-0.5 truncate max-w-full">--</span>
+      </div>
+    </aside>
+
+    <!-- ── Right Side: Card Grid Viewport Fitted Container ───────────── -->
+    <div class="grid-viewport-wrap relative flex-1 flex items-center justify-center min-w-0">
+      <div
+        id="memory-grid"
+        class="memory-grid grid-medium"
+        role="region"
+        aria-label="Memory match cards board"
+      >
+        <!-- Cards hydrated by JavaScript via template -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Victory Modal Dialog Overlay (Inside Game Card) ──────────────── -->
+  <div
+    id="memory-win-modal"
+    class="hidden absolute inset-0 z-30 flex items-center justify-center p-4 backdrop-blur-md bg-black/75 rounded-[22px] transition-all duration-300"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="win-dialog-title"
+  >
+    <div class="w-full max-w-sm p-5 sm:p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-brand)] shadow-[0_0_40px_rgba(245,158,11,0.25)] text-center space-y-3.5 animate-win-pop">
+      <div class="w-12 h-12 mx-auto rounded-xl bg-[var(--color-brand)]/15 border border-[var(--color-brand)]/40 flex items-center justify-center text-2xl shadow-inner">
+        🏆
+      </div>
+
+      <div class="space-y-1">
+        <h2 id="win-dialog-title" class="text-xl sm:text-2xl font-heading font-bold text-[var(--color-text)]">
+          Board Cleared!
+        </h2>
+        <p id="win-dialog-subtitle" class="text-xs text-[var(--color-muted)] font-mono">
+          Outstanding memory recall!
+        </p>
+      </div>
+
+      <!-- Win Stats Breakdown -->
+      <div class="grid grid-cols-2 gap-2.5 py-1">
+        <div class="p-2.5 rounded-xl bg-[var(--color-base)]/80 border border-[var(--color-border)]">
+          <span class="text-[10px] font-mono text-[var(--color-muted)] uppercase block">Moves</span>
+          <span id="win-stat-moves" class="text-lg font-mono font-bold text-[var(--color-brand)]">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-[var(--color-base)]/80 border border-[var(--color-border)]">
+          <span class="text-[10px] font-mono text-[var(--color-muted)] uppercase block">Time</span>
+          <span id="win-stat-time" class="text-lg font-mono font-bold text-[var(--color-text)]">0:00</span>
+        </div>
+      </div>
+
+      <!-- High score notification badge -->
+      <div id="win-best-record-badge" class="hidden items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-semibold">
+        <span>🌟</span>
+        <span>New Personal Best!</span>
+      </div>
+
+      <!-- Action Button -->
+      <div class="pt-1">
+        <button
+          id="memory-play-again-btn"
+          type="button"
+          class="w-full py-2.5 px-5 rounded-xl font-heading font-bold text-xs sm:text-sm tracking-wide
+                 bg-gradient-to-r from-[var(--color-brand)] to-[#ff8c42] text-[#0b0e1b]
+                 hover:brightness-110 active:scale-[0.98] shadow-md shadow-[var(--color-brand)]/20
+                 transition-all duration-150 cursor-pointer"
+        >
+          Play Again →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lightweight Confetti Canvas Overlay ───────────────────────────── -->
+  <canvas
+    id="memory-confetti-canvas"
+    class="pointer-events-none absolute inset-0 w-full h-full z-25 hidden"
+    aria-hidden="true"
+  ></canvas>
+
+  <!-- ── Template for Memory Cards ─────────────────────────────────────── -->
+  <template id="memory-card-template">
+    <button
+      type="button"
+      class="memory-card group"
+      data-index=""
+      aria-label=""
+      aria-disabled="false"
+    >
+      <div class="card-inner">
+        <!-- Back Face (Face-down) -->
+        <div class="card-face card-back" aria-hidden="true">
+          <div class="card-back-pattern"></div>
+          <div class="card-back-icon">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[var(--color-brand)] opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-150" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="20" height="12" rx="3" />
+              <path d="M6 12h4m-2-2v4" />
+              <line x1="15" y1="11" x2="15.01" y2="11" />
+              <line x1="18" y1="13" x2="18.01" y2="13" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Front Face (Revealed when flipped) -->
+        <div class="card-face card-front" aria-hidden="true">
+          <span class="card-emoji select-none"></span>
+        </div>
+      </div>
+    </button>
+  </template>
+</div>
+
+<style>
+  /* ── 3D Perspective & Viewport Sizing ─────────────────────────────────────── */
+  .grid-viewport-wrap {
+    perspective: 1200px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* 
+    Adaptive Card Grid:
+    Sized by min() of available width and viewport height budget (using dvh).
+    Ensures complete visibility on 1366x768 and 360x640 without scrolling.
+  */
+  .memory-grid {
+    --avail-h: min(calc(100dvh - 170px), 520px);
+    display: grid;
+    margin: 0 auto;
+    transition: width 0.2s ease, max-height 0.2s ease;
+  }
+
+  @media (max-width: 640px) {
+    .memory-grid {
+      --avail-h: min(calc(100dvh - 150px), 380px);
+    }
+  }
+
+  /* Easy: 4 cols × 3 rows */
+  .grid-easy {
+    --grid-cols: 4;
+    --grid-rows: 3;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    aspect-ratio: 4 / 3;
+    gap: 0.45rem;
+    width: min(100%, calc(var(--avail-h) * (4 / 3)));
+    max-height: var(--avail-h);
+  }
+
+  /* Medium: 4 cols × 4 rows */
+  .grid-medium {
+    --grid-cols: 4;
+    --grid-rows: 4;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    aspect-ratio: 1 / 1;
+    gap: 0.4rem;
+    width: min(100%, var(--avail-h));
+    max-height: var(--avail-h);
+  }
+
+  /* Hard: 6 cols × 6 rows */
+  .grid-hard {
+    --grid-cols: 6;
+    --grid-rows: 6;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    aspect-ratio: 1 / 1;
+    gap: 0.25rem;
+    width: min(100%, var(--avail-h));
+    max-height: var(--avail-h);
+  }
+
+  @media (min-width: 640px) {
+    .grid-easy { gap: 0.65rem; }
+    .grid-medium { gap: 0.55rem; }
+    .grid-hard { gap: 0.35rem; }
+  }
+
+  /* ── Card Button & 3D Structure ─────────────────────────────────────────── */
+  .memory-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    border-radius: 0.75rem;
+  }
+
+  .memory-card:focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: 0.75rem;
+    will-change: transform;
+  }
+
+  /* Hover micro-interaction when face-down */
+  .memory-card:hover:not(.is-matched):not(.is-flipped):not([aria-disabled="true"]) .card-inner {
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  /* Active Flip State: 180deg Y rotation */
+  .memory-card.is-flipped .card-inner,
+  .memory-card.is-matched .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  /* ── Card Faces (Back and Front) ─────────────────────────────────────────── */
+  .card-face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.75rem;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  /* Back Face (Face-down) */
+  .card-back {
+    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-2) 100%);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .card-back-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    background-image: radial-gradient(var(--color-brand) 1px, transparent 1px);
+    background-size: 8px 8px;
+    pointer-events: none;
+  }
+
+  .card-back-icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58%;
+    height: 58%;
+    border-radius: 9999px;
+    background: var(--color-base)/50;
+    border: 1px dashed var(--color-border);
+  }
+
+  /* Front Face (Face-up) */
+  .card-front {
+    background: linear-gradient(135deg, var(--color-surface-2) 0%, var(--color-surface) 100%);
+    transform: rotateY(180deg);
+    border-color: rgba(245, 158, 11, 0.45);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  }
+
+  .card-emoji {
+    font-size: clamp(1.1rem, 3.4vw, 2.1rem);
+    line-height: 1;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+  }
+
+  .grid-hard .card-emoji {
+    font-size: clamp(0.75rem, 2.3vw, 1.35rem);
+  }
+
+  /* ── Successful Match Animation: Pop (scale to ~1.08) & Emerald Glow ─────── */
+  .memory-card.is-matched .card-inner {
+    animation: matchPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes matchPop {
+    0% { transform: rotateY(180deg) scale(1); }
+    50% { transform: rotateY(180deg) scale(1.08); }
+    100% { transform: rotateY(180deg) scale(1); }
+  }
+
+  .memory-card.is-matched .card-front {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, var(--color-surface-2) 100%);
+    border-color: #10b981;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.45);
+  }
+
+  /* ── Mismatch Animation: Horizontal Shake on both cards ─────────────────── */
+  .memory-card.is-mismatch .card-front {
+    border-color: rgba(239, 68, 68, 0.7);
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+  }
+
+  .memory-card.is-mismatch .card-inner {
+    animation: mismatchShake 0.4s ease-in-out;
+  }
+
+  @keyframes mismatchShake {
+    0%, 100% { transform: rotateY(180deg) translateX(0); }
+    20% { transform: rotateY(180deg) translateX(-5px); }
+    40% { transform: rotateY(180deg) translateX(5px); }
+    60% { transform: rotateY(180deg) translateX(-3px); }
+    80% { transform: rotateY(180deg) translateX(3px); }
+  }
+
+  /* ── Match Particles (Emoji Sparkles & Glowing Dots) ─────────────────────── */
+  :global(.memory-particle) {
+    position: absolute;
+    pointer-events: none;
+    z-index: 28;
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.6);
+    opacity: 1;
+    animation: particleBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, opacity;
+    line-height: 1;
+    user-select: none;
+  }
+
+  :global(.memory-particle-dot) {
+    display: block;
+    border-radius: 9999px;
+  }
+
+  @keyframes particleBurst {
+    0% {
+      transform: translate(-50%, -50%) translate(0, 0) scale(0.6);
+      opacity: 1;
+    }
+    60% {
+      opacity: 0.9;
+    }
+    100% {
+      transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1.1);
+      opacity: 0;
+    }
+  }
+
+  /* ── Win Pop Modal Animation ─────────────────────────────────────────────── */
+  @keyframes winPop {
+    0% { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-win-pop {
+    animation: winPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* ── Active Difficulty Button ────────────────────────────────────────────── */
+  .diff-btn[aria-pressed="true"] {
+    background-color: var(--color-brand);
+    color: #0b0e1b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  }
+  .diff-btn[aria-pressed="false"] {
+    color: var(--color-muted);
+  }
+  .diff-btn[aria-pressed="false"]:hover {
+    color: var(--color-text);
+    background-color: var(--color-surface-2);
+  }
+
+  /* ── Sound Toggle Active State ──────────────────────────────────────────── */
+  .sound-btn[aria-pressed="true"] {
+    border-color: rgba(239, 68, 68, 0.4);
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+
+  /* ── Prefers-Reduced-Motion ──────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .card-inner {
+      transition: opacity 0.15s ease !important;
+      transform-style: flat !important;
+    }
+    .card-face {
+      backface-visibility: visible !important;
+      -webkit-backface-visibility: visible !important;
+    }
+    .card-front {
+      display: none;
+      transform: none !important;
+    }
+    .memory-card.is-flipped .card-inner,
+    .memory-card.is-matched .card-inner {
+      transform: none !important;
+      animation: none !important;
+    }
+    .memory-card.is-flipped .card-back,
+    .memory-card.is-matched .card-back {
+      display: none;
+    }
+    .memory-card.is-flipped .card-front,
+    .memory-card.is-matched .card-front {
+      display: flex;
+    }
+    .memory-card.is-matched .card-inner {
+      animation: none !important;
+    }
+    .memory-card.is-matched .card-front {
+      border-color: #10b981 !important;
+      background: rgba(16, 185, 129, 0.25) !important;
+      box-shadow: none !important;
+    }
+    .memory-card.is-mismatch .card-inner {
+      animation: none !important;
+    }
+    .memory-card.is-mismatch .card-front {
+      border-color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.25) !important;
+      box-shadow: none !important;
+    }
+    .animate-win-pop {
+      animation: none !important;
+    }
+    :global(.memory-particle) {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  import {
+    DIFFICULTIES,
+    buildDeck,
+    checkMatch,
+    getBestScore,
+    saveBestScore,
+    formatTime,
+    type Difficulty,
+    type Card,
+  } from '../../lib/memory';
+
+  import {
+    playFlip,
+    playMatch,
+    playMismatch,
+    playWin,
+    isMuted,
+    toggleMute,
+  } from '../../lib/sounds';
+
+  interface MemoryGameState {
+    difficulty: Difficulty;
+    deck: Card[];
+    flippedIndices: number[];
+    matchedIndices: Set<number>;
+    moves: number;
+    locked: boolean;
+    timerIntervalId: number | null;
+    mismatchTimeoutId: number | null;
+    timerStartTime: number | null;
+    elapsedSeconds: number;
+    isWon: boolean;
+    isStarted: boolean;
+  }
+
+  interface ConfettiParticle {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    color: string;
+    size: number;
+    rotation: number;
+    rotationSpeed: number;
+    opacity: number;
+  }
+
+  let state: MemoryGameState = {
+    difficulty: 'medium',
+    deck: [],
+    flippedIndices: [],
+    matchedIndices: new Set(),
+    moves: 0,
+    locked: false,
+    timerIntervalId: null,
+    mismatchTimeoutId: null,
+    timerStartTime: null,
+    elapsedSeconds: 0,
+    isWon: false,
+    isStarted: false,
+  };
+
+  let activeParticles: HTMLElement[] = [];
+  let confettiAnimId: number | null = null;
+
+  function announce(message: string): void {
+    const announcer = document.getElementById('memory-announcer');
+    if (announcer) {
+      announcer.textContent = message;
+    }
+  }
+
+  function clearActiveParticles(): void {
+    activeParticles.forEach((p) => {
+      if (p.parentNode) {
+        p.remove();
+      }
+    });
+    activeParticles = [];
+  }
+
+  function stopConfetti(): void {
+    if (confettiAnimId !== null) {
+      cancelAnimationFrame(confettiAnimId);
+      confettiAnimId = null;
+    }
+    const canvas = document.getElementById('memory-confetti-canvas') as HTMLCanvasElement | null;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.classList.add('hidden');
+    }
+  }
+
+  function clearAllTimersAndEffects(): void {
+    if (state.timerIntervalId !== null) {
+      window.clearInterval(state.timerIntervalId);
+      state.timerIntervalId = null;
+    }
+    if (state.mismatchTimeoutId !== null) {
+      window.clearTimeout(state.mismatchTimeoutId);
+      state.mismatchTimeoutId = null;
+    }
+    clearActiveParticles();
+    stopConfetti();
+  }
+
+  function updateHUD(): void {
+    const movesEl = document.getElementById('stat-moves');
+    const timeEl = document.getElementById('stat-time');
+    const matchesEl = document.getElementById('stat-matches');
+    const bestEl = document.getElementById('stat-best');
+
+    const config = DIFFICULTIES[state.difficulty];
+    const pairsCount = state.matchedIndices.size / 2;
+
+    if (movesEl) movesEl.textContent = String(state.moves);
+    if (timeEl) timeEl.textContent = formatTime(state.elapsedSeconds);
+    if (matchesEl) matchesEl.textContent = `${pairsCount} / ${config.pairs}`;
+
+    if (bestEl) {
+      const best = getBestScore(state.difficulty);
+      if (best) {
+        bestEl.textContent = `${best.moves}m (${formatTime(best.timeSeconds)})`;
+      } else {
+        bestEl.textContent = '--';
+      }
+    }
+  }
+
+  function startTimer(): void {
+    if (state.isStarted) return;
+    state.isStarted = true;
+    state.timerStartTime = Date.now();
+
+    state.timerIntervalId = window.setInterval(() => {
+      if (!state.timerStartTime || state.isWon) return;
+      const now = Date.now();
+      state.elapsedSeconds = Math.floor((now - state.timerStartTime) / 1000);
+      const timeEl = document.getElementById('stat-time');
+      if (timeEl) {
+        timeEl.textContent = formatTime(state.elapsedSeconds);
+      }
+    }, 1000);
+  }
+
+  function renderGrid(): void {
+    const grid = document.getElementById('memory-grid');
+    const template = document.getElementById('memory-card-template') as HTMLTemplateElement | null;
+    if (!grid || !template) return;
+
+    grid.className = `memory-grid grid-${state.difficulty}`;
+    grid.setAttribute('data-difficulty', state.difficulty);
+    grid.replaceChildren();
+
+    const fragment = document.createDocumentFragment();
+
+    state.deck.forEach((card, index) => {
+      const clone = template.content.cloneNode(true) as DocumentFragment;
+      const cardBtn = clone.querySelector('.memory-card') as HTMLButtonElement | null;
+      const emojiSpan = clone.querySelector('.card-emoji') as HTMLElement | null;
+
+      if (cardBtn && emojiSpan) {
+        cardBtn.dataset.index = String(index);
+        cardBtn.setAttribute('aria-label', `Card ${index + 1}, face down`);
+        cardBtn.setAttribute('aria-disabled', 'false');
+        emojiSpan.textContent = card.emoji;
+        fragment.appendChild(clone);
+      }
+    });
+
+    grid.appendChild(fragment);
+  }
+
+  function spawnMatchParticles(cardEl: HTMLElement, containerEl: HTMLElement): void {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const cardRect = cardEl.getBoundingClientRect();
+    const containerRect = containerEl.getBoundingClientRect();
+
+    const centerX = cardRect.left - containerRect.left + cardRect.width / 2;
+    const centerY = cardRect.top - containerRect.top + cardRect.height / 2;
+
+    const particleCount = 10;
+    const emojis = ['✨', '💫', '⭐', '✦'];
+    const colors = ['#10b981', '#f59e0b', '#34d399', '#fbbf24', '#ffffff'];
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('span');
+      particle.className = 'memory-particle';
+
+      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+      const distance = 25 + Math.random() * 35;
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance;
+
+      particle.style.setProperty('--dx', `${dx.toFixed(1)}px`);
+      particle.style.setProperty('--dy', `${dy.toFixed(1)}px`);
+      particle.style.left = `${centerX.toFixed(1)}px`;
+      particle.style.top = `${centerY.toFixed(1)}px`;
+
+      if (Math.random() > 0.45) {
+        particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        particle.style.fontSize = `${11 + Math.random() * 5}px`;
+      } else {
+        particle.classList.add('memory-particle-dot');
+        const dotColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.backgroundColor = dotColor;
+        particle.style.boxShadow = `0 0 6px ${dotColor}`;
+        const size = 5 + Math.random() * 4;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+      }
+
+      containerEl.appendChild(particle);
+      activeParticles.push(particle);
+
+      particle.addEventListener('animationend', () => {
+        particle.remove();
+        const idx = activeParticles.indexOf(particle);
+        if (idx !== -1) activeParticles.splice(idx, 1);
+      });
+    }
+  }
+
+  function launchConfetti(containerEl: HTMLElement): void {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const canvas = document.getElementById('memory-confetti-canvas') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const rect = containerEl.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    canvas.classList.remove('hidden');
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const colors = ['#f59e0b', '#10b981', '#38bdf8', '#fbbf24', '#a855f7', '#ec4899', '#ffffff'];
+    const particles: ConfettiParticle[] = [];
+    const particleCount = 75;
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: rect.width / 2 + (Math.random() - 0.5) * 80,
+        y: rect.height * 0.65,
+        vx: (Math.random() - 0.5) * 11,
+        vy: -Math.random() * 10 - 4.5,
+        color: colors[i % colors.length],
+        size: Math.random() * 6 + 4,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 12,
+        opacity: 1,
+      });
+    }
+
+    const startTime = performance.now();
+
+    function animateConfetti(time: number) {
+      const elapsed = time - startTime;
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let aliveCount = 0;
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.vy += 0.26;
+        p.y += p.vy;
+        p.rotation += p.rotationSpeed;
+        if (elapsed > 1800) {
+          p.opacity = Math.max(0, p.opacity - 0.02);
+        }
+
+        if (p.y < canvas.height + 20 && p.opacity > 0) {
+          aliveCount++;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.globalAlpha = p.opacity;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        }
+      });
+
+      if (aliveCount > 0 && elapsed < 3500) {
+        confettiAnimId = requestAnimationFrame(animateConfetti);
+      } else {
+        stopConfetti();
+      }
+    }
+
+    confettiAnimId = requestAnimationFrame(animateConfetti);
+  }
+
+  function setDifficulty(newDifficulty: Difficulty): void {
+    state.difficulty = newDifficulty;
+
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-difficulty-btn]');
+    buttons.forEach((btn) => {
+      const isActive = btn.dataset.difficultyBtn === newDifficulty;
+      btn.setAttribute('aria-pressed', String(isActive));
+    });
+
+    resetGame();
+  }
+
+  function resetGame(): void {
+    clearAllTimersAndEffects();
+
+    state = {
+      ...state,
+      deck: buildDeck(state.difficulty),
+      flippedIndices: [],
+      matchedIndices: new Set(),
+      moves: 0,
+      locked: false,
+      timerIntervalId: null,
+      mismatchTimeoutId: null,
+      timerStartTime: null,
+      elapsedSeconds: 0,
+      isWon: false,
+      isStarted: false,
+    };
+
+    const winModal = document.getElementById('memory-win-modal');
+    if (winModal) {
+      winModal.classList.add('hidden');
+    }
+
+    renderGrid();
+    updateHUD();
+    announce(`New ${DIFFICULTIES[state.difficulty].label} game started. All cards face down.`);
+  }
+
+  function handleCardClick(index: number): void {
+    if (state.locked || state.isWon) return;
+    if (state.matchedIndices.has(index)) return;
+    if (state.flippedIndices.includes(index)) return;
+
+    if (!state.isStarted) {
+      startTimer();
+    }
+
+    const grid = document.getElementById('memory-grid');
+    const container = document.getElementById('memory-game-card');
+    if (!grid || !container) return;
+
+    const cardBtn = grid.querySelector<HTMLButtonElement>(`[data-index="${index}"]`);
+    if (!cardBtn) return;
+
+    const currentCard = state.deck[index];
+
+    // Card Flip Action
+    playFlip();
+    cardBtn.classList.add('is-flipped');
+    cardBtn.setAttribute('aria-label', `Card ${index + 1}, flipped: ${currentCard.name} ${currentCard.emoji}`);
+    state.flippedIndices.push(index);
+
+    if (state.flippedIndices.length === 1) {
+      announce(`Flipped Card ${index + 1}: ${currentCard.name}`);
+      return;
+    }
+
+    if (state.flippedIndices.length === 2) {
+      state.moves += 1;
+      updateHUD();
+
+      const [firstIdx, secondIdx] = state.flippedIndices;
+      const firstCard = state.deck[firstIdx];
+      const secondCard = state.deck[secondIdx];
+
+      const firstBtn = grid.querySelector<HTMLButtonElement>(`[data-index="${firstIdx}"]`);
+      const secondBtn = grid.querySelector<HTMLButtonElement>(`[data-index="${secondIdx}"]`);
+
+      const isMatch = checkMatch(firstCard, secondCard);
+
+      if (isMatch) {
+        // Match Action
+        playMatch();
+        state.matchedIndices.add(firstIdx);
+        state.matchedIndices.add(secondIdx);
+        state.flippedIndices = [];
+
+        if (firstBtn && secondBtn) {
+          firstBtn.classList.add('is-matched');
+          secondBtn.classList.add('is-matched');
+          firstBtn.setAttribute('aria-disabled', 'true');
+          secondBtn.setAttribute('aria-disabled', 'true');
+          firstBtn.setAttribute('aria-label', `Card ${firstIdx + 1}, matched: ${firstCard.name} ${firstCard.emoji}`);
+          secondBtn.setAttribute('aria-label', `Card ${secondIdx + 1}, matched: ${secondCard.name} ${secondCard.emoji}`);
+
+          // Spawn particle bursts from both matching cards
+          spawnMatchParticles(firstBtn, container);
+          spawnMatchParticles(secondBtn, container);
+        }
+
+        updateHUD();
+        announce(`Match found! ${firstCard.name}. Total moves: ${state.moves}.`);
+
+        if (state.matchedIndices.size === state.deck.length) {
+          handleWin();
+        }
+      } else {
+        // Mismatch Action
+        playMismatch();
+        state.locked = true;
+
+        if (firstBtn && secondBtn) {
+          firstBtn.classList.add('is-mismatch');
+          secondBtn.classList.add('is-mismatch');
+        }
+
+        announce(`Not a match. Cards flipping back.`);
+
+        state.mismatchTimeoutId = window.setTimeout(() => {
+          if (firstBtn && secondBtn) {
+            firstBtn.classList.remove('is-flipped', 'is-mismatch');
+            secondBtn.classList.remove('is-flipped', 'is-mismatch');
+            firstBtn.setAttribute('aria-label', `Card ${firstIdx + 1}, face down`);
+            secondBtn.setAttribute('aria-label', `Card ${secondIdx + 1}, face down`);
+          }
+          state.flippedIndices = [];
+          state.locked = false;
+        }, 800);
+      }
+    }
+  }
+
+  function handleWin(): void {
+    state.isWon = true;
+    clearAllTimersAndEffects();
+    playWin();
+
+    const isNewBest = saveBestScore(state.difficulty, {
+      moves: state.moves,
+      timeSeconds: state.elapsedSeconds,
+    });
+
+    updateHUD();
+
+    const container = document.getElementById('memory-game-card');
+    if (container) {
+      launchConfetti(container);
+    }
+
+    const winModal = document.getElementById('memory-win-modal');
+    const winStatMoves = document.getElementById('win-stat-moves');
+    const winStatTime = document.getElementById('win-stat-time');
+    const winBestBadge = document.getElementById('win-best-record-badge');
+    const playAgainBtn = document.getElementById('memory-play-again-btn');
+
+    if (winStatMoves) winStatMoves.textContent = String(state.moves);
+    if (winStatTime) winStatTime.textContent = formatTime(state.elapsedSeconds);
+
+    if (winBestBadge) {
+      if (isNewBest) {
+        winBestBadge.classList.remove('hidden');
+        winBestBadge.classList.add('inline-flex');
+      } else {
+        winBestBadge.classList.remove('inline-flex');
+        winBestBadge.classList.add('hidden');
+      }
+    }
+
+    if (winModal) {
+      winModal.classList.remove('hidden');
+    }
+
+    if (playAgainBtn) {
+      playAgainBtn.focus();
+    }
+
+    announce(
+      `Congratulations! You cleared the board in ${state.moves} moves and ${formatTime(state.elapsedSeconds)}.` +
+        (isNewBest ? ' New personal best record established!' : '')
+    );
+  }
+
+  function updateSoundUI(): void {
+    const soundBtn = document.getElementById('memory-sound-btn');
+    const iconOn = document.getElementById('sound-icon-on');
+    const iconOff = document.getElementById('sound-icon-off');
+
+    const muted = isMuted();
+
+    if (soundBtn) {
+      soundBtn.setAttribute('aria-pressed', String(muted));
+      soundBtn.setAttribute(
+        'aria-label',
+        muted ? 'Audio muted. Click to unmute' : 'Audio enabled. Click to mute'
+      );
+    }
+    if (iconOn && iconOff) {
+      iconOn.classList.toggle('hidden', muted);
+      iconOff.classList.toggle('hidden', !muted);
+    }
+  }
+
+  function initMemoryGame(): void {
+    const card = document.getElementById('memory-game-card');
+    if (!card) return;
+
+    // Initialize sound UI from saved preference
+    updateSoundUI();
+
+    // Attach card clicks via delegation
+    const grid = document.getElementById('memory-grid');
+    if (grid && !grid.dataset.initialized) {
+      grid.dataset.initialized = 'true';
+      grid.addEventListener('click', (event) => {
+        const target = event.target as HTMLElement | null;
+        if (!target) return;
+        const cardBtn = target.closest<HTMLButtonElement>('.memory-card');
+        if (!cardBtn || !grid.contains(cardBtn)) return;
+        const indexStr = cardBtn.dataset.index;
+        if (indexStr === undefined) return;
+        const index = parseInt(indexStr, 10);
+        if (!Number.isNaN(index)) {
+          handleCardClick(index);
+        }
+      });
+    }
+
+    // Attach sound toggle button
+    const soundBtn = document.getElementById('memory-sound-btn');
+    if (soundBtn) {
+      soundBtn.onclick = () => {
+        const nowMuted = toggleMute();
+        updateSoundUI();
+        announce(nowMuted ? 'Game sound muted' : 'Game sound unmuted');
+      };
+    }
+
+    // Attach difficulty buttons
+    const diffButtons = document.querySelectorAll<HTMLButtonElement>('[data-difficulty-btn]');
+    diffButtons.forEach((btn) => {
+      btn.onclick = () => {
+        const diff = btn.dataset.difficultyBtn as Difficulty | undefined;
+        if (diff && DIFFICULTIES[diff]) {
+          setDifficulty(diff);
+        }
+      };
+    });
+
+    // Attach restart button
+    const restartBtn = document.getElementById('memory-restart-btn');
+    if (restartBtn) {
+      restartBtn.onclick = () => {
+        resetGame();
+      };
+    }
+
+    // Attach play again button
+    const playAgainBtn = document.getElementById('memory-play-again-btn');
+    if (playAgainBtn) {
+      playAgainBtn.onclick = () => {
+        resetGame();
+      };
+    }
+
+    // Initial setup
+    resetGame();
+  }
+
+  // Handle standard DOM loading and Astro View Transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMemoryGame);
+  } else {
+    initMemoryGame();
+  }
+  document.addEventListener('astro:page-load', initMemoryGame);
+</script>
