@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import SeasonalBackground from '../components/SeasonalBackground.astro';
 import SeasonalAudio from '../components/SeasonalAudio.astro';
+import GhostlyHands from '../components/GhostlyHands.astro';
 import { getCurrentMonthKey } from '../lib/seasonalThemes';
 
 interface Props {
@@ -63,6 +64,9 @@ const activeSeason = getCurrentMonthKey();
 
     <!-- Ambient Soft Procedural Seasonal Melody Engine -->
     <SeasonalAudio />
+
+    <!-- Spooky Jump Scare: Creeping Ghostly Hands -->
+    <GhostlyHands />
 
     <!-- ═══════════════════════════════════════════════════════
          HEADER / NAVIGATION

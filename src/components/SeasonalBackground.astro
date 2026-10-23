@@ -112,8 +112,8 @@ const activeKey = getCurrentMonthKey();
       savedTheme = localStorage.getItem('arcadelab_seasonal_theme');
     } catch(err) {}
 
-    let currentThemeKey = (savedTheme && THEMES[savedTheme]) ? savedTheme : (liveMonthKey || 'sep');
-    let currentTheme = THEMES[currentThemeKey] || THEMES['sep'];
+    let currentThemeKey = (savedTheme && THEMES[savedTheme]) ? savedTheme : liveMonthKey;
+    let currentTheme = THEMES[currentThemeKey] || THEMES[liveMonthKey];
 
     // DOM Glow Elements
     const blob1 = document.getElementById('seasonal-glow-blob-1');
@@ -131,6 +131,9 @@ const activeKey = getCurrentMonthKey();
       document.documentElement.style.setProperty('--headline-gradient', theme.headlineGradient);
       document.documentElement.style.setProperty('--surface-tint', theme.colors.surfaceTint);
       document.documentElement.setAttribute('data-season-theme', theme.id);
+
+      const container = document.getElementById('seasonal-bg-container');
+      if (container) container.setAttribute('data-active-theme', theme.id);
 
       document.querySelectorAll('.seasonal-badge-text').forEach(el => {
         el.textContent = theme.badge;

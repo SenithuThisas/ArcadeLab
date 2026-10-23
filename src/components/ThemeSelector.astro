@@ -126,8 +126,7 @@ const currentTheme = getCurrentTheme();
     const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
     function getAutoMonthKey() {
-      const monthIdx = new Date().getMonth();
-      return MONTH_KEYS[monthIdx] || 'sep';
+      return MONTH_KEYS[new Date().getMonth()];
     }
 
     const btn = document.getElementById('theme-selector-btn');
@@ -164,7 +163,11 @@ const currentTheme = getCurrentTheme();
     if (saved && THEMES[saved]) {
       updateActiveUI(saved, false);
     } else {
-      updateActiveUI(getAutoMonthKey(), true);
+      const autoKey = getAutoMonthKey();
+      updateActiveUI(autoKey, true);
+      window.dispatchEvent(new CustomEvent('arcadelab-theme-change', {
+        detail: { themeKey: autoKey, isAuto: true }
+      }));
     }
 
     // Toggle Dropdown
