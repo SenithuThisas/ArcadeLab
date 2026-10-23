@@ -1,44 +1,44 @@
 ---
-// GhostlyHands.astro - Spooky Jump Scare Easter Egg with Creeping Spectral Hands
+// GhostlyHands.astro - Menacing Shadow Hands Jump Scare with Pitch-Black Sharp-Claw Hands
 ---
 
-<!-- Full-screen Non-blocking Spectral Hands Canvas -->
+<!-- Full-screen Non-blocking Shadow Hands Canvas -->
 <canvas
   id="ghostly-hands-canvas"
   class="fixed inset-0 pointer-events-none z-50 w-full h-full"
   aria-hidden="true"
 ></canvas>
 
-<!-- Spooky Dark Vignette Flash Overlay -->
+<!-- Pitch-Black Nightmare Vignette Flash Overlay -->
 <div
   id="ghostly-scare-vignette"
-  class="fixed inset-0 pointer-events-none z-40 opacity-0 transition-opacity duration-500"
+  class="fixed inset-0 pointer-events-none z-40 opacity-0 transition-opacity duration-300"
   aria-hidden="true"
 ></div>
 
 <style is:global>
-  @keyframes ghostlyScreenShake {
+  @keyframes scaryScreenShake {
     0% { transform: translate(0, 0); }
-    15% { transform: translate(-5px, 3px) rotate(-0.3deg); }
-    30% { transform: translate(4px, -4px) rotate(0.4deg); }
-    50% { transform: translate(-4px, -2px) rotate(-0.2deg); }
-    70% { transform: translate(3px, 3px) rotate(0.2deg); }
-    85% { transform: translate(-2px, 1px) rotate(-0.1deg); }
+    15% { transform: translate(-6px, 4px) rotate(-0.5deg); }
+    30% { transform: translate(5px, -5px) rotate(0.6deg); }
+    50% { transform: translate(-5px, -3px) rotate(-0.3deg); }
+    70% { transform: translate(4px, 4px) rotate(0.3deg); }
+    85% { transform: translate(-3px, 1px) rotate(-0.1deg); }
     100% { transform: translate(0, 0); }
   }
 
-  .ghostly-scare-shake {
-    animation: ghostlyScreenShake 0.28s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  .scary-scare-shake {
+    animation: scaryScreenShake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   }
 
   #ghostly-scare-vignette {
     background: radial-gradient(
       ellipse at center,
-      rgba(0, 0, 0, 0) 35%,
-      rgba(25, 7, 35, 0.65) 75%,
-      rgba(10, 0, 16, 0.95) 100%
+      rgba(0, 0, 0, 0) 18%,
+      rgba(5, 5, 8, 0.75) 55%,
+      rgba(0, 0, 0, 0.98) 85%
     );
-    box-shadow: inset 0 0 100px rgba(168, 85, 247, 0.35), inset 0 0 40px rgba(56, 219, 245, 0.25);
+    box-shadow: inset 0 0 160px rgba(0, 0, 0, 1), inset 0 0 80px rgba(10, 10, 15, 0.9);
   }
 </style>
 
@@ -48,12 +48,12 @@
     let scareAudioCtx = null;
     let isScareActive = false;
     let activeHands = [];
-    let smokeParticles = [];
+    let blackSmoke = [];
     let animFrameId = null;
 
     // Cooldown & Random Scare Thresholds
     let lastScareTimestamp = 0;
-    const SCARE_COOLDOWN_MS = 14000; // Minimum 14 seconds between scares
+    const SCARE_COOLDOWN_MS = 12000; // 12 seconds cooldown
     let clicksSinceLastScare = 0;
 
     const canvas = document.getElementById('ghostly-hands-canvas');
@@ -76,8 +76,8 @@
     resize();
     window.addEventListener('resize', resize);
 
-    // ── Procedural Spooky Jump Scare Web Audio ──────────────────────────────
-    function playJumpScareSound() {
+    // ── Dark Horror Jump Scare Sound Design (Sub Drop + Harsh Snap + Sinister Rasp) ──
+    function playScarySound() {
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (!AudioContextClass) return;
@@ -90,36 +90,51 @@
 
         const now = scareAudioCtx.currentTime;
         const master = scareAudioCtx.createGain();
-        master.gain.setValueAtTime(0.14, now);
+        master.gain.setValueAtTime(0.18, now);
         master.connect(scareAudioCtx.destination);
 
-        // 1. Low sinister shockwave rumble
+        // 1. Violent low-end bass impact / sub thump
         const subOsc = scareAudioCtx.createOscillator();
         const subGain = scareAudioCtx.createGain();
         subOsc.type = 'sawtooth';
-        subOsc.frequency.setValueAtTime(85, now);
-        subOsc.frequency.exponentialRampToValueAtTime(32, now + 0.35);
+        subOsc.frequency.setValueAtTime(110, now);
+        subOsc.frequency.exponentialRampToValueAtTime(26, now + 0.38);
 
         const subFilter = scareAudioCtx.createBiquadFilter();
         subFilter.type = 'lowpass';
-        subFilter.frequency.setValueAtTime(140, now);
-        subFilter.frequency.exponentialRampToValueAtTime(50, now + 0.35);
+        subFilter.frequency.setValueAtTime(160, now);
+        subFilter.frequency.exponentialRampToValueAtTime(40, now + 0.38);
 
-        subGain.gain.setValueAtTime(0.7, now);
-        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+        subGain.gain.setValueAtTime(0.9, now);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
         subOsc.connect(subFilter);
         subFilter.connect(subGain);
         subGain.connect(master);
         subOsc.start(now);
-        subOsc.stop(now + 0.4);
+        subOsc.stop(now + 0.42);
 
-        // 2. Ghostly Rasp / Spectral Gasp Noise Burst
-        const bufferSize = scareAudioCtx.sampleRate * 0.35;
+        // 2. Harsh snapping shadow claw noise burst (bone crunch / talon snap)
+        const snapOsc = scareAudioCtx.createOscillator();
+        const snapGain = scareAudioCtx.createGain();
+        snapOsc.type = 'triangle';
+        snapOsc.frequency.setValueAtTime(480, now);
+        snapOsc.frequency.exponentialRampToValueAtTime(70, now + 0.08);
+
+        snapGain.gain.setValueAtTime(0.8, now);
+        snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+        snapOsc.connect(snapGain);
+        snapGain.connect(master);
+        snapOsc.start(now);
+        snapOsc.stop(now + 0.1);
+
+        // 3. Menacing hollow gasp / whisper whoosh
+        const bufferSize = Math.floor(scareAudioCtx.sampleRate * 0.4);
         const noiseBuffer = scareAudioCtx.createBuffer(1, bufferSize, scareAudioCtx.sampleRate);
         const output = noiseBuffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
-          output[i] = Math.random() * 2 - 1;
+          output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (scareAudioCtx.sampleRate * 0.14));
         }
 
         const whiteNoise = scareAudioCtx.createBufferSource();
@@ -127,70 +142,37 @@
 
         const noiseFilter = scareAudioCtx.createBiquadFilter();
         noiseFilter.type = 'bandpass';
-        noiseFilter.frequency.setValueAtTime(1600, now);
-        noiseFilter.frequency.exponentialRampToValueAtTime(380, now + 0.3);
-        noiseFilter.Q.setValueAtTime(3.8, now);
+        noiseFilter.frequency.setValueAtTime(1400, now);
+        noiseFilter.frequency.exponentialRampToValueAtTime(280, now + 0.32);
+        noiseFilter.Q.setValueAtTime(4.5, now);
 
         const noiseGain = scareAudioCtx.createGain();
         noiseGain.gain.setValueAtTime(0.01, now);
-        noiseGain.gain.linearRampToValueAtTime(0.85, now + 0.04);
-        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        noiseGain.gain.linearRampToValueAtTime(0.9, now + 0.03);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
 
         whiteNoise.connect(noiseFilter);
         noiseFilter.connect(noiseGain);
         noiseGain.connect(master);
         whiteNoise.start(now);
-        whiteNoise.stop(now + 0.38);
-
-        // 3. Eerie Dissonant Screech (Devil's interval tritone)
-        const osc1 = scareAudioCtx.createOscillator();
-        const osc2 = scareAudioCtx.createOscillator();
-        const dissGain = scareAudioCtx.createGain();
-
-        osc1.type = 'sawtooth';
-        osc2.type = 'triangle';
-        osc1.frequency.setValueAtTime(630, now);
-        osc1.frequency.exponentialRampToValueAtTime(260, now + 0.32);
-        osc2.frequency.setValueAtTime(890, now);
-        osc2.frequency.exponentialRampToValueAtTime(370, now + 0.32);
-
-        dissGain.gain.setValueAtTime(0.01, now);
-        dissGain.gain.linearRampToValueAtTime(0.35, now + 0.03);
-        dissGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-
-        osc1.connect(dissGain);
-        osc2.connect(dissGain);
-        dissGain.connect(master);
-
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + 0.36);
-        osc2.stop(now + 0.36);
-      } catch (err) {
-        // Audio policy or device limitation fallback
-      }
+        whiteNoise.stop(now + 0.4);
+      } catch (err) {}
     }
 
-    // ── Procedural Ghostly Hand Model ───────────────────────────────────────
-    // Generates a creepy skeletal phantom hand with jointed clawed fingers
-    function createGhostHand(targetX, targetY, sideAngle, delay = 0) {
-      // Spawn from off-screen or far margin along the given angle
-      const spawnDist = Math.max(width, height) * 0.45 + 120;
+    // ── Spindly Dark Shadow Hand with Wicked Sharp Talons ────────────────────
+    function createDarkHand(targetX, targetY, sideAngle, delay = 0) {
+      const spawnDist = Math.max(width, height) * 0.42 + 160;
       const startX = targetX + Math.cos(sideAngle) * spawnDist;
       const startY = targetY + Math.sin(sideAngle) * spawnDist;
 
-      // Finger specs: lengths and relative spread angles from wrist
+      // Elongated skeletal finger bones with sharp hooked claws
       const fingers = [
-        { name: 'thumb',  spread: -0.52, lengths: [22, 18],     width: 5.5 },
-        { name: 'index',  spread: -0.25, lengths: [28, 22, 17], width: 5.0 },
-        { name: 'middle', spread: 0.00,  lengths: [32, 25, 19], width: 5.2 },
-        { name: 'ring',   spread: 0.24,  lengths: [29, 23, 17], width: 4.8 },
-        { name: 'pinky',  spread: 0.48,  lengths: [21, 16, 14], width: 4.0 }
+        { name: 'thumb',  spread: -0.58, lengths: [24, 20],         baseWidth: 6.0, clawLen: 28, clawCurve: 0.70 },
+        { name: 'index',  spread: -0.28, lengths: [32, 26, 22],     baseWidth: 5.5, clawLen: 34, clawCurve: 0.85 },
+        { name: 'middle', spread: 0.00,  lengths: [38, 30, 24],     baseWidth: 5.8, clawLen: 38, clawCurve: 0.90 },
+        { name: 'ring',   spread: 0.27,  lengths: [34, 28, 22],     baseWidth: 5.2, clawLen: 35, clawCurve: 0.85 },
+        { name: 'pinky',  spread: 0.55,  lengths: [25, 20, 18],     baseWidth: 4.5, clawLen: 30, clawCurve: 0.75 }
       ];
-
-      const palette = Math.random() > 0.5
-        ? { glow: '#c084fc', core: '#e9d5ff', dark: '#581c87', mist: 'rgba(192, 132, 252, ' }
-        : { glow: '#38dbf5', core: '#cffafe', dark: '#0e7490', mist: 'rgba(56, 219, 245, ' };
 
       return {
         startX,
@@ -203,150 +185,194 @@
         progress: 0,
         grasp: 0,
         alpha: 0,
-        palette,
         fingers,
-        scale: 0.95 + Math.random() * 0.35,
-        clawCurve: 0.4 + Math.random() * 0.3,
-        twitch: 0
+        scale: 1.05 + Math.random() * 0.35,
+        wristWobble: Math.random() * Math.PI * 2
       };
     }
 
-    // ── Render a Single Ghostly Hand ─────────────────────────────────────────
-    function drawGhostHand(ctx, hand) {
-      const { currentX, currentY, targetX, targetY, grasp, alpha, palette, fingers, scale } = hand;
+    // ── Draw Dark Shadow Hand with Wicked Sharp Black Nails ─────────────────
+    function drawDarkHand(ctx, hand) {
+      const { currentX, currentY, targetX, targetY, grasp, alpha, fingers, scale } = hand;
       if (alpha <= 0.01) return;
 
       ctx.save();
       ctx.translate(currentX, currentY);
 
-      // Angle of reach towards target
+      // Angle facing directly towards target point
       const angle = Math.atan2(targetY - currentY, targetX - currentX);
       ctx.rotate(angle);
       ctx.scale(scale, scale);
 
       ctx.globalAlpha = Math.min(alpha, 1);
-      ctx.shadowColor = palette.glow;
-      ctx.shadowBlur = 18;
 
-      // 1. Wispy Ethereal Forearm / Wrist Tendrils
-      const armGrad = ctx.createLinearGradient(-140, 0, 0, 0);
+      // Deep, pitch-black shadow outline & dark aura (no colorful glows!)
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+      ctx.shadowBlur = 24;
+
+      // 1. Forearm / Wrist: Pitch-black shadow tendrils fading from darkness
+      const armGrad = ctx.createLinearGradient(-180, 0, 0, 0);
       armGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      armGrad.addColorStop(0.3, palette.mist + '0.15)');
-      armGrad.addColorStop(0.7, palette.mist + '0.45)');
-      armGrad.addColorStop(1, palette.core);
+      armGrad.addColorStop(0.35, 'rgba(5, 5, 8, 0.85)');
+      armGrad.addColorStop(0.75, 'rgba(10, 10, 14, 0.98)');
+      armGrad.addColorStop(1, '#050508');
 
       ctx.fillStyle = armGrad;
       ctx.beginPath();
-      ctx.moveTo(-130, -18);
-      ctx.bezierCurveTo(-80, -32, -30, -22, -10, -16);
-      ctx.lineTo(-10, 16);
-      ctx.bezierCurveTo(-30, 22, -80, 32, -130, 18);
+      ctx.moveTo(-170, -22);
+      ctx.bezierCurveTo(-110, -36, -50, -28, -12, -20);
+      ctx.lineTo(-12, 20);
+      ctx.bezierCurveTo(-50, 28, -110, 36, -170, 22);
       ctx.closePath();
       ctx.fill();
 
-      // Shadow carpal bones on wrist
-      ctx.strokeStyle = palette.dark;
-      ctx.lineWidth = 1.6;
+      // Shadowy Carpal Tendons / Veins
+      ctx.strokeStyle = '#181822';
+      ctx.lineWidth = 2.2;
       ctx.beginPath();
-      ctx.moveTo(-70, -6);
-      ctx.lineTo(-15, -4);
-      ctx.moveTo(-70, 6);
-      ctx.lineTo(-15, 4);
+      ctx.moveTo(-110, -8);
+      ctx.lineTo(-20, -6);
+      ctx.moveTo(-110, 8);
+      ctx.lineTo(-20, 6);
+      ctx.moveTo(-90, 0);
+      ctx.lineTo(-15, 0);
       ctx.stroke();
 
-      // 2. Ghostly Palm Structure
-      const palmGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, 28);
-      palmGrad.addColorStop(0, '#ffffff');
-      palmGrad.addColorStop(0.5, palette.core);
-      palmGrad.addColorStop(1, palette.mist + '0.25)');
+      // Faint ash rim on top edge of wrist for dark contrast
+      ctx.strokeStyle = 'rgba(140, 140, 155, 0.25)';
+      ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.moveTo(-150, -21);
+      ctx.bezierCurveTo(-90, -32, -40, -24, -12, -19);
+      ctx.stroke();
+
+      // 2. Palm: Jet Black Skeletal Silhouette with Bony Knuckle Ridges
+      const palmGrad = ctx.createRadialGradient(-2, 0, 4, 0, 0, 32);
+      palmGrad.addColorStop(0, '#020204');
+      palmGrad.addColorStop(0.65, '#09090d');
+      palmGrad.addColorStop(1, '#020204');
 
       ctx.fillStyle = palmGrad;
       ctx.beginPath();
-      ctx.ellipse(-4, 0, 22, 17, 0, 0, Math.PI * 2);
+      ctx.ellipse(-4, 0, 24, 19, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Translucent inner palm glow
-      ctx.fillStyle = palette.glow;
-      ctx.beginPath();
-      ctx.arc(-2, 0, 9, 0, Math.PI * 2);
-      ctx.fill();
+      // Sharp shadow ridge contour
+      ctx.strokeStyle = '#1a1a22';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
 
-      // 3. Skeletal Jointed Fingers with Creeping Curved Claws
+      // 3. Spindly Dark Fingers with Razor-Sharp Sickle Nails
       fingers.forEach((f) => {
-        let curX = 14;
-        let curY = f.spread * 22;
-        let segAngle = f.spread * (1 - grasp * 0.55);
+        let curX = 16;
+        let curY = f.spread * 24;
+        let segAngle = f.spread * (1 - grasp * 0.7);
 
         ctx.save();
+
+        // Draw articulated bone phalanges
         f.lengths.forEach((len, idx) => {
-          // As grasp increases, fingers articulate and hook viciously inward
-          const bend = grasp * (0.35 + idx * 0.45);
-          segAngle += bend * (f.spread < 0 ? -0.2 : 0.2);
+          // As grasp increases, fingers curl aggressively like a predatory spider clutching inward
+          const curlAmount = grasp * (0.45 + idx * 0.55);
+          segAngle += curlAmount * (f.spread < 0 ? -0.25 : 0.25);
 
           const nextX = curX + Math.cos(segAngle) * len;
           const nextY = curY + Math.sin(segAngle) * len;
 
-          // Draw bone phalanx segment
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = Math.max(1.8, f.width - idx * 1.1);
+          const segWidth = Math.max(2.2, f.baseWidth - idx * 1.1);
+
+          // Deep Black Bone Shaft
+          ctx.strokeStyle = '#050508';
+          ctx.lineWidth = segWidth + 2.0;
           ctx.lineCap = 'round';
           ctx.beginPath();
           ctx.moveTo(curX, curY);
           ctx.lineTo(nextX, nextY);
           ctx.stroke();
 
-          // Outer phantom wisp along the bone
-          ctx.strokeStyle = palette.mist + '0.45)';
-          ctx.lineWidth = f.width + 2.5;
+          // Subtle bone core definition (charcoal gray so joints and shape are scary and visible)
+          ctx.strokeStyle = '#181820';
+          ctx.lineWidth = Math.max(1.5, segWidth - 1.2);
           ctx.beginPath();
           ctx.moveTo(curX, curY);
           ctx.lineTo(nextX, nextY);
           ctx.stroke();
 
-          // Knuckle joint sphere
-          ctx.fillStyle = palette.core;
+          // Fine silvery-ash edge highlight on top edge of finger
+          ctx.strokeStyle = 'rgba(160, 160, 175, 0.3)';
+          ctx.lineWidth = 0.8;
           ctx.beginPath();
-          ctx.arc(curX, curY, f.width * 0.55, 0, Math.PI * 2);
+          ctx.moveTo(curX, curY - segWidth * 0.4);
+          ctx.lineTo(nextX, nextY - segWidth * 0.4);
+          ctx.stroke();
+
+          // Knuckle joint bulge (spindly skeletal bumps)
+          ctx.fillStyle = '#0a0a0f';
+          ctx.beginPath();
+          ctx.arc(curX, curY, segWidth * 0.65, 0, Math.PI * 2);
           ctx.fill();
+
+          ctx.strokeStyle = '#252530';
+          ctx.lineWidth = 0.9;
+          ctx.stroke();
 
           curX = nextX;
           curY = nextY;
         });
 
-        // Sharp Ghostly Claw at the tip
-        const clawAngle = segAngle + (0.55 + hand.clawCurve) * (grasp > 0.3 ? 1.2 : 0.6);
-        const clawLen = 14 + grasp * 5;
-        const tipX = curX + Math.cos(clawAngle) * clawLen;
-        const tipY = curY + Math.sin(clawAngle) * clawLen;
+        // ── 4. TERRIFYING LONG SCARY SHARP BLACK NAILS / CLAWS ──
+        // Long, wicked, curved talon like a vulture or demon claw
+        const clawCurve = f.clawCurve;
+        const totalClawLen = f.clawLen + grasp * 12;
+        const clawAngle = segAngle + (0.55 + clawCurve * 0.8) * (grasp > 0.25 ? 1.4 : 0.7);
 
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.8;
-        ctx.beginPath();
-        ctx.moveTo(curX, curY);
-        ctx.quadraticCurveTo(
-          curX + Math.cos(clawAngle - 0.3) * (clawLen * 0.6),
-          curY + Math.sin(clawAngle - 0.3) * (clawLen * 0.6),
-          tipX,
-          tipY
-        );
-        ctx.stroke();
+        // Control points for hooked sickle talon shape
+        const tipX = curX + Math.cos(clawAngle) * totalClawLen;
+        const tipY = curY + Math.sin(clawAngle) * totalClawLen;
+        const hookBackX = curX + Math.cos(clawAngle - 0.45) * (totalClawLen * 0.65);
+        const hookBackY = curY + Math.sin(clawAngle - 0.45) * (totalClawLen * 0.65);
 
-        // Tip starlight ember glint
-        ctx.fillStyle = '#ffffff';
+        // Solid Pitch Black Claw Body
+        ctx.fillStyle = '#000000';
         ctx.beginPath();
-        ctx.arc(tipX, tipY, 1.6, 0, Math.PI * 2);
+        ctx.moveTo(curX, curY - 2.5);
+        ctx.quadraticCurveTo(hookBackX, hookBackY - 3, tipX, tipY); // Top razor curve
+        ctx.quadraticCurveTo(hookBackX - 1, hookBackY + 2, curX, curY + 2.5); // Bottom inner curve
+        ctx.closePath();
         ctx.fill();
 
-        // Ectoplasm spark emitter
-        if (Math.random() < 0.22 && hand.alpha > 0.4) {
-          smokeParticles.push({
-            x: currentX + Math.cos(angle) * curX - Math.sin(angle) * curY,
-            y: currentY + Math.sin(angle) * curX + Math.cos(angle) * curY,
-            vx: (Math.random() - 0.5) * 1.5,
-            vy: -0.6 - Math.random() * 1.2,
-            size: 2.5 + Math.random() * 3.5,
-            color: palette.glow,
-            alpha: 0.8
+        // Dark charcoal talon texture line
+        ctx.strokeStyle = '#1b1b24';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(curX + 2, curY);
+        ctx.quadraticCurveTo(hookBackX, hookBackY, tipX, tipY);
+        ctx.stroke();
+
+        // Lethal Razor Needle Edge on Claw: cold glint highlight along the top cutting curve
+        ctx.strokeStyle = 'rgba(230, 235, 245, 0.85)';
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.moveTo(hookBackX, hookBackY - 2.5);
+        ctx.lineTo(tipX, tipY);
+        ctx.stroke();
+
+        // Needle Point Tip (razor-sharp stiletto glint)
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(tipX, tipY, 1.0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Black smoke & dark ash emission from sharp claws
+        if (Math.random() < 0.28 && hand.alpha > 0.35) {
+          blackSmoke.push({
+            x: currentX + Math.cos(angle) * tipX - Math.sin(angle) * tipY,
+            y: currentY + Math.sin(angle) * tipX + Math.cos(angle) * tipY,
+            vx: (Math.random() - 0.5) * 1.8,
+            vy: -0.5 - Math.random() * 1.4,
+            size: 3 + Math.random() * 5,
+            color: Math.random() > 0.5 ? 'rgba(5, 5, 8, ' : 'rgba(20, 20, 26, ',
+            alpha: 0.85
           });
         }
 
@@ -356,15 +382,15 @@
       ctx.restore();
     }
 
-    // ── Animation Loop ───────────────────────────────────────────────────────
+    // ── Animation Loop (Predatory Lunge -> Violent Grab -> Dissolve) ─────────
     function stepScareAnimation(timestamp) {
       ctx.clearRect(0, 0, width, height);
 
       let anyAlive = false;
 
-      // Update & Draw Ghostly Hands
+      // Update & Draw Shadow Hands
       activeHands.forEach((hand) => {
-        hand.progress += 0.038;
+        hand.progress += 0.042; // Fast, startling attack
 
         if (hand.progress < 0) {
           anyAlive = true;
@@ -373,59 +399,63 @@
 
         const p = hand.progress;
 
-        // Phase 1: Rapid lunge towards target (0.0 -> 0.4)
-        if (p < 0.4) {
-          const t = p / 0.4;
-          const ease = Math.sin((t * Math.PI) / 2); // Snappy smooth lunge
-          hand.currentX = hand.startX + (hand.targetX - hand.startX) * ease * 0.88;
-          hand.currentY = hand.startY + (hand.targetY - hand.startY) * ease * 0.88;
-          hand.alpha = Math.min(1, t * 1.6);
-          hand.grasp = t * 0.35;
+        // Phase 1: Sudden rapid lunge from darkness towards target (0.0 -> 0.38)
+        if (p < 0.38) {
+          const t = p / 0.38;
+          // Aggressive explosive acceleration
+          const ease = Math.pow(t, 2.5);
+          hand.currentX = hand.startX + (hand.targetX - hand.startX) * (0.2 + ease * 0.72);
+          hand.currentY = hand.startY + (hand.targetY - hand.startY) * (0.2 + ease * 0.72);
+          hand.alpha = Math.min(1, t * 2.2);
+          hand.grasp = t * 0.25; // Fingers splayed wide, ready to clutch
           anyAlive = true;
         }
-        // Phase 2: Creeping claw clutch & tremble at target (0.4 -> 0.65)
+        // Phase 2: Violent Grasp! Sharp claws snap shut at target with terrifying tremor (0.38 -> 0.65)
         else if (p < 0.65) {
-          const t = (p - 0.4) / 0.25;
-          hand.currentX = hand.startX + (hand.targetX - hand.startX) * (0.88 + t * 0.12);
-          hand.currentY = hand.startY + (hand.targetY - hand.startY) * (0.88 + t * 0.12);
-          // Eerie twitch jitter
-          hand.currentX += (Math.random() - 0.5) * 4;
-          hand.currentY += (Math.random() - 0.5) * 4;
+          const t = (p - 0.38) / 0.27;
+          hand.currentX = hand.startX + (hand.targetX - hand.startX) * (0.92 + t * 0.08);
+          hand.currentY = hand.startY + (hand.targetY - hand.startY) * (0.92 + t * 0.08);
+
+          // Predatory claw grasp snaps shut
+          hand.grasp = 0.25 + Math.min(1, t * 1.4) * 0.75;
+
+          // Violent predatory shudder / struggle jitter
+          hand.currentX += (Math.random() - 0.5) * 5;
+          hand.currentY += (Math.random() - 0.5) * 5;
           hand.alpha = 1.0;
-          hand.grasp = 0.35 + t * 0.65; // Clutches tight
           anyAlive = true;
         }
-        // Phase 3: Dissolve into smoky mist (0.65 -> 1.0)
+        // Phase 3: Dissolve into swirling black ash and shadowy smoke (0.65 -> 1.0)
         else if (p <= 1.0) {
           const t = (p - 0.65) / 0.35;
-          hand.alpha = Math.max(0, 1.0 - t * 1.2);
+          hand.alpha = Math.max(0, 1.0 - t * 1.4);
           hand.grasp = 1.0;
-          hand.currentY -= 0.8; // Drifts upward as smoke
+          hand.currentY -= 1.2; // Dissolving upward into shadow
           anyAlive = hand.alpha > 0.02;
         }
 
-        drawGhostHand(ctx, hand);
+        drawDarkHand(ctx, hand);
       });
 
-      // Update & Draw Smoke Particles
-      for (let i = smokeParticles.length - 1; i >= 0; i--) {
-        const sp = smokeParticles[i];
+      // Update & Draw Pitch-Black Smoke Tendrils
+      for (let i = blackSmoke.length - 1; i >= 0; i--) {
+        const sp = blackSmoke[i];
         sp.x += sp.vx;
         sp.y += sp.vy;
-        sp.alpha -= 0.022;
-        sp.size += 0.15;
+        sp.alpha -= 0.026;
+        sp.size += 0.25;
 
         if (sp.alpha <= 0) {
-          smokeParticles.splice(i, 1);
+          blackSmoke.splice(i, 1);
           continue;
         }
 
         anyAlive = true;
         ctx.save();
         ctx.globalAlpha = Math.max(0, sp.alpha);
-        ctx.fillStyle = sp.color;
-        ctx.shadowColor = sp.color;
-        ctx.shadowBlur = 8;
+        ctx.fillStyle = sp.color + sp.alpha + ')';
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
         ctx.fill();
@@ -435,58 +465,57 @@
       if (anyAlive) {
         animFrameId = requestAnimationFrame(stepScareAnimation);
       } else {
-        // Animation finished: clean up and return to zero CPU usage
+        // Scare complete: reset canvas to zero CPU usage
         isScareActive = false;
         activeHands = [];
-        smokeParticles = [];
+        blackSmoke = [];
         ctx.clearRect(0, 0, width, height);
         if (vignette) vignette.style.opacity = '0';
         animFrameId = null;
       }
     }
 
-    // ── Trigger the Jump Scare ───────────────────────────────────────────────
+    // ── Trigger the Dark Jump Scare ──────────────────────────────────────────
     function triggerJumpScare(clickX, clickY) {
       if (isScareActive) return;
       isScareActive = true;
       lastScareTimestamp = Date.now();
       clicksSinceLastScare = 0;
 
-      // 1. Play eerie jump scare sound
-      playJumpScareSound();
+      // 1. Play terrifying dark horror sound
+      playScarySound();
 
-      // 2. Physical screen shake on body
-      document.body.classList.remove('ghostly-scare-shake');
-      // Reflow to restart animation reliably
-      void document.body.offsetWidth;
-      document.body.classList.add('ghostly-scare-shake');
+      // 2. Violent physical screen shake on body
+      document.body.classList.remove('scary-scare-shake');
+      void document.body.offsetWidth; // Force CSS reflow
+      document.body.classList.add('scary-scare-shake');
       setTimeout(() => {
-        document.body.classList.remove('ghostly-scare-shake');
-      }, 300);
+        document.body.classList.remove('scary-scare-shake');
+      }, 320);
 
-      // 3. Dark nightmare vignette flash
+      // 3. Pitch-black nightmare darkness flash
       if (vignette) {
-        vignette.style.opacity = '0.85';
+        vignette.style.opacity = '0.92';
         setTimeout(() => {
           vignette.style.opacity = '0';
-        }, 360);
+        }, 420);
       }
 
-      // 4. Generate 2 to 3 creeping hands lunging from different angles
+      // 4. Generate 2 to 3 pitch-black hands grabbing inward at click point
       activeHands = [];
       const handCount = Math.random() > 0.4 ? 3 : 2;
 
-      // Select random angles around the click (bottom-left, bottom-right, sides)
+      // Ambush angles from surrounding shadows
       const baseAngles = [
-        Math.PI * 0.35 + (Math.random() - 0.5) * 0.3, // bottom right
-        Math.PI * 0.75 + (Math.random() - 0.5) * 0.3, // bottom left
-        -Math.PI * 0.2 + (Math.random() - 0.5) * 0.3  // right side
+        Math.PI * 0.38 + (Math.random() - 0.5) * 0.25,  // bottom right
+        Math.PI * 0.72 + (Math.random() - 0.5) * 0.25,  // bottom left
+        -Math.PI * 0.18 + (Math.random() - 0.5) * 0.25  // side
       ];
 
       for (let i = 0; i < handCount; i++) {
         const angle = baseAngles[i % baseAngles.length];
-        const delay = i * 0.04; // Micro-staggered strike
-        activeHands.push(createGhostHand(clickX, clickY, angle, delay));
+        const delay = i * 0.035;
+        activeHands.push(createDarkHand(clickX, clickY, angle, delay));
       }
 
       if (!animFrameId) {
@@ -504,20 +533,15 @@
         return;
       }
 
-      // Respect current seasonal theme:
-      // Spooky Haunt (Halloween / Oct) has the highest jump scare excitement.
-      // Other themes have a rare easter egg probability.
+      // Active theme check (Spooky Haunt has prime priority)
       const currentTheme =
         document.documentElement.getAttribute('data-season-theme') ||
         ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][new Date().getMonth()];
 
       const isSpookyTheme = currentTheme === 'oct' || currentTheme === 'halloween';
 
-      // Probability calculation:
-      // In October/Halloween: ~18% chance (approx 1 in 5-6 clicks after cooldown)
-      // If user has clicked more than 10 times since last scare, guarantee higher chance
-      const baseChance = isSpookyTheme ? 0.18 : 0.08;
-      const boostedChance = clicksSinceLastScare >= 10 ? 0.50 : baseChance;
+      const baseChance = isSpookyTheme ? 0.20 : 0.08;
+      const boostedChance = clicksSinceLastScare >= 8 ? 0.55 : baseChance;
 
       if (Math.random() < boostedChance) {
         const x = e.clientX || width / 2;
@@ -528,8 +552,8 @@
 
     document.addEventListener('click', onDocumentClick, { capture: true, passive: true });
 
-    // Expose programmatic trigger for testing or console fun:
-    // window.triggerGhostlyJumpScare()
+    // Expose programmatic trigger for instant test / demo:
+    // window.triggerGhostlyJumpScare(x, y)
     window.triggerGhostlyJumpScare = function (x, y) {
       triggerJumpScare(x !== undefined ? x : width / 2, y !== undefined ? y : height / 2);
     };
