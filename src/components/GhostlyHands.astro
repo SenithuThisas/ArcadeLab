@@ -528,14 +528,24 @@
         return;
       }
 
-      // Active theme check (Spooky Haunt has prime priority)
-      const currentTheme =
-        document.documentElement.getAttribute('data-season-theme') ||
-        ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][new Date().getMonth()];
+      // Strictly ONLY for the Halloween / Spooky Haunt theme
+      let activeThemeKey = null;
+      try {
+        activeThemeKey = localStorage.getItem('arcadelab_seasonal_theme');
+      } catch (e) {}
 
-      const isSpookyTheme = currentTheme === 'oct' || currentTheme === 'halloween';
+      if (!activeThemeKey) {
+        activeThemeKey =
+          document.documentElement.getAttribute('data-season-theme') ||
+          ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][new Date().getMonth()];
+      }
 
-      const baseChance = isSpookyTheme ? 0.25 : 0.10;
+      const isHalloweenTheme = activeThemeKey === 'oct' || activeThemeKey === 'halloween';
+      if (!isHalloweenTheme) {
+        return; // Strictly disabled for all other seasons and themes
+      }
+
+      const baseChance = 0.25;
       const boostedChance = clicksSinceLastScare >= 4 ? 0.85 : baseChance;
 
       if (Math.random() < boostedChance) {
